@@ -43,6 +43,9 @@
 		"sensiolabs/security-checker": "^4.1",
 		"symfony/polyfill-intl-normalizer": "*"
 	},
+	"replace" : {
+		"sjorek/unicode-normalization-stream-filter" : "*"
+	},
 	"suggest" : {
 		"ext-intl" : "This stream filter can use 'intl'-extension's native Normalizer-implementation to provide unicode-normalization in preference of the suggested php-based 'symfony/polyfill-intl-normalizer' or 'patchwork/utf8'package",
 		"ext-iconv" : "This stream filter can use a php-based implementation utilizing 'iconv'-extension and one of the other three Normalizer-implementations to provide a special unicode-normalization for HFS+ filesystems",
