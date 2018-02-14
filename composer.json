@@ -64,6 +64,9 @@
 		"unicode-normalization:security-check": [
 			"security-checker security:check --ansi"
 		],
+		"unicode-normalization:security-check-bugfix-for-travis": [
+			"security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
+		],
 		"unicode-normalization:update-test-fixtures": "@php build/scripts/updateUnicodeNormalizationTestFixtures.php"
 	}
 }

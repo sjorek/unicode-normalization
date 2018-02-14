@@ -58,7 +58,7 @@ script:
     composer unicode-normalization:test;
   fi
 - if [[ $CHECK_SECURITY = true ]]; then
-    composer -v unicode-normalization:security-check;
+    composer -v unicode-normalization:security-check-bugfix-for-travis;
   fi
 
 sudo: false
