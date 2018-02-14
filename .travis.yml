@@ -1,0 +1,73 @@
+language: php
+
+git:
+  depth: 50
+
+matrix:
+  include:
+    - php: 7.0
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
+    - php: 7.0
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
+    - php: 7.0
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
+    - php: 7.1
+      env: LINT=true CHECK_SECURITY=true UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
+    - php: 7.1
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
+    - php: 7.1
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
+    - php: 7.2
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
+    - php: 7.2
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
+    - php: 7.2
+      env: UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
+    - php: nightly
+      env: NIGHTLY=true UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
+    - php: nightly
+      env: NIGHTLY=true UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
+    - php: nightly
+      env: NIGHTLY=true UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
+  allow_failures:
+    - php: nightly
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+    - $HOME/.php-cs-fixer
+
+install:
+- phpenv config-rm xdebug.ini || true
+- travis_retry composer self-update
+- if [[ $NIGHTLY = true ]]; then
+    composer remove --dev friendsofphp/php-cs-fixer;
+    composer validate;
+  fi
+- travis_retry composer install --no-interaction
+- travis_retry composer dump-autoload --optimize
+
+script:
+- if [[ $LINT = true ]]; then
+    composer validate;
+    composer unicode-normalization:cs-lint;
+  fi
+- if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+    composer unicode-normalization:test-all;
+  else
+    composer unicode-normalization:test;
+  fi
+- if [[ $CHECK_SECURITY = true ]]; then
+    composer -v unicode-normalization:security-check;
+  fi
+
+sudo: false
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+  slack:
+    on_success: always
+    on_failure: always
+    secure: EIArU4j71+9CBEwVsvwuqeKYG3JrVtCOy5msAgmMoV+WCe+xnpb1N78tNv9UIzT4EJgpFzam1y37sGsyCG8krN0X2fDfoLp6NT7MKx5S8x+3iv/TckCyrzCiltb55dLBkjc+b7RWcy6pBz+g8UP2qvl+Q9uVKSg2z/E+Rl9/udpgHA9r6KA6yMen+tT/0ik7/rhCXrGxg+Lhx6przg//dmWdNb5oMTJnWQ+uOkK6YYTTeonFLhLV7xM/TM1X/U6zhHk4w6xU+pa0d/pOIgwYD6kVRB55IV0jHCdiwHIEEuzdFPQ3vDMu7c3C+eXvlrq9qRSNKpaOu2AoToe9cFZSonoks5Ti8jDOJZmBzl0ydDIJclJdWz8t7cYlh7Cxmm0VBFVBTk+cC0SK2mR6AicvTOUwb41ZhR8Wl40OuKtzQZIAl2LlMD6JVipkJ/z8jqI5kLfg3rflnvoUKmig7/MC4FI3Vuq9SUl4oWMviLCikSyG9GnutG/A2gamJ4qzS62UZtKVPHDZ+26sGNHz+4/ALoWpZtJVT3/E5B7ekk8eC2KKLk6L0jSIgpUYlDBkhhthYMu8Sor8DesN46HlaID70vJxWaPbDwNPymFe38qES2kZBFlnZbxlppOV9FLEImGRUxuo/1Gpg/6zESzTYGN28BXiWrO4NUbHKxrjuSk0Z8I=
