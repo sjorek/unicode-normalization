@@ -9,28 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests;
+namespace Sjorek\UnicodeNormalization\Conformance;
+
+use Sjorek\UnicodeNormalization\Utility;
 
 /**
- * An iterator to import "UnicodeNormalizationTest.X.Y.Z.txt" files from www.unicode.org.
+ * An iterator to update "UnicodeNormalizationTest.X.Y.Z.txt" files from www.unicode.org.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class UnicodeNormalizationTestUpdater implements \IteratorAggregate
+class NormalizationTestUpdater implements \IteratorAggregate
 {
-    public static function setup()
-    {
-        if (!extension_loaded('iconv')) {
-            die('Missing "iconv" extension.' . chr(10));
-        }
-
-        $nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
-        $mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
-        if ($mac !== @iconv('utf-8', 'utf-8-mac', $nfc) || $nfc !== @iconv('utf-8-mac', 'utf-8', $mac)) {
-            die('Loadded "iconv" extension is not able to handle NFD_MAC.' . chr(10));
-        }
-    }
-
     /**
      * @var \Iterator
      */
@@ -45,9 +34,22 @@ class UnicodeNormalizationTestUpdater implements \IteratorAggregate
      * Constructor
      *
      * @param $unicodeVersion string
+     * @throws \RuntimeException
      */
     public function __construct($unicodeVersion)
     {
+        if (!extension_loaded('mbstring'))
+        {
+            throw new \RuntimeException('The required extension "mbstring" is not loaded');
+        }
+
+        if (!Utility::appleIconvIsAvailable())
+        {
+            throw new \RuntimeException(
+                'The required extension "iconv" is either not loaded or not able to handle NFD_MAC'
+            );
+        }
+
         $sourceTemplate = 'https://www.unicode.org/Public/%s/ucd/NormalizationTest.txt';
         $this->source = sprintf($sourceTemplate, $unicodeVersion);
         $this->iterator = new \NoRewindIterator(new \SplFileObject($this->source, 'r', false));
@@ -99,7 +101,7 @@ class UnicodeNormalizationTestUpdater implements \IteratorAggregate
                             if ($m === false) {
                                 throw new \Exception(
                                     sprintf(
-                                        'Could not create NFD_MAC in line %s of: %s' . chr(10),
+                                        'Could not create NFD_MAC in line %s of: %s' . PHP_EOL,
                                         $lineNumber,
                                         $this->source
                                     )

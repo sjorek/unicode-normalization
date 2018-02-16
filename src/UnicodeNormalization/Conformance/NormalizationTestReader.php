@@ -9,14 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests;
+namespace Sjorek\UnicodeNormalization\Conformance;
+
 
 /**
- * An iterator to read "UnicodeNormalizationTest.X.Y.Z.txt.gz" fixture files.
+ * An iterator to read "NormalizationTest.X.Y.Z.txt" fixture files.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class UnicodeNormalizationTestReader implements \IteratorAggregate
+class NormalizationTestReader implements \IteratorAggregate
 {
     /**
      * @var string
@@ -41,19 +42,50 @@ class UnicodeNormalizationTestReader implements \IteratorAggregate
     /**
      * Constructor
      *
-     * @param $unicodeVersion string
+     * @param string $unicodeVersion
+     * @param string $filePath
      */
-    public function __construct($unicodeVersion)
+    public function __construct($unicodeVersion, $filePath = null)
     {
         $this->unicodeVersion = $unicodeVersion;
+        if ($filePath === null)
+        {
+            $sourceTemplate = implode(
+                DIRECTORY_SEPARATOR,
+                [
+                    __DIR__,
+                    '..',
+                    '..',
+                    '..',
+                    'tests',
+                    'UnicodeNormalization',
+                    'Tests',
+                    'Fixtures',
+                    'NormalizationTest.%s.txt.gz',
+                ]
+            );
+            $filePath = realpath(sprintf($sourceTemplate, $this->unicodeVersion));
+            if (!file_exists($filePath)) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Path to fixtures "%s" does not exist. Please run this script from the project root.',
+                        $filePath
+                    )
+                );
+            }
+        } else {
+            if (!file_exists($filePath)) {
+                throw new \RuntimeException(sprintf('Path to fixtures "%s" does not exist.', $filePath));
+            }
+        }
 
-        $sourceTemplate = implode(
-            DIRECTORY_SEPARATOR,
-            array(__DIR__, 'Fixtures', 'UnicodeNormalizationTest.%s.txt.gz')
-        );
-        $this->source = sprintf($sourceTemplate, $this->unicodeVersion);
+        if (strtolower(substr($filePath, -3)) === '.gz')
+        {
+            $filePath = 'compress.zlib://' . $filePath;
+        }
 
-        $this->fileObject = new \SplFileObject('compress.zlib://' . $this->source, 'r', false);
+        $this->source = $filePath;
+        $this->fileObject = new \SplFileObject($this->source, 'r', false);
         $array = iterator_to_array(
             (function () {
                 foreach ($this->fileObject as $lineNumber => $line) {
