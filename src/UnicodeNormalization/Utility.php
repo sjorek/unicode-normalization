@@ -14,9 +14,10 @@ namespace Sjorek\UnicodeNormalization;
 
 use Sjorek\UnicodeNormalization\Helper\FilesystemInterface;
 use Sjorek\UnicodeNormalization\Helper\Filesystem;
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+use Sjorek\UnicodeNormalization\Implementation\NormalizerStub;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
  * Class to handle unicode specific functionality
@@ -25,7 +26,6 @@ use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
  */
 class Utility
 {
-
     /**
      * Convert the given value to a known normalization-form constant.
      *
@@ -483,5 +483,60 @@ class Utility
         );
 
         return $capabilities;
+    }
+
+    /**
+     * @var string
+     * @link https://packagist.org/packages/patchwork/utf8
+     * @link https://github.com/tchwork/utf8
+     */
+    const NORMALIZER_IMPLEMENTATION_PATCHWORK = 'Patchwork\\PHP\\Shim\\Normalizer';
+
+    /**
+     * @var string
+     * @link https://packagist.org/packages/symfony/polyfill-intl-normalizer
+     * @link https://github.com/symfony/polyfill-intl-normalizer
+     * @link https://github.com/symfony/polyfill/tree/master/src/Intl/Normalizer
+     */
+    const NORMALIZER_IMPLEMENTATION_SYMFONY = 'Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer';
+
+    /**
+     * The normalizer implementation class
+     * @var string
+     */
+    protected static $normalizerImplementation = null;
+
+    /**
+     * Get the normalizer implementation's class-name.
+     *
+     * @return string
+     * @see Utility::registerNormalizerImplementation()
+     */
+    public static function getNormalizerImplementation()
+    {
+        if (self::$normalizerImplementation === null && self::registerNormalizerImplementation() === false)
+        {
+            self::registerNormalizerImplementation(NormalizerStub::class);
+        }
+        return self::$normalizerImplementation;
+    }
+
+    /**
+     * Register the normalizer implementation's class-name. The registration works once only.
+     *
+     * @param string $className The implementation class-name, default: "Normalizer"
+     * @return boolean          Returns true on success and false on subsequent calls or for missing classes
+     * @see Utility::NORMALIZER_IMPLEMENTATION_PATCHWORK
+     * @see Utility::NORMALIZER_IMPLEMENTATION_SYMFONY
+     * @see Utility::NORMALIZER_IMPLEMENTATION_STUB
+     */
+    public static function registerNormalizerImplementation($className = 'Normalizer')
+    {
+        if (self::$normalizerImplementation === null && class_exists($className, true))
+        {
+            self::$normalizerImplementation = $className;
+            return true;
+        }
+        return false;
     }
 }

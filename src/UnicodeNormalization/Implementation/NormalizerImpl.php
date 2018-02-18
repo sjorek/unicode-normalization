@@ -12,8 +12,14 @@
 namespace Sjorek\UnicodeNormalization\Implementation;
 
 
-if (!class_exists(__NAMESPACE__ . '\\NormalizerImpl', false) && class_exists('Normalizer', false))
+use Sjorek\UnicodeNormalization\Utility;
+
+if (class_exists(__NAMESPACE__ . '\\NormalizerImpl', false))
 {
+    // Nothing to do here …
+
+} elseif (Utility::getNormalizerImplementation() === 'Normalizer') {
+
     /**
      * Unicode Normalizer Implementation
      *
@@ -21,12 +27,8 @@ if (!class_exists(__NAMESPACE__ . '\\NormalizerImpl', false) && class_exists('No
      */
     class NormalizerImpl extends \Normalizer {}
 
-} elseif (class_exists(__NAMESPACE__ . '\\NormalizerImpl', false)) {
-
-    // Nothing to do here …
-
 } else {
 
-    // Register stub normalizer implementation, providing (very limited and minimal) support for NFC and ASCII.
-    class_alias(__NAMESPACE__ . '\\NormalizerStub', __NAMESPACE__ . '\\NormalizerImpl', true);
+    // Alias normalizer implementation.
+    class_alias(Utility::getNormalizerImplementation(), __NAMESPACE__ . '\\NormalizerImpl', true);
 }
