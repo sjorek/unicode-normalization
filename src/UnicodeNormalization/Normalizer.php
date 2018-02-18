@@ -52,31 +52,6 @@ class Normalizer implements NormalizerInterface
     protected $form = self::NFC;
 
     /**
-     * Supported normalization forms
-     *
-     * @var integer[]
-     */
-    protected $normalizationForms = [
-        self::NONE
-    ];
-
-    /**
-     * Supported unicode-conformance level
-     *
-     * @var string
-     */
-    protected $conformanceLevel = '0.0.0';
-
-    /**
-     * Is this implementation strict?
-     *
-     * @var boolean
-     *
-     * @see Normalizer::isStrictImplementation()
-     */
-    protected $strictImplementation = true;
-
-    /**
      * Constructor
      *
      * @param integer|string|null $form    [optional] Set normalization form, optional
@@ -86,10 +61,6 @@ class Normalizer implements NormalizerInterface
      */
     public function __construct($form = null)
     {
-        $capabilities = Utility::detectUnicodeCapabilities();
-        $this->conformanceLevel = $capabilities['level'];
-        $this->normalizationForms = $capabilities['forms'];
-        $this->strictImplementation = $capabilities['strict'];
         $this->setForm($form);
     }
 
@@ -102,7 +73,7 @@ class Normalizer implements NormalizerInterface
         if (!is_integer($form)) {
             $form = Utility::parseNormalizationForm($form);
         }
-        if (!in_array((int) $form, $this->normalizationForms, true)) {
+        if (!in_array((int) $form, self::getCapabilities()['forms'], true)) {
             throw new InvalidNormalizationFormException(
                 sprintf('Unsupported unicode-normalization form: %s.', $form), 1398603947
             );
@@ -121,37 +92,13 @@ class Normalizer implements NormalizerInterface
 
     /**
      * {@inheritDoc}
-     * @see NormalizerInterface::getConformanceLevel()
-     */
-    public function getConformanceLevel() {
-        return $this->conformanceLevel;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see NormalizerInterface::getNormalizationForms()
-     */
-    public function getNormalizationForms() {
-        return $this->normalizationForms;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see NormalizerInterface::isStrictImplementation()
-     */
-    public function isStrictImplementation() {
-        return $this->strictImplementation;
-    }
-
-    /**
-     * {@inheritDoc}
      * @see NormalizerInterface::normalize()
      */
     public function normalize($input, $form = null)
     {
         if ($form === null) {
             $form = $this->form;
-        } elseif (!in_array((int) $form, $this->normalizationForms, true)) {
+        } elseif (!in_array((int) $form, self::getCapabilities()['forms'], true)) {
             throw new InvalidNormalizationFormException(
                 sprintf('Unsupported unicode-normalization form: %s.', $form), 1398603947
             );
@@ -161,7 +108,7 @@ class Normalizer implements NormalizerInterface
         } elseif ($input === "\xFF") {
             return false;
             // Empty string or plain ASCII is always valid for all forms, let it through.
-        } elseif ($input === '' || !preg_match( '/[\x80-\xff]/', $input)) {
+        } elseif ($input === '' || !preg_match( '/[\x80-\xFF]/', $input)) {
             return $input;
         } else {
             $result = NormalizerImpl::normalize($input, self::NFD);
@@ -180,7 +127,7 @@ class Normalizer implements NormalizerInterface
     {
         if ($form === null) {
             $form = $this->form;
-        } elseif (!in_array((int) $form, $this->normalizationForms, true)) {
+        } elseif (!in_array((int) $form, self::getCapabilities()['forms'], true)) {
             throw new InvalidNormalizationFormException(
                 sprintf('Unsupported unicode-normalization form: %s.', $form), 1398603947
             );
@@ -190,7 +137,7 @@ class Normalizer implements NormalizerInterface
         } elseif ($input === '') {
             return true;
         } else {
-            if ($this->strictImplementation) {
+            if (self::getCapabilities()['strict']) {
                 $result = NormalizerImpl::normalize($input, self::NFD);
                 if ($result === null || $result === false) {
                     return false;
@@ -211,9 +158,6 @@ class Normalizer implements NormalizerInterface
      */
     public function normalizeTo($input, $form = null)
     {
-        if ($form === null) {
-            $form = $this->form;
-        }
         if ($this->isNormalized($input, $form)) {
             return $input;
         }
@@ -237,4 +181,13 @@ class Normalizer implements NormalizerInterface
         }
         return $input;
     }
+
+    /**
+     * {@inheritDoc}
+     * @see NormalizerInterface::getCapabilities()
+     */
+    public static function getCapabilities() {
+        return Utility::detectUnicodeCapabilities();
+    }
+
 }

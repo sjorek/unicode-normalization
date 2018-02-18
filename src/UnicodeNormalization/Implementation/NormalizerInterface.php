@@ -136,7 +136,6 @@ interface NormalizerInterface
      */
     const NFD_MAC = 32, FORM_D_MAC  = 32; // 0x2 & 0xF
 
-
     /**
      * Set the default normalization form to the given value.
      *
@@ -153,32 +152,6 @@ interface NormalizerInterface
      * @return integer
      */
     public function getForm();
-
-    /**
-     * Return the unicode conformance level
-     *
-     * @return string
-     */
-    public static function getConformanceLevel();
-
-    /**
-     * Return an array of supported normalization form constants
-     *
-     * @return integer[]
-     */
-    public static function getNormalizationForms();
-
-    /**
-     * Returns true if this normalizer implementation behaves strict.
-     *
-     * The strict implementation uses a potentially expensive equality-check to check if
-     * a string is normalized to NFD_MAC. As we primilarily want to use it for filenames,
-     * this full check should be ok.
-     *
-     * @return boolean
-     * @see NormalizerInterface::NFD_MAC
-     */
-    public function isStrictImplementation();
 
     /**
      * Normalizes the input provided and returns the normalized string.
@@ -227,4 +200,12 @@ interface NormalizerInterface
      * @link http://www.php.net/manual/en/normalizer.normalize.php
      */
     public function normalizeStringTo($input, $form = null);
+
+    /**
+     * Return the unicode capabilities
+     *
+     * @return array
+     * @see Utility::detectUnicodeCapabilities()
+     */
+    public static function getCapabilities();
 }
