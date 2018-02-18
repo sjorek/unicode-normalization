@@ -13,11 +13,11 @@ namespace Sjorek\UnicodeNormalization\Validator;
 
 
 /**
- * Class for validating and sanitizing the normalization of unicode-based URIs.
+ * Class for validating and sanitizing the normalization of unicode-based url-encoded strings.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class UriValidator
+class UrlEncodedStringValidator
 {
     /**
      * @var StringValidator
