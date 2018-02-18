@@ -216,7 +216,7 @@ interface NormalizerInterface
     public function normalizeTo($input, $form = null);
 
     /**
-     * Normalizes the $string provided to the given or default $normalization and returns the normalized string.
+     * Normalizes the $string provided to the given or default $form and returns the normalized string.
      *
      * Does not call underlying implementation if given normalization is NONE and normalizes only if needed.
      *
