@@ -111,14 +111,21 @@ class Utility
     }
 
     /**
-     * Detect unicode conformance level, supported normalization forms and if the implemention is strict.
+     * Detect unicode conformance level, supported normalization forms and if the implementation is strict.
      *
-     * The result will look like:
+     * The result might look like:
      * <pre>
      * php > [
-     * php >      'conformance-level' => '0.0.0',
-     * php >      'normalization-forms' => [1,2,3,4,5],
-     * php >      'strict-implementation' => true,
+     * php >      'level' => '9.0.0',
+     * php >      'forms' => [
+     * php >          NormalizerInterface::NONE,
+     * php >          NormalizerInterface::NFC,
+     * php >          NormalizerInterface::NFD,
+     * php >          NormalizerInterface::NFKC,
+     * php >          NormalizerInterface::NFKC,
+     * php >          NormalizerInterface::NFD_MAC,
+     * php >      ],
+     * php >      'strict' => true,
      * php > ]
      * </pre>
      *
@@ -163,9 +170,9 @@ class Utility
         }
 
         return [
-            'conformance-level' => $conformanceLevel,
-            'normalization-forms' => $normalizationForms,
-            'strict-implementation' => $strictImplementation,
+            'level' => $conformanceLevel,
+            'forms' => $normalizationForms,
+            'strict' => $strictImplementation,
         ];
     }
 
@@ -302,7 +309,7 @@ class Utility
      * php > [
      * php >      'locale' => true,
      * php >      'shell' => true,
-     * php >      'unicode' => true,[
+     * php >      'unicode' => [
      * php >          NormalizerInterface::NONE => false,
      * php >          NormalizerInterface::NFC => true,
      * php >          NormalizerInterface::NFD => true,
@@ -318,7 +325,7 @@ class Utility
      * php > [
      * php >      'locale' => true,
      * php >      'shell' => true,
-     * php >      'unicode' => true,[
+     * php >      'unicode' => [
      * php >          NormalizerInterface::NONE => false,
      * php >          NormalizerInterface::NFC => [
      * php >              'read' => false,

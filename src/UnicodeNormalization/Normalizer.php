@@ -87,9 +87,9 @@ class Normalizer implements NormalizerInterface
     public function __construct($form = null)
     {
         $capabilities = Utility::detectUnicodeCapabilities();
-        $this->conformanceLevel = $capabilities['conformance-level'];
-        $this->normalizationForms = $capabilities['normalization-forms'];
-        $this->strictImplementation = $capabilities['strict-implementation'];
+        $this->conformanceLevel = $capabilities['level'];
+        $this->normalizationForms = $capabilities['forms'];
+        $this->strictImplementation = $capabilities['strict'];
         $this->setForm($form);
     }
 
