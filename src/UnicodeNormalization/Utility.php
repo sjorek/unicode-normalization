@@ -111,6 +111,13 @@ class Utility
     }
 
     /**
+     * The detected unicode capabilities.
+     * @var array
+     * @see Utility::detectUnicodeCapabilities();
+     */
+    protected static $unicodeCapabilities = null;
+
+    /**
      * Detect unicode conformance level, supported normalization forms and if the implementation is strict.
      *
      * The result might look like:
@@ -135,41 +142,60 @@ class Utility
      */
     public static function detectUnicodeCapabilities()
     {
-        $intlExtensionLoaded = extension_loaded('intl');
+        if (self::$unicodeCapabilities !== null)
+        {
+            return self::$unicodeCapabilities;
+        }
+        // To prevent a too early registration, do not add an use-statement in the head!
+        $implementation = \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::class;
+        $implementationIsStub = is_a($implementation, NormalizerStub::class, true);
+        $intlExtensionUsed = (
+            extension_loaded('intl') &&
+            class_exists('Normalizer', false) &&
+            is_a($implementation, 'Normalizer', true) &&
+            ! (
+                is_a($implementation, self::NORMALIZER_IMPLEMENTATION_PATCHWORK, true) || 
+                is_a($implementation, self::NORMALIZER_IMPLEMENTATION_SYMFONY, true) ||
+                $implementationIsStub
+            )
+        );
 
         // TODO replace hard-coded unicode-conformance-levels with a real detection.
-        // If it is not a mac - this is a stupid assumption that every Darwin is a Mac!
-        if (false === stripos(PHP_OS, 'Darwin'))
+        if ($implementationIsStub)
         {
+            $conformanceLevel = '0.0.0';
+        } elseif (false === stripos(PHP_OS, 'Darwin')) {
+            // If it is not a mac - this is a stupid assumption that every Darwin is a Mac!
             // The 'intl' extension's Normalizer implementation is less conform than
             // implementations from 'patchwork/utf8' or 'symfony/polyfill-intl-normalizer'
-            $conformanceLevel = $intlExtensionLoaded ? '6.3.0' : '7.0.0';
+            $conformanceLevel = $intlExtensionUsed ? '6.3.0' : '7.0.0';
         } else {
             // On Mac OS the 'intl'-extension uses the underlying operating
             // system features, which conforms to higher levels than above!
-            $conformanceLevel = $intlExtensionLoaded ? '9.0.0' : '7.0.0';
+            $conformanceLevel = $intlExtensionUsed ? '9.0.0' : '7.0.0';
         }
 
-        $normalizationForms = [Normalizer::NONE];
-        if (class_exists('Normalizer', false))
+        $normalizationForms = [
+            NormalizerInterface::NONE,
+            NormalizerInterface::NFC,
+        ];
+        if ($implementationIsStub)
         {
+            $strictImplementation = false;
+        } else {
             $normalizationForms += [
-                NormalizerInterface::NFC,
                 NormalizerInterface::NFD,
                 NormalizerInterface::NFKC,
-                NormalizerInterface::NFKD
+                NormalizerInterface::NFKD,
             ];
             if (self::appleIconvIsAvailable())
             {
                 $normalizationForms[] = NormalizerInterface::NFD_MAC;
             }
-
-            $strictImplementation = $intlExtensionLoaded;
-        } else {
-            $strictImplementation = false;
+            $strictImplementation = $intlExtensionUsed;
         }
 
-        return [
+        return self::$unicodeCapabilities = [
             'level' => $conformanceLevel,
             'forms' => $normalizationForms,
             'strict' => $strictImplementation,
