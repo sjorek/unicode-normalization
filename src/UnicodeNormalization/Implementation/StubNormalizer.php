@@ -17,7 +17,7 @@ namespace Sjorek\UnicodeNormalization\Implementation;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class NormalizerStub
+class StubNormalizer
 {
     /**
      * Normalizes the input provided and returns the normalized string.

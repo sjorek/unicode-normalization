@@ -15,7 +15,7 @@ namespace Sjorek\UnicodeNormalization;
 use Sjorek\UnicodeNormalization\Helper\FilesystemInterface;
 use Sjorek\UnicodeNormalization\Helper\Filesystem;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
-use Sjorek\UnicodeNormalization\Implementation\NormalizerStub;
+use Sjorek\UnicodeNormalization\Implementation\StubNormalizer;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
@@ -148,7 +148,7 @@ class Utility
         }
         // To prevent a too early registration, do not add an use-statement in the head!
         $implementation = \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::class;
-        $implementationIsStub = is_a($implementation, NormalizerStub::class, true);
+        $implementationIsStub = is_a($implementation, StubNormalizer::class, true);
         $intlExtensionUsed = (
             extension_loaded('intl') &&
             class_exists('Normalizer', false) &&
@@ -542,7 +542,7 @@ class Utility
     {
         if (self::$normalizerImplementation === null && self::registerNormalizerImplementation() === false)
         {
-            self::registerNormalizerImplementation(NormalizerStub::class);
+            self::registerNormalizerImplementation(StubNormalizer::class);
         }
         return self::$normalizerImplementation;
     }
