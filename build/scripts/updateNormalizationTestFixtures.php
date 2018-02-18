@@ -34,7 +34,7 @@ try {
 
         $writer = new NormalizationTestWriter(
             $unicodeVersion,
-            basename(__FILE__),
+            'sjorek/unicode-normalization',
             $updater->source
         );
         echo sprintf('Importing unicode version %s to %s', $unicodeVersion, $writer->filePath) . PHP_EOL . PHP_EOL;

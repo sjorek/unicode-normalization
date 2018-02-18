@@ -53,19 +53,19 @@ class NormalizationTestWriter extends \SplFileObject
                     'NormalizationTest.%s.txt.gz',
                 ]
             );
-            $filePath = realpath(sprintf($destinationTemplate, $unicodeVersion));
+            $filePath = sprintf($destinationTemplate, $unicodeVersion);
 
             if (!is_dir(dirname($filePath))) {
                 throw new \RuntimeException(
                     sprintf(
                         'Path to fixtures "%s" does not exist. Please run this script from the project root.',
-                        $filePath
+                        dirname($filePath)
                     )
                 );
             }
         } else {
             if (!is_dir(dirname($filePath))) {
-                throw new \RuntimeException(sprintf('Path to fixtures "%s" does not exist.', $filePath));
+                throw new \RuntimeException(sprintf('Path to fixtures "%s" does not exist.', dirname($filePath)));
             }
         }
 

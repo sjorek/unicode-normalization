@@ -64,7 +64,7 @@ class NormalizationTestReader implements \IteratorAggregate
                     'NormalizationTest.%s.txt.gz',
                 ]
             );
-            $filePath = realpath(sprintf($sourceTemplate, $this->unicodeVersion));
+            $filePath = sprintf($sourceTemplate, $this->unicodeVersion);
             if (!file_exists($filePath)) {
                 throw new \RuntimeException(
                     sprintf(
