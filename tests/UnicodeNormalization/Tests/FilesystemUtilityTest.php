@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Filesystem;
 
+use org\bovigo\vfs;
 use Sjorek\UnicodeNormalization\FilesystemUtility;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
-use org\bovigo\vfs;
 
 if (!class_exists(__NAMESPACE__ . '\\Filesystem', false)) {
     /**
