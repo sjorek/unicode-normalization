@@ -46,7 +46,7 @@ class NormalizationUtility
      *   variant HFS+ will always use decomposed NFD path-strings if needed.
      * </pre>
      *
-     * @param string|int|bool|null $value
+     * @param null|bool|int|string $value
      *
      * @throws InvalidNormalizationForm
      */
@@ -233,9 +233,12 @@ class NormalizationUtility
      * php > ]
      * </pre>
      *
-     * @return array
      *
      * @see \IntlChar::getUnicodeVersion()
+     *
+     * @param null|mixed $implementation
+     *
+     * @return array
      */
     public static function detectCapabilities($implementation = null)
     {

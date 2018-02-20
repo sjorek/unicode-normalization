@@ -172,7 +172,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
         if (false === $expected) {
             $this->assertFalse($actual);
         } else {
-            $this->assertEquals($expected, $actual);
+            $this->assertSame($expected, $actual);
         }
     }
 
@@ -411,7 +411,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
                     $actual = stream_get_contents($actualStream);
                     fclose($actualStream);
 
-                    $this->assertEquals(explode($delimiter, $expected), explode($delimiter, $actual));
+                    $this->assertSame(explode($delimiter, $expected), explode($delimiter, $actual));
                     $this->assertSame($expected, $actual);
                 }
             }
@@ -425,7 +425,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
                 $actual = stream_get_contents($actualStream);
                 fclose($actualStream);
 
-                $this->assertEquals(explode($delimiter, $expected), explode($delimiter, $actual));
+                $this->assertSame(explode($delimiter, $expected), explode($delimiter, $actual));
                 $this->assertSame($expected, $actual);
             }
         }

@@ -147,7 +147,7 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
     /**
      * @param bool     $assert
      * @param string   $string
-     * @param int|null $form
+     * @param null|int $form
      * @test
      * @runInSeparateProcess
      * @dataProvider provideCheckIsNormalizedData
@@ -255,9 +255,9 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
     }
 
     /**
-     * @param string|false $same
+     * @param false|string $same
      * @param string       $string
-     * @param int|null     $form
+     * @param null|int     $form
      * @test
      * @runInSeparateProcess
      * @dataProvider provideCheckNormalizeData

@@ -225,7 +225,7 @@ interface NormalizerInterface
      *
      * @throws \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      *
-     * @return string|null Normalized string or null if an error occurred
+     * @return null|string Normalized string or null if an error occurred
      *
      * @see NormalizerInterface::normalize()
      * @see NormalizerInterface::isNormalized()
@@ -242,7 +242,7 @@ interface NormalizerInterface
      *
      * @throws \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      *
-     * @return string|null Normalized string or null if an error occurred
+     * @return null|string Normalized string or null if an error occurred
      *
      * @see NormalizerInterface::normalize()
      * @see NormalizerInterface::isNormalized()

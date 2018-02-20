@@ -55,7 +55,7 @@ class Normalizer implements NormalizerInterface
     /**
      * Constructor.
      *
-     * @param int|string|null $form [optional] Set normalization form, optional
+     * @param null|int|string $form [optional] Set normalization form, optional
      *
      * @see NormalizationUtility::parseForm()
      */

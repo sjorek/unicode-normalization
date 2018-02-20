@@ -112,11 +112,11 @@ class NormalizationUtilityTest extends AbstractTestCase
     {
         $capabilities = NormalizationUtility::detectCapabilities();
 
-        $this->assertTrue(is_array($capabilities));
+        $this->assertInternalType('array', $capabilities);
 
         $keys = array_keys($capabilities);
         $this->assertTrue(sort($keys));
-        $this->assertEquals(['forms', 'level', 'strict'], $keys);
+        $this->assertSame(['forms', 'level', 'strict'], $keys);
 
         $this->assertArrayHasKey('forms', $capabilities);
         $this->assertTrue(in_array(NormalizerInterface::NONE, $capabilities['forms'], true));
@@ -126,7 +126,7 @@ class NormalizationUtilityTest extends AbstractTestCase
         $this->assertTrue(version_compare('0.0.0.0', $capabilities['level'], '<='));
 
         $this->assertArrayHasKey('strict', $capabilities);
-        $this->assertTrue(is_bool($capabilities['strict']));
+        $this->assertInternalType('bool', $capabilities['strict']);
     }
 
     // ///////////////////////////////////////////////////
@@ -160,6 +160,8 @@ class NormalizationUtilityTest extends AbstractTestCase
      * @dataProvider provideCheckRegisterImplementation
      * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::getImplementation()
      * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::registerImplementation()
+     *
+     * @param mixed $implementationClass
      */
     public function checkRegisterImplementation($implementationClass)
     {

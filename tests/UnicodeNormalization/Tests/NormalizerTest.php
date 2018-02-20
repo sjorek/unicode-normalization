@@ -28,9 +28,9 @@ class NormalizerTest extends AbstractImplementationTestCase
     const IMPLEMENTATION_CLASS = NormalizationUtility::IMPLEMENTATION_INTL;
 
     /**
-     * @param string|false $same
+     * @param false|string $same
      * @param string       $string
-     * @param int|null     $form
+     * @param null|int     $form
      * @test
      * @dataProvider provideCheckNormalizeData
      * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
@@ -48,9 +48,9 @@ class NormalizerTest extends AbstractImplementationTestCase
     }
 
     /**
-     * @param string|false $same
+     * @param false|string $same
      * @param string       $string
-     * @param int|null     $form
+     * @param null|int     $form
      * @test
      * @dataProvider provideCheckNormalizeData
      * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo

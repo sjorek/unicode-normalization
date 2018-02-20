@@ -98,6 +98,8 @@ class FilesystemUtilityTest extends AbstractTestCase
      * @expectedException              \InvalidArgumentException
      * @expectedExceptionMessageRegExp /^Invalid path given, which is either not absolute or does not exist: /
      * @expectedExceptionCode          1518778464
+     *
+     * @param mixed $path
      */
     public function checkDetectCapabilitiesForPathWithInvalidPath($path)
     {
@@ -141,13 +143,16 @@ class FilesystemUtilityTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider provideCheckDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
+     *
+     * @param mixed $locale
+     * @param mixed $charset
      */
     public function checkDetectCapabilitiesForPathWithUnsupportedLocaleAndCharset($locale, $charset)
     {
         $locale = $this->assertSetLocale($locale);
         $charset = $this->assertSetCharset($charset);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'locale' => false,
                 'shell' => false,
@@ -228,7 +233,7 @@ class FilesystemUtilityTest extends AbstractTestCase
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);
         $charset = $this->assertSetCharset('UTF-8');
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'locale' => true,
                 'shell' => true,

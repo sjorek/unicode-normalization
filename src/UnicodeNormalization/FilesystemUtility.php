@@ -37,7 +37,7 @@ class FilesystemUtility
     /**
      * List of mapping unicode-normalization constants to filenames in corresponding unicode-normalizations.
      *
-     * @var string[]|bool[]
+     * @var bool[]|string[]
      */
     const FILESYSTEM_MODES = [
         // Raw binary data (not normalized, and not even a mix different normalizations):
@@ -190,7 +190,7 @@ class FilesystemUtility
      * @throws \InvalidArgumentException if given path is not an absolute path to a directory
      * @throws IOExceptionInterface      on filesystem error
      *
-     * @return bool[]|array[]
+     * @return array[]|bool[]
      */
     public static function detectCapabilitiesForPath($absolutePath, FilesystemInterface $fs = null)
     {

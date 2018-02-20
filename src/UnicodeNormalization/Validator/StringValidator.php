@@ -59,7 +59,7 @@ class StringValidator
      * @param int    $form    [optional] normalization form to apply, overriding the default
      * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
      *
-     * @return string|false The converted string or false if given charset is unknown
+     * @return false|string The converted string or false if given charset is unknown
      *
      * @see \Patchwork\Utf8\Bootup::filterString()
      */
@@ -112,7 +112,7 @@ class StringValidator
      * @param string $input   The string to filter
      * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
      *
-     * @return string|false The converted string or false if given charset is unknown
+     * @return false|string The converted string or false if given charset is unknown
      */
     protected function convertStringToUtf8($input, $charset = null)
     {

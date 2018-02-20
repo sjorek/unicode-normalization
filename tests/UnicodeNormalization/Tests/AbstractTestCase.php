@@ -30,6 +30,7 @@ class AbstractTestCase extends TestCase
      * @param mixed  $object
      * @param string $methodName
      * @param array  $arguments
+     * @param mixed  $objectOrClass
      *
      * @return mixed
      */
@@ -47,6 +48,7 @@ class AbstractTestCase extends TestCase
     /**
      * @param mixed  $object
      * @param string $propertyName
+     * @param mixed  $objectOrClass
      *
      * @return mixed
      */
@@ -65,6 +67,7 @@ class AbstractTestCase extends TestCase
      * @param mixed  $object
      * @param string $propertyName
      * @param mixed  $value
+     * @param mixed  $objectOrClass
      *
      * @return mixed
      */
