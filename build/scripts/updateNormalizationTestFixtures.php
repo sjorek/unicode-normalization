@@ -12,7 +12,7 @@
 
 namespace Sjorek\UnicodeNormalization\Conformance;
 
-if ('cli' !== php_sapi_name()) {
+if ('cli' !== PHP_SAPI) {
     die('Script must be called from command line.' . PHP_EOL);
 }
 

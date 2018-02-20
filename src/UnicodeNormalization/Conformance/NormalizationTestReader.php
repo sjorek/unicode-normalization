@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Unicode Normalization project.
  *
@@ -90,7 +92,7 @@ class NormalizationTestReader implements \IteratorAggregate
 
         $fileObject = new \SplFileObject($this->source, 'r', false);
         $array = iterator_to_array(
-            (function () use($fileObject) {
+            (function () use ($fileObject) {
                 foreach ($fileObject as $lineNumber => $line) {
                     yield from $this->processLine($lineNumber + 1, $line);
                 }
