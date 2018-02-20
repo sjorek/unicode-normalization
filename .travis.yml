@@ -6,29 +6,10 @@ git:
 matrix:
   include:
     - php: 7.0
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
-    - php: 7.0
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
-    - php: 7.0
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
     - php: 7.1
-      env: LINT=true CHECK_SECURITY=true UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
-    - php: 7.1
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
-    - php: 7.1
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
+      env: LINT=true CHECK_SECURITY=true
     - php: 7.2
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
-    - php: 7.2
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
-    - php: 7.2
-      env: UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
     - php: nightly
-      env: NIGHTLY=true UNICODE_NORMALIZER_IMPLEMENTATION=Normalizer
-    - php: nightly
-      env: NIGHTLY=true UNICODE_NORMALIZER_IMPLEMENTATION=Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer
-    - php: nightly
-      env: NIGHTLY=true UNICODE_NORMALIZER_IMPLEMENTATION=Patchwork\\PHP\\Shim\\Normalizer
   allow_failures:
     - php: nightly
 
