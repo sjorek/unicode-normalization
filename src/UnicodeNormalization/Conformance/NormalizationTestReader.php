@@ -29,11 +29,6 @@ class NormalizationTestReader implements \IteratorAggregate
     public $source;
 
     /**
-     * @var \SplFileObject
-     */
-    protected $fileObject;
-
-    /**
      * @var \Iterator
      */
     protected $iterator;
@@ -82,18 +77,6 @@ class NormalizationTestReader implements \IteratorAggregate
         }
 
         $this->source = $filePath;
-        $this->fileObject = new \SplFileObject($this->source, 'r', false);
-        $array = iterator_to_array(
-            (function () {
-                foreach ($this->fileObject as $lineNumber => $line) {
-                    $lineNumber += 1;
-                    yield from $this->processLine($lineNumber, $line);
-                }
-            })(),
-            true
-        );
-        unset($this->fileObject);
-        $this->iterator = new \ArrayIterator($array);
     }
 
     /**
@@ -101,7 +84,22 @@ class NormalizationTestReader implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return $this->iterator;
+        if (isset($this->iterator)) {
+            return $this->iterator;
+        }
+
+        $fileObject = new \SplFileObject($this->source, 'r', false);
+        $array = iterator_to_array(
+            (function () use($fileObject) {
+                foreach ($fileObject as $lineNumber => $line) {
+                    yield from $this->processLine($lineNumber + 1, $line);
+                }
+            })(),
+            true
+        );
+        unset($fileObject);
+
+        return $this->iterator = new \ArrayIterator($array);
     }
 
     /**
