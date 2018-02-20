@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Conformance\NormalizationTestReader;
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\StreamFilter;
+use Sjorek\UnicodeNormalization\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -281,6 +281,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
      */
     public function checkFilterWithParameter($expected, $form, $fragment)
     {
+        $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
         $this->assertTrue(StreamFilter::register(), 'stream-filter registration succeeds');
         $stream = $this->createStream();
         $filter = stream_filter_append($stream, 'convert.unicode-normalization', STREAM_FILTER_READ, $form);
@@ -334,6 +335,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
      */
     public function checkFilterWithNamespace($expected, $form, $fragment)
     {
+        $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
         $this->assertTrue(StreamFilter::register(), 'stream-filter registration succeeds');
         $stream = $this->createStream();
         $filter = stream_filter_append(
@@ -364,7 +366,6 @@ class StreamFilterTest extends AbstractNormalizationTestCase
         NormalizationTestReader $fileIterator
     ) {
         $this->markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion);
-
         $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
 
         $this->assertTrue(StreamFilter::register(), 'stream-filter registration succeeds');
