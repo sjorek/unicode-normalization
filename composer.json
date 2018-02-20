@@ -32,12 +32,14 @@
 		}
 	},
 	"require" : {
-		"php" : ">=7.0"
+		"php": ">=7.0",
+		"symfony/filesystem": "^3.4"
 	},
 	"require-dev" : {
 		"ext-iconv": "*",
 		"ext-intl": "*",
 		"friendsofphp/php-cs-fixer": "^2.7",
+		"mikey179/vfsStream": "^1.6",
 		"patchwork/utf8": "*",
 		"phpunit/phpunit": "^6.4",
 		"sensiolabs/security-checker": "^4.1",
@@ -52,6 +54,9 @@
 		"symfony/polyfill-intl-normalizer" : "This stream filter can use the php-based Normalizer-implementation from 'symfony/polyfill-intl-normalizer' package to provide unicode-normalization, but 'intl'-extensions' native implementation is preferred",
 		"patchwork/utf8" : "This stream filter can use the php-based Normalizer-implementation from 'patchwork/utf8' package to provide unicode-normalization, but 'intl'-extensions' native implementation is preferred"
 	},
+	"config": {
+		"process-timeout": 900
+	},
 	"scripts": {
 		"unicode-normalization:build": [
 			"@unicode-normalization:security-check",
@@ -61,7 +66,7 @@
 		"unicode-normalization:test": "phpunit -v --exclude-group=large",
 		"unicode-normalization:test-all": "phpunit -v",
 		"unicode-normalization:test-large": "phpunit -v --group=large",
-		"unicode-normalization:test-coverage": "phpunit -v --coverage-html coverage",
+		"unicode-normalization:test-coverage": "phpunit -v --exclude-group=large --coverage-html coverage",
 		"unicode-normalization:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
 		"unicode-normalization:cs-fix": "php-cs-fixer fix -vv || true",
 		"unicode-normalization:security-check": [
