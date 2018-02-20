@@ -231,7 +231,8 @@ class AbstractNormalizationTestCase extends AbstractTestCase
 
     protected function markTestSkippedIfAppleIconvIsNotAvailable($form)
     {
-        if (NormalizerInterface::NFD_MAC === $form && !NormalizationUtility::appleIconvIsAvailable()) {
+        if (NormalizerInterface::NFD_MAC === NormalizationUtility::parseForm($form) &&
+            !NormalizationUtility::appleIconvIsAvailable()) {
             $this->markTestSkipped(
                 'Skipped test as "iconv" extension is either not available '
                 . 'or not able to handle "utf-8-mac" charset.'
