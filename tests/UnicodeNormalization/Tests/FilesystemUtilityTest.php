@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Filesystem;
 
-use org\bovigo\vfs;
 use Sjorek\UnicodeNormalization\FilesystemUtility;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
+use org\bovigo\vfs;
 
 if (!class_exists(__NAMESPACE__ . '\\Filesystem', false)) {
     /**
@@ -240,11 +240,11 @@ class FilesystemUtilityTest extends AbstractTestCase
                 'unicode' => [
                     0 => true,
                     NormalizerInterface::NONE => true,
-                    NormalizerInterface::NFD => true,
-                    NormalizerInterface::NFKD => false,
                     NormalizerInterface::NFC => true,
-                    NormalizerInterface::NFKC => false,
+                    NormalizerInterface::NFD => true,
                     NormalizerInterface::NFD_MAC => true,
+                    NormalizerInterface::NFKD => false,
+                    NormalizerInterface::NFKC => false,
                 ],
             ],
             FilesystemUtility::detectCapabilitiesForPath($this->vfs->url(), $this->fs),
