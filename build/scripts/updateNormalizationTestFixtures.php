@@ -12,18 +12,17 @@
 
 namespace Sjorek\UnicodeNormalization\Conformance;
 
-
-if (php_sapi_name() !== 'cli') {
+if ('cli' !== php_sapi_name()) {
     die('Script must be called from command line.' . PHP_EOL);
 }
 
-if ($argc !== 1) {
+if (1 !== $argc) {
     die('Invalid amount of command line arguments.' . PHP_EOL);
 }
 
 require 'vendor/autoload.php';
 
-$unicodeVersions = array('6.3.0', '7.0.0', '8.0.0', '9.0.0', '10.0.0');
+$unicodeVersions = ['6.3.0', '7.0.0', '8.0.0', '9.0.0', '10.0.0'];
 
 try {
     foreach ($unicodeVersions as $unicodeVersion) {
