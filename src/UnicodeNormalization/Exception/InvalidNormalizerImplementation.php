@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -9,12 +11,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization;
-
+namespace Sjorek\UnicodeNormalization\Exception;
 
 /**
- * Exception for invalid or unknown normalization form values
+ * Exception for missing or invalid normalizer implementations.
  */
-class InvalidNormalizationFormException extends \InvalidArgumentException
+class InvalidNormalizerImplementation extends \RuntimeException
 {
 }

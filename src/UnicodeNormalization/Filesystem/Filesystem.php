@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -9,18 +11,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Helper;
-
-
-use Symfony\Component\Filesystem\Exception\IOException;
+namespace Sjorek\UnicodeNormalization\Filesystem;
 
 /**
  * Facade to filesystem specific functionality, providing a reduced interface to what is needed.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class Filesystem extends \Symfony\Component\Filesystem\Filesystem implements FilesystemInterface
+class Filesystem implements FilesystemInterface
 {
+    /**
+     * @var \Symfony\Component\Filesystem\Filesystem
+     */
+    protected $fs;
+
+    /**
+     * @param \Symfony\Component\Filesystem\Filesystem $fs
+     */
+    public function __construct(\Symfony\Component\Filesystem\Filesystem $fs = null)
+    {
+        if (null === $fs) {
+            $fs = new \Symfony\Component\Filesystem\Filesystem();
+        }
+        $this->fs = $fs;
+    }
+
     /**
      * Returns whether the file path is an absolute path.
      *
@@ -30,7 +45,7 @@ class Filesystem extends \Symfony\Component\Filesystem\Filesystem implements Fil
      */
     public function isAbsolutePath($file)
     {
-        return parent::isAbsolutePath($file);
+        return $this->fs->isAbsolutePath($file);
     }
 
     /**
@@ -38,11 +53,11 @@ class Filesystem extends \Symfony\Component\Filesystem\Filesystem implements Fil
      *
      * @param string $dir The directory path
      *
-     * @throws IOException On any directory creation failure
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface On any directory creation failure
      */
     public function mkdir($dir)
     {
-        parent::mkdir($dir);
+        $this->fs->mkdir($dir);
     }
 
     /**
@@ -50,11 +65,11 @@ class Filesystem extends \Symfony\Component\Filesystem\Filesystem implements Fil
      *
      * @param string $file A filename
      *
-     * @throws IOException When touch fails
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When touch fails
      */
     public function touch($file)
     {
-        parent::touch($file);
+        $this->fs->touch($file);
     }
 
     /**
@@ -62,10 +77,10 @@ class Filesystem extends \Symfony\Component\Filesystem\Filesystem implements Fil
      *
      * @param string $file A filename to remove
      *
-     * @throws IOException When removal fails
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When removal fails
      */
     public function remove($file)
     {
-        parent::remove($file);
+        $this->fs->remove($file);
     }
 }

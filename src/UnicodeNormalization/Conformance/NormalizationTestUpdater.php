@@ -11,7 +11,7 @@
 
 namespace Sjorek\UnicodeNormalization\Conformance;
 
-use Sjorek\UnicodeNormalization\Utility;
+use Sjorek\UnicodeNormalization\NormalizationUtility;
 
 /**
  * An iterator to update "UnicodeNormalizationTest.X.Y.Z.txt" files from www.unicode.org.
@@ -31,20 +31,19 @@ class NormalizationTestUpdater implements \IteratorAggregate
     public $source;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param $unicodeVersion string
+     *
      * @throws \RuntimeException
      */
     public function __construct($unicodeVersion)
     {
-        if (!extension_loaded('mbstring'))
-        {
+        if (!extension_loaded('mbstring')) {
             throw new \RuntimeException('The required extension "mbstring" is not loaded');
         }
 
-        if (!Utility::appleIconvIsAvailable())
-        {
+        if (!NormalizationUtility::appleIconvIsAvailable()) {
             throw new \RuntimeException(
                 'The required extension "iconv" is either not loaded or not able to handle NFD_MAC'
             );
@@ -69,9 +68,11 @@ class NormalizationTestUpdater implements \IteratorAggregate
     }
 
     /**
-     * @param  int        $lineNumber
-     * @param  string     $line
+     * @param int    $lineNumber
+     * @param string $line
+     *
      * @throws \Exception
+     *
      * @return string[]
      */
     public function processLine($lineNumber, $line)
@@ -94,11 +95,11 @@ class NormalizationTestUpdater implements \IteratorAggregate
                     explode(' ', $string)
                 );
 
-                if ($index === 2) {
+                if (2 === $index) {
                     $mac = array_map(
                         function ($n) use ($lineNumber) {
                             $m = iconv('utf-8', 'utf-8-mac', $n);
-                            if ($m === false) {
+                            if (false === $m) {
                                 throw new \Exception(
                                     sprintf(
                                         'Could not create NFD_MAC in line %s of: %s' . PHP_EOL,
@@ -123,16 +124,16 @@ class NormalizationTestUpdater implements \IteratorAggregate
             $codes[6] = ' ';
             $codes = implode(';', $codes);
 
-            return array(implode('#', array_merge(array($codes), $codesAndComment)), $comment);
-        } else {
-            return array(
-                str_replace(
-                    '#      source; NFC; NFD; NFKC; NFKD',
-                    '#      source; NFC; NFD; NFKC; NFKD; NFD_MAC',
-                    $line
-                ),
-                "",
-            );
+            return [implode('#', array_merge([$codes], $codesAndComment)), $comment];
         }
+
+        return [
+            str_replace(
+                '#      source; NFC; NFD; NFKC; NFKD',
+                '#      source; NFC; NFD; NFKC; NFKD; NFD_MAC',
+                $line
+            ),
+            '',
+        ];
     }
 }

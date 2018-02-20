@@ -11,7 +11,6 @@
 
 namespace Sjorek\UnicodeNormalization\Conformance;
 
-
 /**
  * A file object to write "UnicodeNormalizationTest.X.Y.Z.txt" fixture files.
  *
@@ -28,7 +27,7 @@ class NormalizationTestWriter extends \SplFileObject
     public $filePath;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $unicodeVersion
      * @param string $generator
@@ -37,8 +36,7 @@ class NormalizationTestWriter extends \SplFileObject
      */
     public function __construct($unicodeVersion, $generator, $source, $filePath = null)
     {
-        if ($filePath === null)
-        {
+        if (null === $filePath) {
             $destinationTemplate = implode(
                 DIRECTORY_SEPARATOR,
                 [
@@ -69,8 +67,7 @@ class NormalizationTestWriter extends \SplFileObject
             }
         }
 
-        if (strtolower(substr($filePath, -3)) === '.gz')
-        {
+        if ('.gz' === strtolower(substr($filePath, -3))) {
             $filePath = 'compress.zlib://' . $filePath;
         }
 
@@ -86,7 +83,7 @@ class NormalizationTestWriter extends \SplFileObject
      */
     public function add($line)
     {
-        if ($this->fwrite($line) === null) {
+        if (null === $this->fwrite($line)) {
             throw new \Exception(sprintf('Could not write "%s" file.', basename($this->filePath)));
         }
     }

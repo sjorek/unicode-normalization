@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -11,13 +13,13 @@
 
 namespace Sjorek\UnicodeNormalization;
 
-
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
  * A stream-filter implementation for normalizing unicode, currently only utf8.
  *
  * @see Normalizer
+ *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class StreamFilter extends \php_user_filter
@@ -25,35 +27,35 @@ class StreamFilter extends \php_user_filter
     const NAMESPACE = 'convert.unicode-normalization';
 
     /**
-     * 0x80 for 0b0xxxxxxx
+     * 0x80 for 0b0xxxxxxx.
      *
      * @var int
      */
     const BYTE_SINGLE = 0b10000000;
 
     /**
-     * 0xC0 for 0b10xxxxxx
+     * 0xC0 for 0b10xxxxxx.
      *
      * @var int
      */
     const BYTE_PAYLOAD = 0b11000000;
 
     /**
-     * 0xE0 for 0b110xxxxx
+     * 0xE0 for 0b110xxxxx.
      *
      * @var int
      */
     const BYTE_DOUBLE = 0b11100000;
 
     /**
-     * 0xF0 for 0b1110xxxx
+     * 0xF0 for 0b1110xxxx.
      *
      * @var int
      */
     const BYTE_TRIPLE = 0b11110000;
 
     /**
-     * 0xF8 for 0b11110xxx
+     * 0xF8 for 0b11110xxx.
      *
      * @var int
      */
@@ -76,7 +78,7 @@ class StreamFilter extends \php_user_filter
     // const BYTE_HEXA = 0b11111110;
 
     /**
-     * 0xFF for 0b11111111
+     * 0xFF for 0b11111111.
      *
      * @var int
      */
@@ -98,51 +100,53 @@ class StreamFilter extends \php_user_filter
     protected $form;
 
     /**
-     * @param string $namespace
-     * @param Normalizer $normalizer
-     * @return boolean
+     * @param string              $namespace
+     * @param NormalizerInterface $normalizer
+     *
+     * @return bool
      */
-    public static function register($namespace = StreamFilter::NAMESPACE, NormalizerInterface $normalizer = null)
+    public static function register($namespace = self::NAMESPACE, NormalizerInterface $normalizer = null)
     {
         // already registered or missing dependency ?
-        if (static::$namespace !== null) {
+        if (null !== static::$namespace) {
             return false;
         }
         $result = stream_filter_register($namespace, static::class);
-        if ($result === true)
-        {
+        if (true === $result) {
             $result = stream_filter_register(sprintf('%s.*', $namespace), __CLASS__);
         }
-        if ($result === true)
-        {
+        if (true === $result) {
             static::$namespace = $namespace;
             static::$normalizer = $normalizer ?: new Normalizer();
         }
+
         return $result;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \php_user_filter::onCreate()
-     * @throws InvalidNormalizationFormException
+     *
+     * @throws \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      */
     public function onCreate()
     {
         if ($this->filtername === static::$namespace) {
-            if (isset($this->params))
-            {
-                $this->form = Utility::parseNormalizationForm($this->params);
+            if (isset($this->params)) {
+                $this->form = NormalizationUtility::parseForm($this->params);
             } else {
                 $this->form = static::$normalizer->getForm();
             }
 
             return true;
-        } elseif (strpos($this->filtername, '.') !== false) {
+        }
+        if (false !== strpos($this->filtername, '.')) {
             list($form, $namespace) = explode('.', strrev($this->filtername), 2);
             $namespace = strrev($namespace);
             $form = strrev($form);
             if ($namespace === static::$namespace) {
-                $this->form = Utility::parseNormalizationForm($form);
+                $this->form = NormalizationUtility::parseForm($form);
 
                 return true;
             }
@@ -154,7 +158,8 @@ class StreamFilter extends \php_user_filter
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \php_user_filter::filter()
      */
     public function filter($in, $out, &$consumed, $closing)
@@ -162,7 +167,7 @@ class StreamFilter extends \php_user_filter
         $normalizer = static::$normalizer;
         while ($bucket = stream_bucket_make_writeable($in)) {
             $result = $this->processStringFragment($bucket->data, $bucket->datalen, $normalizer);
-            if ($result === false) {
+            if (false === $result) {
                 return PSFS_ERR_FATAL;
             }
             list($data, $datalen) = $result;
@@ -175,14 +180,15 @@ class StreamFilter extends \php_user_filter
     }
 
     /**
-     * @param  string              $fragment
-     * @param  int                 $fragmentSize
-     * @param  NormalizerInterface $normalizer
-     * @return array|boolean
+     * @param string              $fragment
+     * @param int                 $fragmentSize
+     * @param NormalizerInterface $normalizer
+     *
+     * @return array|bool
      */
     protected function processStringFragment($fragment, $fragmentSize, NormalizerInterface $normalizer)
     {
-        if ($fragment === '' || $fragmentSize === 0 || 1 > static::getCodePointSize($fragment[0])) {
+        if ('' === $fragment || 0 === $fragmentSize || 1 > static::getCodePointSize($fragment[0])) {
             return false;
         }
 
@@ -195,10 +201,12 @@ class StreamFilter extends \php_user_filter
             $codePointSize = static::getCodePointSize($fragment[$fragmentSize - $offset]);
             if ($codePointSize < 0) {
                 return false;
-            } elseif ($codePointSize === 0) {
+            }
+            if (0 === $codePointSize) {
                 ++$payloadSize;
                 continue;
-            } elseif ($codePointSize === $offset && $codePointSize === $payloadSize) {
+            }
+            if ($codePointSize === $offset && $codePointSize === $payloadSize) {
                 // nothing to do here!
             } else {
                 $fragmentSize -= $offset;
@@ -206,18 +214,19 @@ class StreamFilter extends \php_user_filter
             }
 
             $result = $normalizer->normalizeStringTo($fragment, $this->form);
-            if ($result === false || $result === null) {
+            if (false === $result || null === $result) {
                 return false;
-            } else {
-                return array($result, $fragmentSize);
             }
+
+            return [$result, $fragmentSize];
         }
 
         return false;
     }
 
     /**
-     * @param  mixed $byte
+     * @param mixed $byte
+     *
      * @return int
      */
     protected static function getCodePointSize($byte)
@@ -225,15 +234,19 @@ class StreamFilter extends \php_user_filter
         $byte = ord($byte) & self::BYTE_MASK;
         if ($byte < self::BYTE_SINGLE) {
             return 1;
-        } elseif ($byte < self::BYTE_PAYLOAD) {
+        }
+        if ($byte < self::BYTE_PAYLOAD) {
             return 0;
-        } elseif ($byte < self::BYTE_DOUBLE) {
+        }
+        if ($byte < self::BYTE_DOUBLE) {
             return 2;
-        } elseif ($byte < self::BYTE_TRIPLE) {
+        }
+        if ($byte < self::BYTE_TRIPLE) {
             return 3;
-        } elseif ($byte < self::BYTE_QUAD) {
+        }
+        if ($byte < self::BYTE_QUAD) {
             return 4;
-        // DISABLED, AS IT IS NOT STANDARD …
+            // DISABLED, AS IT IS NOT STANDARD …
         // } elseif ($byte < self::BYTE_PENTA) {
         //     return 5;
         // } elseif ($byte < self::BYTE_HEXA) {

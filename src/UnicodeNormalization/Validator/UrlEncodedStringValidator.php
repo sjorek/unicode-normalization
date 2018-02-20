@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -10,7 +12,6 @@
  */
 
 namespace Sjorek\UnicodeNormalization\Validator;
-
 
 /**
  * Class for validating and sanitizing the normalization of unicode-based url-encoded strings.
@@ -29,8 +30,7 @@ class UrlEncodedStringValidator
      */
     public function __construct(StringValidator $stringValidator = null)
     {
-        if ($stringValidator === null)
-        {
+        if (null === $stringValidator) {
             $stringValidator = new StringValidator();
         }
         $this->stringValidator = $stringValidator;
@@ -42,19 +42,21 @@ class UrlEncodedStringValidator
      *
      * The implementation is adopted from \Patchwork\Utf8\Bootup::filterRequestUri() and tweaked for our needs.
      *
-     * @param string  $uri      The uri to filter
-     * @param integer $form     [optional] normalization form to check against, overriding the default
-     * @param string  $charset  [optional] charset to try to convert from, default is ISO-8859-1
+     * @param string $uri     The uri to filter
+     * @param int    $form    [optional] normalization form to check against, overriding the default
+     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     *
      * @return string
+     *
      * @see \Patchwork\Utf8\Bootup::filterRequestUri()
+     *
      * @todo Feature #57695: Keep this method in sync patchwork's implementation
      * @todo Feature #57695: Figure out why patchwork's implementation assumes Windows-CP1252 as fallback
      */
     public function sanitize($uri, $form = null, $charset = null)
     {
-
         // is url empty or is the url-decoded url already valid utf8 ?
-        if ($uri === '' || !preg_match('/[\x80-\xFF]/', urldecode($uri))) {
+        if ('' === $uri || !preg_match('/[\x80-\xFF]/', urldecode($uri))) {
             return $uri;
         }
 
@@ -73,7 +75,7 @@ class UrlEncodedStringValidator
         $uri = preg_replace_callback(
             '/(^|.)(?:%[89A-F][0-9A-F])+/i',
             // url-decode -> utf8-encode -> url-encode
-            function ($match) use($stringValidator, $form, $charset) {
+            function ($match) use ($stringValidator, $form, $charset) {
                 return urlencode($stringValidator->sanitize(urldecode($match[0]), $form, $charset));
             },
             $uri
@@ -85,12 +87,14 @@ class UrlEncodedStringValidator
     /**
      * Test if given uri is properly url-encoded with well-formed and normalized UTF-8.
      *
-     * @param string  $uri      The uri to to test
-     * @param integer $form     [optional] normalization form to check against, overriding the default
-     * @param string  $charset  [optional] charset to try to convert from, default is ISO-8859-1
-     * @return boolean TRUE if the string is a well-formed and normalized UTF-8 string.
+     * @param string $uri     The uri to to test
+     * @param int    $form    [optional] normalization form to check against, overriding the default
+     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     *
+     * @return bool TRUE if the string is a well-formed and normalized UTF-8 string
      */
-    public function isValid($uri, $form = null, $charset = null) {
-        return $uri === '' || $uri === $this->sanitize($uri, $form, $charset);
+    public function isValid($uri, $form = null, $charset = null)
+    {
+        return '' === $uri || $uri === $this->sanitize($uri, $form, $charset);
     }
 }

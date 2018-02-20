@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -11,7 +13,7 @@
 
 namespace Sjorek\UnicodeNormalization\Validator;
 
-
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Normalizer;
 
 /**
@@ -29,10 +31,9 @@ class StringValidator
     /**
      * @param Normalizer $normalizer
      */
-    public function __construct(Normalizer $normalizer = null)
+    public function __construct(NormalizerInterface $normalizer = null)
     {
-        if ($normalizer === null)
-        {
+        if (null === $normalizer) {
             $normalizer = new Normalizer();
         }
         $this->normalizer = $normalizer;
@@ -43,7 +44,8 @@ class StringValidator
      * linked below. It is meant for internal usage as part of NFC-compatible string-filter methods below.
      *
      * @var string
-     * @link http://www.unicode.org/glossary/#combining_character
+     *
+     * @see http://www.unicode.org/glossary/#combining_character
      */
     const LEADING_COMBINATOR = "\xe2\x97\x8c";
 
@@ -53,10 +55,12 @@ class StringValidator
      * This implementation has been shamelessly taken from the “patchwork/utf8”
      * package's “Bootup::filterString()”-method and tweaked for our needs.
      *
-     * @param string  $input    The string to filter
-     * @param integer $form     [optional] normalization form to apply, overriding the default
-     * @param string  $charset  [optional] charset to try to convert from, default is ISO-8859-1
-     * @return string|false     The converted string or false if given charset is unknown
+     * @param string $input   The string to filter
+     * @param int    $form    [optional] normalization form to apply, overriding the default
+     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     *
+     * @return string|false The converted string or false if given charset is unknown
+     *
      * @see \Patchwork\Utf8\Bootup::filterString()
      */
     public function sanitize($input, $form = null, $charset = null)
@@ -66,7 +70,7 @@ class StringValidator
             $self = $this;
             $input = explode("\r", $input);
             $input = array_map(
-                function($string) use($self, $form, $charset){
+                function ($string) use ($self, $form, $charset) {
                     $self->sanitize($string, $form, $charset);
                 },
                 $input
@@ -76,15 +80,12 @@ class StringValidator
         }
         if (preg_match('/[\x80-\xFF]/', $input) || !preg_match('//u', $input)) {
             $normalized = $this->normalizer->normalizeStringTo($input, $form);
-            if (isset($normalized[0]) && preg_match('//u', $normalized))
-            {
+            if (isset($normalized[0]) && preg_match('//u', $normalized)) {
                 $input = $normalized;
-            } elseif (false === ($input = $this->convertStringToUtf8($input, $charset)))
-            {
+            } elseif (false === ($input = $this->convertStringToUtf8($input, $charset))) {
                 return false;
             }
-            if ($input[0] >= "\x80" && isset($normalized[0]) && preg_match('/^\p{Mn}/u', $input))
-            {
+            if ($input[0] >= "\x80" && isset($normalized[0]) && preg_match('/^\p{Mn}/u', $input)) {
                 // Prepend leading combining chars for NFC-safe concatenations.
                 $input = self::LEADING_COMBINATOR . $input;
             }
@@ -96,19 +97,22 @@ class StringValidator
     /**
      * Test if given input is a well-formed and normalized UTF-8 string.
      *
-     * @param string  $input    The string to check
-     * @param integer $form     [optional] normalization form to check against, overriding the default
-     * @param string  $charset  [optional] charset to try to convert from, default is ISO-8859-1
-     * @return boolean TRUE if the string is a well-formed and normalized UTF-8 string.
+     * @param string $input   The string to check
+     * @param int    $form    [optional] normalization form to check against, overriding the default
+     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     *
+     * @return bool TRUE if the string is a well-formed and normalized UTF-8 string
      */
-    public function isValid($input, $form = null, $charset = null) {
+    public function isValid($input, $form = null, $charset = null)
+    {
         return $input === $this->sanitize($input, $form);
     }
 
     /**
-     * @param string  $input    The string to filter
-     * @param string  $charset  [optional] charset to try to convert from, default is ISO-8859-1
-     * @return string|false     The converted string or false if given charset is unknown
+     * @param string $input   The string to filter
+     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     *
+     * @return string|false The converted string or false if given charset is unknown
      */
     protected function convertStringToUtf8($input, $charset = null)
     {

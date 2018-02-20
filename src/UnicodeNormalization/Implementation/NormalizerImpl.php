@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -11,24 +13,20 @@
 
 namespace Sjorek\UnicodeNormalization\Implementation;
 
+use Sjorek\UnicodeNormalization\NormalizationUtility;
 
-use Sjorek\UnicodeNormalization\Utility;
-
-if (class_exists(__NAMESPACE__ . '\\NormalizerImpl', false))
-{
+if (class_exists(__NAMESPACE__ . '\\NormalizerImpl', false)) {
     // Nothing to do here …
-
-} elseif (Utility::getNormalizerImplementation() === 'Normalizer') {
-
+} elseif ('Normalizer' === NormalizationUtility::getImplementation()) {
     /**
-     * Unicode Normalizer Implementation
+     * Unicode Normalizer Implementation.
      *
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
-    class NormalizerImpl extends \Normalizer {}
-
+    class NormalizerImpl extends \Normalizer
+    {
+    }
 } else {
-
     // Alias normalizer implementation.
-    class_alias(Utility::getNormalizerImplementation(), __NAMESPACE__ . '\\NormalizerImpl', true);
+    class_alias(NormalizationUtility::getImplementation(), __NAMESPACE__ . '\\NormalizerImpl', true);
 }

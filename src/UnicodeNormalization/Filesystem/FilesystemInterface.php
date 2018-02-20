@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the Unicode Normalization project.
@@ -9,10 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Helper;
-
-
-use Symfony\Component\Filesystem\Exception\IOException;
+namespace Sjorek\UnicodeNormalization\Filesystem;
 
 /**
  * Interface for filesystem specific functionality.
@@ -35,7 +34,7 @@ interface FilesystemInterface
      *
      * @param string $dir The directory path
      *
-     * @throws IOException On any directory creation failure
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface On any directory creation failure
      */
     public function mkdir($dir);
 
@@ -44,7 +43,7 @@ interface FilesystemInterface
      *
      * @param string $file A filename
      *
-     * @throws IOException When touch fails
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When touch fails
      */
     public function touch($file);
 
@@ -53,7 +52,7 @@ interface FilesystemInterface
      *
      * @param string $file A filename to remove
      *
-     * @throws IOException When removal fails
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When removal fails
      */
     public function remove($file);
 }

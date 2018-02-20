@@ -11,7 +11,6 @@
 
 namespace Sjorek\UnicodeNormalization\Conformance;
 
-
 /**
  * An iterator to read "NormalizationTest.X.Y.Z.txt" fixture files.
  *
@@ -40,7 +39,7 @@ class NormalizationTestReader implements \IteratorAggregate
     protected $iterator;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $unicodeVersion
      * @param string $filePath
@@ -48,8 +47,7 @@ class NormalizationTestReader implements \IteratorAggregate
     public function __construct($unicodeVersion, $filePath = null)
     {
         $this->unicodeVersion = $unicodeVersion;
-        if ($filePath === null)
-        {
+        if (null === $filePath) {
             $sourceTemplate = implode(
                 DIRECTORY_SEPARATOR,
                 [
@@ -79,8 +77,7 @@ class NormalizationTestReader implements \IteratorAggregate
             }
         }
 
-        if (strtolower(substr($filePath, -3)) === '.gz')
-        {
+        if ('.gz' === strtolower(substr($filePath, -3))) {
             $filePath = 'compress.zlib://' . $filePath;
         }
 
@@ -108,9 +105,11 @@ class NormalizationTestReader implements \IteratorAggregate
     }
 
     /**
-     * @param  int        $lineNumber
-     * @param  string     $line
+     * @param int    $lineNumber
+     * @param string $line
+     *
      * @throws \Exception
+     *
      * @return string[]
      */
     public function processLine($lineNumber, $line)
@@ -121,7 +120,7 @@ class NormalizationTestReader implements \IteratorAggregate
         $comment = explode(')', $comment);
         $comment = trim(array_pop($comment));
 
-        if (count($codes) !== 7) {
+        if (7 !== count($codes)) {
             return;
         }
 
@@ -129,6 +128,6 @@ class NormalizationTestReader implements \IteratorAggregate
         $codes = array_filter($codes);
         $codes = array_map('hex2bin', $codes);
 
-        yield $lineNumber => array($comment, $codes);
+        yield $lineNumber => [$comment, $codes];
     }
 }
