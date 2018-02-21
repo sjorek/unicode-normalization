@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Validator;
+namespace Sjorek\UnicodeNormalization\Validation;
 
 /**
  * Class for validating and sanitizing the normalization of unicode-based url-encoded strings.

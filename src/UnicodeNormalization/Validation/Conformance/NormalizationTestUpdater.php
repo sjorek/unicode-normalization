@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Conformance;
+namespace Sjorek\UnicodeNormalization\Validation\Conformance;
 
 use Sjorek\UnicodeNormalization\NormalizationUtility;
 

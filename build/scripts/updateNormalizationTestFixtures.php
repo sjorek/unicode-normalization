@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Conformance;
+namespace Sjorek\UnicodeNormalization\Validation\Conformance;
 
 if ('cli' !== PHP_SAPI) {
     die('Script must be called from command line.' . PHP_EOL);

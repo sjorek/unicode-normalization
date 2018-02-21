@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\StreamFilter;
+use Sjorek\UnicodeNormalization\Validation\Conformance\NormalizationTestReader;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
