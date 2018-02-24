@@ -10,44 +10,125 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Validation\Conformance;
+namespace Sjorek\UnicodeNormalization\Tests\Conformance;
 
 if ('cli' !== PHP_SAPI) {
-    die('Script must be called from command line.' . PHP_EOL);
+    die('The script must be called from command line.' . PHP_EOL);
 }
 
-if (1 !== $argc) {
-    die('Invalid amount of command line arguments.' . PHP_EOL);
+if (!file_exists('composer.json')) {
+    die('The script must be called project root.' . PHP_EOL);
+}
+
+if (!file_exists('vendor/autoload.php')) {
+    die('Please run "php composer.phar install" once.".' . PHP_EOL);
 }
 
 require 'vendor/autoload.php';
 
-$unicodeVersions = ['6.3.0', '7.0.0', '8.0.0', '9.0.0', '10.0.0'];
-
 try {
-    foreach ($unicodeVersions as $unicodeVersion) {
-        $updater = new NormalizationTestUpdater(
-            $unicodeVersion
-        );
-        echo sprintf('Fetching unicode version %s from: %s', $unicodeVersion, $updater->source) . PHP_EOL;
 
-        $writer = new NormalizationTestWriter(
-            $unicodeVersion,
-            'sjorek/unicode-normalization',
-            $updater->source
-        );
-        echo sprintf('Importing unicode version %s to %s', $unicodeVersion, $writer->filePath) . PHP_EOL . PHP_EOL;
+    if (in_array('-h', $argv, true) || in_array('--help', $argv, true)) {
+        $usage = <<<EOT
+Usage:
+    php %script [-c|-h|-v] [--check|--help|--verbose] [UNICODE_VERSION...]
 
+Examples:
+    php %script
+    php %script --verbose %versions
+    php %script --verbose %latest
+    php %script --check
+    php %script --help
+EOT;
+        echo str_replace(
+            [
+                '%script',
+                '%latest',
+                '%versions',
+            ],
+            [
+                $argv[0],
+                NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST,
+                implode(' ', NormalizationTestUtility::KNOWN_UNICODE_VERSIONS)
+            ],
+            implode(PHP_EOL, explode("\n", $usage)) . PHP_EOL
+        );
+        exit(0);
+    }
+
+    $verbose = in_array('-v', $argv, true) || in_array('--verbose', $argv, true);
+    if ($verbose) {
+        $argv = array_filter($argv, function($arg) { return !in_array($arg, ['-v', '--verbose'], true); });
+    }
+
+    if (in_array('-c', $argv, true) || in_array('--check', $argv, true)) {
+        $current = NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST;
+        if ($verbose) {
+            echo sprintf(
+                'Current unicode version: %s' . PHP_EOL,
+                $current
+            );
+            echo 'Detecting latest unicode version ...' . PHP_EOL;
+        }
+        $latest = NormalizationTestUtility::detectLatestVersion();
+        if (version_compare($current, $latest, '=')) {
+            if ($verbose) {
+                echo 'The current unicode version is up-to-date.' . PHP_EOL;
+            }
+            exit(0);
+        } else {
+            if ($verbose) {
+                echo sprintf(
+                    'A new unicode version has been released: %s' .PHP_EOL,
+                    $latest
+                );
+            }
+            exit(1);
+        }
+    }
+
+    $versions = array_slice($argv, 1) ?: NormalizationTestUtility::KNOWN_UNICODE_VERSIONS;
+
+    foreach ($versions as $version) {
+        echo sprintf(
+            'Updating unicode normalization conformance tests for version: %s' . PHP_EOL,
+            $version
+        );
+
+        $updater = NormalizationTestUtility::createUpdater($version);
+        echo sprintf(
+            'Fetching tests from: %s' . PHP_EOL,
+            $updater->getSource()
+        );
+
+        $writer = NormalizationTestUtility::createWriter($version, $updater->getSource());
+        echo sprintf(
+            'Writing tests to: %s' . PHP_EOL,
+            $writer->getFilePath()
+        );
+
+        $amount  = 0;
         foreach ($updater as $lineNumber => $data) {
-            $line = array_shift($data);
-            $comment = array_shift($data);
+            list($line, $comment) = $data;
             if ($comment) {
-                echo sprintf('Processed line %s: %s', $lineNumber, $comment) . PHP_EOL;
+                $amount += 1;
+                if ($verbose) {
+                    echo sprintf('Processed line %s: %s' . PHP_EOL, $lineNumber, $comment);
+                }
             }
             $writer->add($line);
         }
-        echo sprintf('Imported unicode version %s to %s', $unicodeVersion, $writer->filePath) . PHP_EOL . PHP_EOL;
+
+        echo sprintf(
+            'Updated %d tests in: %s' . PHP_EOL . PHP_EOL,
+            $amount,
+            $writer->getFilePath()
+        );
     }
 } catch (\Exception $e) {
-    die(sprintf('An error occurred: %s', $e->getMessage()) . PHP_EOL);
+    echo sprintf(
+        PHP_EOL . 'An error occurred: ' . PHP_EOL . PHP_EOL . '    %s' . PHP_EOL . PHP_EOL,
+        $e->getMessage()
+    );
+    exit(1);
 }
