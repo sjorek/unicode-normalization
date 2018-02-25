@@ -1,0 +1,25 @@
+{
+    "name": "sjorek/unicode-normalization-symfony-implementation",
+    "description" : "This package provides symfony's polyfill implementations for the 'sjorek/unicode-normalization' package - please do not install this package directly.",
+    "homepage" : "https://sjorek.github.io/unicode-normalization/",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Stephan Jorek",
+            "email": "stephan.jorek@gmail.com"
+        }
+    ],
+    "type": "metapackage",
+    "require": {
+        "symfony/polyfill-intl-normalizer": "*",
+        "symfony/polyfill-mbstring": "*"
+    },
+    "suggest" : {
+        "ext-intl" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
+        "ext-mbstring" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead."
+    },
+    "version": "1.0.0",
+    "provide": {
+        "sjorek/unicode-normalization-implementation": "1.0.0"
+    }
+}

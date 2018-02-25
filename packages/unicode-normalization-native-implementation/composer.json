@@ -1,0 +1,21 @@
+{
+    "name": "sjorek/unicode-normalization-native-implementation",
+    "description" : "This package provides native implementations for the 'sjorek/unicode-normalization' package - please do not install this package directly.",
+    "homepage" : "https://sjorek.github.io/unicode-normalization/",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Stephan Jorek",
+            "email": "stephan.jorek@gmail.com"
+        }
+    ],
+    "type": "metapackage",
+    "require": {
+        "ext-intl": "*",
+        "ext-mbstring": "*"
+    },
+    "version": "1.0.0",
+    "provide": {
+        "sjorek/unicode-normalization-implementation": "1.0.0"
+    }
+}

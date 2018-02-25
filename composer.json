@@ -1,80 +1,112 @@
 {
-	"name" : "sjorek/unicode-normalization",
-	"description" : "An enhanced facade to existing unicode-normalization implementations.",
-	"homepage" : "https://sjorek.github.io/unicode-normalization/",
-	"license" : "BSD-3-Clause",
-	"authors": [
-		{
-			"name": "Stephan Jorek",
-			"email": "stephan.jorek@gmail.com"
-		}
-	],
-	"type" : "library",
-	"keywords" : [
-		"stream",
-		"stream-filter",
-		"unicode",
-		"normalization",
-		"utf8",
-		"nfc",
-		"nfd",
-		"nfkc",
-		"nfkd"
-	],
-	"autoload" : {
-		"psr-4" : {
-			"Sjorek\\UnicodeNormalization\\" : "src/UnicodeNormalization"
-		}
-	},
-	"autoload-dev" : {
-		"psr-4" : {
-			"Sjorek\\UnicodeNormalization\\Tests\\" : "tests/UnicodeNormalization/Tests"
-		}
-	},
-	"require" : {
-		"php": ">=7.0",
-		"symfony/filesystem": "^3.4"
-	},
-	"require-dev" : {
-		"ext-iconv": "*",
-		"ext-intl": "*",
-		"friendsofphp/php-cs-fixer": "^2.7",
-		"mikey179/vfsStream": "^1.6",
-		"patchwork/utf8": "*",
-		"phpunit/phpunit": "^6.4",
-		"sensiolabs/security-checker": "^4.1",
-		"symfony/polyfill-intl-normalizer": "*"
-	},
-	"replace" : {
-		"sjorek/unicode-normalization-stream-filter" : "*"
-	},
-	"suggest" : {
-		"ext-intl" : "This stream filter can use 'intl'-extension's native Normalizer-implementation to provide unicode-normalization in preference of the suggested php-based 'symfony/polyfill-intl-normalizer' or 'patchwork/utf8'package",
-		"ext-iconv" : "This stream filter can use a php-based implementation utilizing 'iconv'-extension and one of the other three Normalizer-implementations to provide a special unicode-normalization for HFS+ filesystems",
-		"symfony/polyfill-intl-normalizer" : "This stream filter can use the php-based Normalizer-implementation from 'symfony/polyfill-intl-normalizer' package to provide unicode-normalization, but 'intl'-extensions' native implementation is preferred",
-		"patchwork/utf8" : "This stream filter can use the php-based Normalizer-implementation from 'patchwork/utf8' package to provide unicode-normalization, but 'intl'-extensions' native implementation is preferred"
-	},
-	"config": {
-		"process-timeout": 900
-	},
-	"scripts": {
-		"unicode-normalization:build": [
-			"@unicode-normalization:security-check",
-			"@unicode-normalization:cs-lint",
-			"@unicode-normalization:test"
-		],
-		"unicode-normalization:test": "phpunit -v --exclude-group=large",
-		"unicode-normalization:test-all": "phpunit -v",
-		"unicode-normalization:test-large": "phpunit -v --group=large",
-		"unicode-normalization:test-coverage": "phpunit -v --exclude-group=large --coverage-html coverage",
-		"unicode-normalization:cs-lint": "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run",
-		"unicode-normalization:cs-fix": "php-cs-fixer fix -vv || true",
-		"unicode-normalization:security-check": [
-			"security-checker security:check --ansi"
-		],
-		"unicode-normalization:security-check-bugfix-for-travis": [
-			"security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
-		],
-		"unicode-normalization:update-test-fixtures": "@php build/scripts/updateUnicodeNormalizationTestFixtures.php"
-	}
+    "name" : "sjorek/unicode-normalization",
+    "description" : "An enhanced facade to existing unicode-normalization implementations.",
+    "homepage" : "https://sjorek.github.io/unicode-normalization/",
+    "license" : "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Stephan Jorek",
+            "email": "stephan.jorek@gmail.com"
+        }
+    ],
+    "type" : "library",
+    "keywords" : [
+        "stream",
+        "stream-filter",
+        "unicode",
+        "normalization",
+        "utf8",
+        "nfc",
+        "nfd",
+        "nfkc",
+        "nfkd"
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "Sjorek\\UnicodeNormalization\\" : "src/UnicodeNormalization"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "Sjorek\\UnicodeNormalization\\Tests\\" : "tests/UnicodeNormalization/Tests"
+        }
+    },
+    "require" : {
+        "php": ">=7.0",
+        "sjorek/unicode-normalization-implementation": "^1.0",
+        "symfony/filesystem": "^3.4"
+    },
+    "require-dev" : {
+        "ext-iconv": "*",
+        "ext-zlib": "*",
+        "friendsofphp/php-cs-fixer": "^2.7",
+        "mikey179/vfsStream": "^1.6",
+        "phpunit/phpunit": "^6.4",
+        "sensiolabs/security-checker": "^4.1"
+    },
+    "replace" : {
+        "sjorek/unicode-normalization-stream-filter" : "*"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/unicode-normalization-*-implementation"
+        }
+    ],
+    "suggest" : {
+        "ext-iconv" : "Eventually enables a special unicode-normalization mode for HFS+ filesystems (NFD_MAC), if the 'iconv' extension supports the 'utf-8-mac' charset."
+    },
+    "config": {
+        "process-timeout": 900
+    },
+    "scripts": {
+        "run:build": [
+            "@run:clean",
+            "@run:security-check",
+            "@run:cs-lint",
+            "@run:coverage"
+        ],
+        "run:clean": [
+            "[ -d coverage ] && rm -r coverage || true"
+        ],
+        "run:test": [
+            "phpunit -v --exclude-group=large"
+         ],
+        "run:test-all": [
+            "phpunit -v"
+        ],
+        "run:test-large": [
+            "phpunit -v --group=large"
+        ],
+        "run:test-conformance": [
+            "phpunit -v --group=conformance"
+        ],
+        "run:test-coverage": [
+            "phpunit -v --exclude-group=large --coverage-text"
+        ],
+        "run:test-all-coverage": [
+            "phpunit -v --coverage-text"
+        ],
+        "run:coverage": [
+            "phpunit -v --exclude-group=large --coverage-html coverage"
+        ],
+        "run:cs-lint": [
+            "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
+        ],
+        "run:cs-fix": [
+            "php-cs-fixer fix -vv || true"
+        ],
+        "run:security-check": [
+            "security-checker security:check --ansi"
+        ],
+        "run:security-check-bugfix-for-travis": [
+            "security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
+        ],
+        "run:normalization-test-fixtures-update-check": [
+            "@php build/scripts/updateNormalizationTestFixtures.php --check --verbose"
+        ],
+        "run:normalization-test-fixtures-update": [
+            "@php build/scripts/updateNormalizationTestFixtures.php"
+        ]
+    }
 }

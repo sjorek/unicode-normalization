@@ -1,0 +1,25 @@
+{
+    "name": "sjorek/unicode-normalization-patchwork-implementation",
+    "description" : "This package provides patchwork's polyfill implementations for the 'sjorek/unicode-normalization' package - please do not install this package directly.",
+    "homepage" : "https://sjorek.github.io/unicode-normalization/",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Stephan Jorek",
+            "email": "stephan.jorek@gmail.com"
+        }
+    ],
+    "type": "metapackage",
+    "require": {
+        "patchwork/utf8": "*"
+    },
+    "suggest" : {
+        "ext-iconv" : "For better performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
+        "ext-intl" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
+        "ext-mbstring" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead."
+    },
+    "version": "1.0.0",
+    "provide": {
+        "sjorek/unicode-normalization-implementation": "1.0.0"
+    }
+}
