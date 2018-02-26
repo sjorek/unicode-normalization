@@ -11,17 +11,17 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization;
+namespace Sjorek\UnicodeNormalization\Implementation;
 
 
 if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
     /**
      * Normalizer implementation (for IDE only).
      *
-     * @see Implementation\Normalizer
+     * @see StrictNormalizer
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
-    class Normalizer extends Implementation\Normalizer
+    class Normalizer extends BaseNormalizer
     {
     }
 }

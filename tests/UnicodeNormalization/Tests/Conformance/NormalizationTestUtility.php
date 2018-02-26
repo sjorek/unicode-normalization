@@ -63,6 +63,7 @@ EOT;
         . '/umisU';
 
     /**
+     * @see \Sjorek\UnicodeNormalization\NormalizationUtility::MAP_ICU_TO_UNICODE_VERSION
      * @var string
      */
     const UPDATE_CHECK_VERSION_LATEST = '10.0.0';

@@ -82,9 +82,17 @@ class NormalizationTestUpdater implements \IteratorAggregate
             $this->iterator = new \NoRewindIterator(new \SplFileObject($this->source, 'r', false));
         }
         return (function () {
+            $mbEncoding = null;
+            if (MB_OVERLOAD_STRING & (int) ini_get('mbstring.func_overload')) {
+                $mbEncoding = mb_internal_encoding();
+                mb_internal_encoding('8bit');
+            }
             foreach ($this->iterator as $lineNumber => $line) {
                 $lineNumber += 1;
                 yield $lineNumber => $this->processLine($lineNumber, $line);
+            }
+            if (null !== $mbEncoding) {
+                mb_internal_encoding($mbEncoding);
             }
         })();
     }

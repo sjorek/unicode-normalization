@@ -16,7 +16,7 @@ namespace Sjorek\UnicodeNormalization\Tests;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\StreamFilter;
-use Sjorek\UnicodeNormalization\Validation\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -353,6 +353,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
     /**
      * @test
      * @large
+     * @group conformance
      * @runInSeparateProcess
      * @dataProvider provideConformanceTestData
      *

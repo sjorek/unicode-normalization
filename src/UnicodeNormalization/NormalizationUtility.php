@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization;
 
 use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
-use Sjorek\UnicodeNormalization\Exception\InvalidNormalizerImplementation;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
@@ -112,14 +111,6 @@ class NormalizationUtility
     /**
      * @var string
      *
-     * @see \Normalizer
-     * @see http://.php.net/manual/en/class.normalizer.php
-     */
-    const IMPLEMENTATION_INTL = 'Normalizer';
-
-    /**
-     * @var string
-     *
      * @see \Symfony\Polyfill\Intl\Normalizer\Normalizer
      * @see https://packagist.org/packages/symfony/polyfill-intl-normalizer
      * @see https://github.com/symfony/polyfill-intl-normalizer
@@ -137,192 +128,39 @@ class NormalizationUtility
     const IMPLEMENTATION_PATCHWORK = 'Patchwork\\PHP\\Shim\\Normalizer';
 
     /**
-     * @var string
+     * Registration method to be called by (an) bootstrap script like "src/UnicodeNormalization/bootstrap.php".
      *
-     * @see \Sjorek\UnicodeNormalization\Implementation\StubNormalizer
+     * @return boolean
      */
-    const IMPLEMENTATION_STUB = __NAMESPACE__ . '\\Implementation\\StubNormalizer';
-
-    /**
-     * The normalizer implementation class.
-     *
-     * @var string
-     */
-    protected static $implementation = null;
-
-    /**
-     * Get the normalizer implementation's class-name.
-     *
-     * @throws InvalidNormalizerImplementation if all known implementations are missing
-     *
-     * @return string
-     *
-     * @see NormalizationUtility::registerImplementation()
-     */
-    public static function getImplementation()
+    public static function register()
     {
-        if (null === self::$implementation) {
-            $candidates = [
-                self::IMPLEMENTATION_INTL,
-                self::IMPLEMENTATION_SYMFONY,
-                self::IMPLEMENTATION_PATCHWORK,
-                self::IMPLEMENTATION_STUB,
-            ];
-            foreach ($candidates as $candidate) {
-                try {
-                    if (self::registerImplementation($candidate)) {
-                        return self::$implementation;
-                    }
-                } catch (InvalidNormalizerImplementation $e) {
-                }
-            }
-            // We should not get here, as the stub implementation is always available
-            throw new InvalidNormalizerImplementation('Missing normalizer implementation.', 1519042942);
+        $normalizerClass = __NAMESPACE__ . '\\Normalizer';
+        // Do not use the autoloader here !
+        if (class_exists($normalizerClass, false)) {
+            return false;
         }
-
-        return self::$implementation;
-    }
-
-    /**
-     * Register the normalizer implementation's class-name. The registration works once only.
-     *
-     * @param string $className The implementation class-name
-     *
-     * @throws InvalidNormalizerImplementation given implementation does not exist
-     *
-     * @return bool Returns true on success and false on subsequent calls
-     *
-     * @see NormalizationUtility::IMPLEMENTATION_INTL
-     * @see NormalizationUtility::IMPLEMENTATION_PATCHWORK
-     * @see NormalizationUtility::IMPLEMENTATION_SYMFONY
-     * @see NormalizationUtility::IMPLEMENTATION_STUB
-     */
-    public static function registerImplementation($className)
-    {
-        if (null === self::$implementation) {
-            if (class_exists((string) $className, true)) {
-                self::$implementation = (string) $className;
-
-                return true;
-            }
-            throw new InvalidNormalizerImplementation(
-                    sprintf('The given normalizer implementation does not exist: %s', $className),
-                    1519042943
-                );
+        $implementationClass = __NAMESPACE__ . '\\Implementation\\Normalizer';
+        // Do not use the autoloader here !
+        if (class_exists($implementationClass, false)) {
+            return false;
         }
-
-        return false;
-    }
-
-    /**
-     * Detect unicode conformance level, supported normalization forms and if the implementation is strict.
-     *
-     * The result might look like:
-     * <pre>
-     * php > [
-     * php >      'level' => '9.0.0.0',
-     * php >      'forms' => [
-     * php >          NormalizerInterface::NONE,
-     * php >          NormalizerInterface::NFC,
-     * php >          NormalizerInterface::NFD,
-     * php >          NormalizerInterface::NFKC,
-     * php >          NormalizerInterface::NFKC,
-     * php >          NormalizerInterface::NFD_MAC,
-     * php >      ],
-     * php >      'strict' => true,
-     * php > ]
-     * </pre>
-     *
-     *
-     * @see \IntlChar::getUnicodeVersion()
-     *
-     * @param null|mixed $implementation
-     *
-     * @return array
-     */
-    public static function detectCapabilities($implementation = null)
-    {
-        if (null === $implementation) {
-            $implementation = self::getImplementation();
-        }
-
-        if (class_exists($implementation, true) && method_exists($implementation, 'getCapabilities')) {
-            return call_user_func($implementation . '::getCapabilities');
-        }
-
-        $conformanceLevel = '0.0.0.0';
-        $normalizationForms = [];
-        $strictImplementation = true;
-
-        switch ($implementation) {
-            case self::IMPLEMENTATION_INTL:
-                if (extension_loaded('intl')) {
-                    $conformanceLevel = implode('.', \IntlChar::getUnicodeVersion());
-                    $normalizationForms = [
-                        NormalizerInterface::NONE,
-                        NormalizerInterface::NFC,
-                        NormalizerInterface::NFD,
-                        NormalizerInterface::NFKC,
-                        NormalizerInterface::NFKD,
-                    ];
-                    if (self::appleIconvIsAvailable()) {
-                        $normalizationForms[] = NormalizerInterface::NFD_MAC;
-                    }
-                    $strictImplementation = true;
-                    break;
-                }
-                if (
-                    !(
-                        is_a($implementation, self::IMPLEMENTATION_SYMFONY) ||
-                        is_a($implementation, self::IMPLEMENTATION_PATCHWORK)
-                    )) {
-                    throw new InvalidNormalizerImplementation(
-                        sprintf(
-                            'The normalizer implementation "%s" should either run with "intl"-extension loaded '
-                            . 'or implement a "%s::getCapabilities()" method.',
-                            $implementation,
-                            $implementation
-                        ),
-                        1519042943
-                    );
-                }
-                // no break here, to fall through to one of the polyfills
-            case self::IMPLEMENTATION_SYMFONY:
-            case self::IMPLEMENTATION_PATCHWORK:
-                // Beware: Normalizer-implementations from the 'patchwork/utf8' and
-                // 'symfony/polyfill-intl-normalizer' packages may have a higher conformance
-                // level than the native 'intl'-extension's implementation, as the latter
-                // depends on the underling ICU implementation.
-                // TODO replace hard-coded unicode-conformance-levels with a real detection or something better.
-                $conformanceLevel = '7.0.0.0';
-                $normalizationForms = [
-                    NormalizerInterface::NONE,
-                    NormalizerInterface::NFC,
-                    NormalizerInterface::NFD,
-                    NormalizerInterface::NFKC,
-                    NormalizerInterface::NFKD,
-                ];
-                if (self::appleIconvIsAvailable()) {
-                    $normalizationForms[] = NormalizerInterface::NFD_MAC;
-                }
-                $strictImplementation = false;
+        $baseClass = __NAMESPACE__ . '\\Implementation\\BaseNormalizer';
+        foreach([self::IMPLEMENTATION_SYMFONY, self::IMPLEMENTATION_PATCHWORK] as $looseImplementation) {
+            // Use the autoloader here !
+            if (class_exists($looseImplementation, true) && is_a('Normalizer', $looseImplementation, true)) {
+                $baseClass = __NAMESPACE__ . '\\Implementation\\StrictNormalizer';
                 break;
-            default:
-                throw new InvalidNormalizerImplementation(
-                    sprintf(
-                        'Missing "%s::getCapabilities()" method-implementation.',
-                        $implementation
-                    ),
-                    1519042944
-                );
+            }
         }
-
-        return [
-            // 'class' => $implementation,
-            'level' => $conformanceLevel,
-            'forms' => $normalizationForms,
-            'strict' => $strictImplementation,
-        ];
+        // Use the autoloader here !
+        if (!class_alias($baseClass, $implementationClass, true)) {
+            return false;
+        }
+        if (self::isNfdMacCompatible()) {
+            $implementationClass  = __NAMESPACE__ . '\\Implementation\\MacNormalizer';
+        }
+        // Use the autoloader here !
+        return class_alias($implementationClass, $normalizerClass, true);
     }
 
     /**
@@ -333,7 +171,7 @@ class NormalizationUtility
      *
      * @see Normalizer::NFD_MAC
      */
-    public static function appleIconvIsAvailable()
+    public static function isNfdMacCompatible()
     {
         $nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
         $mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
@@ -344,4 +182,174 @@ class NormalizationUtility
             $nfc === @iconv('utf-8-mac', 'utf-8', $mac)
         ;
     }
+
+    /**
+     * Get the supported unicode version level as version triple ("X.Y.Z").
+     * @throws \RuntimeException
+     * @return string
+     */
+    public static function detectUnicodeVersion()
+    {
+        if(extension_loaded('intl')) {
+            if (class_exists('IntlChar', true) && method_exists('IntlChar', 'getUnicodeVersion')) {
+                return implode('.', array_slice(\IntlChar::getUnicodeVersion(), 0, 3));
+            }
+            $icuVersion = null;
+            if (defined('INTL_ICU_VERSION')) {
+                $icuVersion = INTL_ICU_VERSION;
+            } else {
+                try {
+                    $reflector = new \ReflectionExtension('intl');
+                    ob_start();
+                    $reflector->info();
+                    $output = strip_tags(ob_get_clean());
+                    $matches = null;
+                    preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
+                    $icuVersion = trim($matches[1]);
+                } catch (\ReflectionException $e) {
+                    $icuVersion = null;
+                }
+            }
+            if ($icuVersion !== null) {
+                $icuVersion = array_shift(explode('.', $icuVersion));
+                // taken from http://source.icu-project.org/repos/icu/trunk/icu4j/main/classes/core/src/com/ibm/icu/util/VersionInfo.java
+                $icuToUnicodeVersionMap = [
+                    '49' => '6.1.0',
+                    '50' => '6.2.0',
+                    '52' => '6.3.0',
+                    '54' => '7.0.0',
+                    '56' => '8.0.0',
+                    '58' => '9.0.0',
+                    '60' => '10.0.0',
+                ];
+                if (isset($icuToUnicodeVersionMap[$icuVersion])) {
+                    return $icuToUnicodeVersionMap[$icuVersion];
+                }
+            }
+        } else {
+            $candidates = [
+                NormalizationUtility::IMPLEMENTATION_SYMFONY,
+                NormalizationUtility::IMPLEMENTATION_PATCHWORK
+            ];
+            foreach($candidates as $candidate) {
+                if(class_exists($candidate, true) && is_a('Normalizer', $candidate, true)) {
+                    // TODO replace hard-code unicode version with something better, especially for the Symfony implementation
+                    return '7.0.0';
+                }
+            }
+        }
+
+        throw new \RuntimeException('Could not determine unicode version.', 1519488534);
+    }
+
+//     /**
+//      * Detect unicode conformance level, supported normalization forms and if the implementation is strict.
+//      *
+//      * The result might look like:
+//      * <pre>
+//      * php > [
+//      * php >      'level' => '9.0.0.0',
+//      * php >      'forms' => [
+//      * php >          NormalizerInterface::NONE,
+//      * php >          NormalizerInterface::NFC,
+//      * php >          NormalizerInterface::NFD,
+//      * php >          NormalizerInterface::NFKC,
+//      * php >          NormalizerInterface::NFKC,
+//      * php >          NormalizerInterface::NFD_MAC,
+//      * php >      ],
+//      * php >      'strict' => true,
+//      * php > ]
+//      * </pre>
+//      *
+//      *
+//      * @see \IntlChar::getUnicodeVersion()
+//      *
+//      * @param null|mixed $implementation
+//      *
+//      * @return array
+//      */
+//     public static function detectCapabilities($implementation = null)
+//     {
+//         if (null === $implementation) {
+//             $implementation = self::getImplementation();
+//         }
+
+//         if (class_exists($implementation, true) && method_exists($implementation, 'getCapabilities')) {
+//             return call_user_func($implementation . '::getCapabilities');
+//         }
+
+//         $conformanceLevel = '0.0.0.0';
+//         $normalizationForms = [];
+//         $strictImplementation = true;
+
+//         switch ($implementation) {
+//             case self::IMPLEMENTATION_INTL:
+//                 if (extension_loaded('intl')) {
+//                     $conformanceLevel = implode('.', \IntlChar::getUnicodeVersion());
+//                     $normalizationForms = [
+//                         NormalizerInterface::NONE,
+//                         NormalizerInterface::NFC,
+//                         NormalizerInterface::NFD,
+//                         NormalizerInterface::NFKC,
+//                         NormalizerInterface::NFKD,
+//                     ];
+//                     if (self::appleIconvIsAvailable()) {
+//                         $normalizationForms[] = NormalizerInterface::NFD_MAC;
+//                     }
+//                     $strictImplementation = true;
+//                     break;
+//                 }
+//                 if (
+//                     !(
+//                         is_a($implementation, self::IMPLEMENTATION_SYMFONY) ||
+//                         is_a($implementation, self::IMPLEMENTATION_PATCHWORK)
+//                     )) {
+//                     throw new InvalidNormalizerImplementation(
+//                         sprintf(
+//                             'The normalizer implementation "%s" should either run with "intl"-extension loaded '
+//                             . 'or implement a "%s::getCapabilities()" method.',
+//                             $implementation,
+//                             $implementation
+//                         ),
+//                         1519042943
+//                     );
+//                 }
+//                 // no break here, to fall through to one of the polyfills
+//             case self::IMPLEMENTATION_SYMFONY:
+//             case self::IMPLEMENTATION_PATCHWORK:
+//                 // Beware: Normalizer-implementations from the 'patchwork/utf8' and
+//                 // 'symfony/polyfill-intl-normalizer' packages may have a higher conformance
+//                 // level than the native 'intl'-extension's implementation, as the latter
+//                 // depends on the underling ICU implementation.
+//                 // TODO replace hard-coded unicode-conformance-levels with a real detection or something better.
+//                 $conformanceLevel = '7.0.0.0';
+//                 $normalizationForms = [
+//                     NormalizerInterface::NONE,
+//                     NormalizerInterface::NFC,
+//                     NormalizerInterface::NFD,
+//                     NormalizerInterface::NFKC,
+//                     NormalizerInterface::NFKD,
+//                 ];
+//                 if (self::appleIconvIsAvailable()) {
+//                     $normalizationForms[] = NormalizerInterface::NFD_MAC;
+//                 }
+//                 $strictImplementation = false;
+//                 break;
+//             default:
+//                 throw new InvalidNormalizerImplementation(
+//                     sprintf(
+//                         'Missing "%s::getCapabilities()" method-implementation.',
+//                         $implementation
+//                     ),
+//                     1519042944
+//                 );
+//         }
+//         return [
+//             // 'class' => $implementation,
+//             'level' => $conformanceLevel,
+//             'forms' => $normalizationForms,
+//             'strict' => $strictImplementation,
+//         ];
+//     }
+
 }

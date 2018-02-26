@@ -16,7 +16,7 @@ namespace Sjorek\UnicodeNormalization\Tests;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Validation\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestUtility;
 
 /**
  * Base test case class for all unit-tests.
@@ -82,33 +82,37 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             if (NormalizerInterface::NONE === $form) {
                 continue;
             }
-            foreach (['6.3.0', '7.0.0', '8.0.0', '9.0.0', '10.0.0'] as $unicodeVersion) {
+            foreach (NormalizationTestUtility::KNOWN_UNICODE_VERSIONS as $version) {
+                // append an additional '.0' as the php implementation internally uses a version quadruple
+                $version .= '.0';
+                // It is more self-explanatory if the test and not the data-provider skips the tests
+                // if (version_compare($unicodeVersion, static::$capabilities['level'], '>')) {
+                //    continue;
+                // }
                 $caption = 'unicode version %s with normalization form %s (%s)';
                 switch ($form) {
                     case NormalizerInterface::NFC:
-                        $caption = sprintf($caption, $unicodeVersion, $form, 'NFC');
+                        $caption = sprintf($caption, $version, $form, 'NFC');
                         break;
                     case NormalizerInterface::NFD:
-                        $caption = sprintf($caption, $unicodeVersion, $form, 'NFD');
+                        $caption = sprintf($caption, $version, $form, 'NFD');
                         break;
                     case NormalizerInterface::NFKC:
-                        $caption = sprintf($caption, $unicodeVersion, $form, 'NFKC');
+                        $caption = sprintf($caption, $version, $form, 'NFKC');
                         break;
                     case NormalizerInterface::NFKD:
-                        $caption = sprintf($caption, $unicodeVersion, $form, 'NFKD');
+                        $caption = sprintf($caption, $version, $form, 'NFKD');
                         break;
                     case NormalizerInterface::NFD_MAC:
-                        $caption = sprintf($caption, $unicodeVersion, $form, 'NFD_MAC');
+                        $caption = sprintf($caption, $version, $form, 'NFD_MAC');
                         break;
                 }
-                if (!isset($iterators[$unicodeVersion])) {
-                    $iterators[$unicodeVersion] = new NormalizationTestReader($unicodeVersion);
+                if (!isset($iterators[$version])) {
+                    $iterators[$version] = NormalizationTestUtility::createReader($version);
                 }
-                // append an additional '.0' as the php implementation internally uses a version quadruple
-                $data[$caption] = [$unicodeVersion . '.0', $form, $iterators[$unicodeVersion]];
+                $data[$caption] = [$version, $form, $iterators[$version]];
             }
         }
-
         return $data;
     }
 

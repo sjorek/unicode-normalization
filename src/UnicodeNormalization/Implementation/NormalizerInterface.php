@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Implementation;
 
+use Normalizer;
+
 /**
  * Interface for the unicode normalizer facade.
  * Additionally required form constants are defined here.
@@ -30,7 +32,7 @@ interface NormalizerInterface
      *
      * @var int
      */
-    const NONE = 1;
+    const NONE = Normalizer::NONE;
 
     /**
      * Canonical decomposition.
@@ -47,7 +49,7 @@ interface NormalizerInterface
      * @see https://developer.apple.com/library/content/qa/qa1173/_index.html
      * @see https://developer.apple.com/library/content/qa/qa1235/_index.html
      */
-    const NFD = 2;
+    const NFD = Normalizer::NFD;
 
     /**
      * @var int
@@ -69,7 +71,7 @@ interface NormalizerInterface
      *
      * @see http://www.unicode.org/glossary/#normalization_form_kd
      */
-    const NFKD = 3;
+    const NFKD = Normalizer::NFKD;
 
     /**
      * @var int
@@ -94,7 +96,7 @@ interface NormalizerInterface
      *
      * @see http://www.unicode.org/glossary/#normalization_form_c
      */
-    const NFC = 4;
+    const NFC = Normalizer::NFC;
 
     /**
      * @var int
@@ -117,7 +119,7 @@ interface NormalizerInterface
      *
      * @see http://www.unicode.org/glossary/#normalization_form_kc
      */
-    const NFKC = 5;
+    const NFKC = Normalizer::NFKC;
 
     /**
      * @var int
@@ -160,7 +162,7 @@ interface NormalizerInterface
      * @see http://dubeiko.com/development/FileSystems/HFSPLUS/tn1150.html#CanonicalDecomposition
      * @see https://opensource.apple.com/source/libiconv/libiconv-50/libiconv/lib/utf8mac.h.auto.html
      */
-    const NFD_MAC = 32; // 0x2 & 0xF
+    const NFD_MAC = 18; // 0x02 (NFD) | 0x10 = 0x12 (18)
 
     /**
      * @var int
@@ -250,11 +252,16 @@ interface NormalizerInterface
     public function normalizeStringTo($input, $form = null);
 
     /**
-     * Return the unicode capabilities.
+     * Get the supported unicode version level as version triple ("X.Y.Z").
+     *
+     * @return string
+     */
+    public static function getUnicodeVersion();
+
+    /**
+     * Get the supported unicode normalization forms as array.
      *
      * @return array
-     *
-     * @see \Sjorek\UnicodeNormalization\NormalizationUtility::detectCapabilities()
      */
-    public static function getCapabilities();
+    public static function getNormalizationForms();
 }

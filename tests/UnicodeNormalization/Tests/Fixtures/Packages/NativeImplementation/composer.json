@@ -14,8 +14,7 @@
         "ext-intl": "*",
         "ext-mbstring": "*"
     },
-    "version": "1.0.0",
     "provide": {
-        "sjorek/unicode-normalization-implementation": "1.0.0"
+        "sjorek/unicode-normalization-implementation": "self.version"
     }
 }

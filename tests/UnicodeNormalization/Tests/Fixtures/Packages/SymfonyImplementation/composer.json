@@ -18,8 +18,7 @@
         "ext-intl" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
         "ext-mbstring" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead."
     },
-    "version": "1.0.0",
     "provide": {
-        "sjorek/unicode-normalization-implementation": "1.0.0"
+        "sjorek/unicode-normalization-implementation": "self.version"
     }
 }
