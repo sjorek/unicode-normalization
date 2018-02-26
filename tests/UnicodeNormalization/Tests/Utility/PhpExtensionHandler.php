@@ -36,6 +36,12 @@ class PhpExtensionHandler
         $handler->check();
     }
 
+    public static function renderWithout($extension, ...$extensions)
+    {
+        $handler = new static(array_merge([$extension], $extensions));
+        return $handler->render();
+    }
+
     /**
      * Constructor
      * @param string[] $extensions
@@ -89,11 +95,21 @@ class PhpExtensionHandler
     }
 
     /**
+     * Returns the rendered php ini
+     *
+     * @return string
+     */
+    protected function render()
+    {
+        return $this->renderIni($this->getAllPhpIniLocations());
+    }
+
+    /**
      * Executes the restarted command then deletes the tmp ini
      *
      * @param string $command
      */
-    protected function restart($command)
+    private function restart($command)
     {
         $exitCode = 1;
         passthru($command, $exitCode);
@@ -159,6 +175,18 @@ class PhpExtensionHandler
             return false;
         }
 
+        return @file_put_contents($this->tmpIni, $this->renderIni($iniPaths));
+    }
+
+    /**
+     * Returns the rendered php.ini
+     *
+     * @param array $iniPaths Locations reported by the current process
+     *
+     * @return string
+     */
+    private function renderIni(array $iniPaths)
+    {
         // $iniPaths has at least one item and it may be empty
         if (empty($iniPaths[0])) {
             array_shift($iniPaths);
@@ -183,7 +211,7 @@ class PhpExtensionHandler
             $content .= 'opcache.enable_cli=0' . PHP_EOL;
         }
 
-        return @file_put_contents($this->tmpIni, $content);
+        return $content;
     }
 
     /**
