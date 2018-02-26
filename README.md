@@ -11,10 +11,46 @@ php composer.phar require sjorek/unicode-normalization
 ```
 
 
-## Example
+## Usage
+
+### Stream filtering
 
 ```php
 <?php
+
+// Register normalization implementation (once)
+\Sjorek\UnicodeNormalization\Utility::register();
+
+// Register stream filter (once)
+\Sjorek\UnicodeNormalization\StreamFilter::register();
+
+/**
+ * @var $stream        resource    The stream to filter.
+ * @var $form          string      The form to normalize unicode to.
+ * @var $read_write    int         [optional] STREAM_FILTER_* constant to override the filter injection point
+ * @var $params        string|int  [optional] A normalization-form alias or value
+ *
+ * @link http://php.net/manual/en/function.stream-filter-append.php
+ * @link http://php.net/manual/en/function.stream-filter-prepend.php
+ */
+stream_filter_append($stream, "convert.unicode-normalization.$form"[, $read_write[, $params]]);
+```
+
+Note: Be careful when using on streams in `r+` or `w+` (or similar) modes; by default PHP will assign the
+filter to both the reading and writing chain. This means it will attempt to convert the data twice - first when
+reading from the stream, and once again when writing to it.
+
+
+## Examples
+
+### Stream filtering
+
+```php
+<?php
+// Register normalization implementation
+\Sjorek\UnicodeNormalization\Utility::register();
+
+// Register stream filter
 \Sjorek\UnicodeNormalization\StreamFilter::register();
 
 $in_file = fopen('utf8-file.txt', 'r');
@@ -22,31 +58,15 @@ $out_file = fopen('utf8-normalized-to-nfc-file.txt', 'w');
 
 // It works as a read filter:
 stream_filter_append($in_file, 'convert.unicode-normalization.NFC');
+
+// Normalization form may be given as fourth parameter:
+// stream_filter_append($in_file, 'convert.unicode-normalization', null, 'NFC');
+
 // And it also works as a write filter:
 // stream_filter_append($out_file, 'convert.unicode-normalization.NFC');
 
 stream_copy_to_stream($in_file, $out_file);
 ```
-
-
-## Usage
-
-```php
-<?php
-/**
- * @var $stream        resource   The stream to filter.
- * @var $form          string     The form to normalize unicode to.
- * @var $read_write    int        STREAM_FILTER_* constant to override the filter injection point
- *
- * @link http://php.net/manual/en/function.stream-filter-append.php
- * @link http://php.net/manual/en/function.stream-filter-prepend.php
- */
-stream_filter_append($stream, "convert.unicode-normalization.$form", $read_write);
-```
-
-Note: Be careful when using on streams in `r+` or `w+` (or similar) modes; by default PHP will assign the
-filter to both the reading and writing chain. This means it will attempt to convert the data twice - first when
-reading from the stream, and once again when writing to it.
 
 
 ## Contributing
