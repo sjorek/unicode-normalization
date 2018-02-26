@@ -24,20 +24,27 @@
     "autoload" : {
         "psr-4" : {
             "Sjorek\\UnicodeNormalization\\" : "src/UnicodeNormalization"
-        }
+        },
+        "files": [
+            "src/bootstrap.php"
+        ]
     },
     "autoload-dev" : {
         "psr-4" : {
             "Sjorek\\UnicodeNormalization\\Tests\\" : "tests/UnicodeNormalization/Tests"
-        }
+        },
+        "files": [
+            "tests/bootstrap.php"
+        ]
     },
     "require" : {
         "php": ">=7.0",
-        "sjorek/unicode-normalization-implementation": "^1.0",
         "symfony/filesystem": "^3.4"
     },
     "require-dev" : {
         "ext-iconv": "*",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
         "ext-zlib": "*",
         "friendsofphp/php-cs-fixer": "^2.7",
         "mikey179/vfsStream": "^1.6",
@@ -49,12 +56,17 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "packages/unicode-normalization-*-implementation"
+            "type" : "path",
+            "url" : "tests/UnicodeNormalization/Tests/Fixtures/Packages/*Implementation"
         }
     ],
     "suggest" : {
-        "ext-iconv" : "Eventually enables a special unicode-normalization mode for HFS+ filesystems (NFD_MAC), if the 'iconv' extension supports the 'utf-8-mac' charset."
+        "ext-iconv" : "Eventually enables a special unicode-normalization mode for HFS+ filesystems (NFD_MAC), if the 'iconv' extension supports the 'utf-8-mac' charset.",
+        "ext-intl" : "For best performance, but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
+        "ext-mbstring" : "For best performance, but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
+        "symfony/polyfill-intl-normalizer": "For compatibility, if one of the above php extensions is not available and the 'patchwork/utf8' package is not suiteable.",
+        "symfony/polyfill-mbstring": "For compatibility, if one of the above php extensions is not available and the 'patchwork/utf8' package is not suiteable.",
+        "patchwork/utf8": "For compatibility, if one of the above php extensions is not available and the 'symfony/polyfill-*' packages are not suiteable."
     },
     "config": {
         "process-timeout": 900
@@ -67,28 +79,59 @@
             "@run:coverage"
         ],
         "run:clean": [
-            "[ -d coverage ] && rm -r coverage || true"
+            "[ -d coverage ] && rm -r coverage || true",
+            "@run:remove-implementation-packages"
         ],
         "run:test": [
-            "phpunit -v --exclude-group=large"
+            "@run:require-native-implementation",
+            "phpunit -v --exclude-group=symfony --exclude-group=patchwork --exclude-group=large",
+            "@run:require-symfony-implementation",
+            "phpunit -v --group=symfony --exclude-group=large",
+            "@run:require-patchwork-implementation",
+            "phpunit -v --group=patchwork --exclude-group=large",
+            "@run:remove-implementation-packages"
          ],
         "run:test-all": [
-            "phpunit -v"
+            "@run:require-native-implementation",
+            "phpunit -v --exclude-group=symfony --exclude-group=patchwork",
+            "@run:require-symfony-implementation",
+            "phpunit -v --group=symfony",
+            "@run:require-patchwork-implementation",
+            "phpunit -v --group=patchwork",
+            "@run:remove-implementation-packages"
         ],
         "run:test-large": [
-            "phpunit -v --group=large"
+            "@run:require-native-implementation",
+            "phpunit -v --group=large",
+            "@run:require-symfony-implementation",
+            "phpunit -v --group=large",
+            "@run:require-patchwork-implementation",
+            "phpunit -v --group=large",
+            "@run:remove-implementation-packages"
         ],
         "run:test-conformance": [
-            "phpunit -v --group=conformance"
+            "@run:require-native-implementation",
+            "phpunit -v --group=conformance",
+            "@run:require-symfony-implementation",
+            "phpunit -v --group=conformance",
+            "@run:require-patchwork-implementation",
+            "phpunit -v --group=conformance",
+            "@run:remove-implementation-packages"
         ],
         "run:test-coverage": [
-            "phpunit -v --exclude-group=large --coverage-text"
+            "@run:require-native-implementation",
+            "phpunit -v --exclude-group=symfony --exclude-group=patchwork --exclude-group=large --coverage-text",
+            "@run:remove-implementation-packages"
         ],
         "run:test-all-coverage": [
-            "phpunit -v --coverage-text"
+            "@run:require-native-implementation",
+            "phpunit -v --exclude-group=symfony --exclude-group=patchwork --coverage-text",
+            "@run:remove-implementation-packages"
         ],
         "run:coverage": [
-            "phpunit -v --exclude-group=large --coverage-html coverage"
+            "@run:require-native-implementation",
+            "phpunit -v --exclude-group=large --coverage-html coverage",
+            "@run:remove-implementation-packages"
         ],
         "run:cs-lint": [
             "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
@@ -107,6 +150,37 @@
         ],
         "run:normalization-test-fixtures-update": [
             "@php build/scripts/updateNormalizationTestFixtures.php"
+        ],
+        "run:require-native-implementation": [
+            "@run:remove-implementation-packages",
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-implementation:@dev"
+        ],
+        "run:require-symfony-implementation": [
+            "@run:remove-implementation-packages",
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-implementation:@dev"
+        ],
+        "run:require-patchwork-implementation": [
+            "@run:remove-implementation-packages",
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-implementation:@dev"
+        ],
+        "run:remove-implementation-packages": [
+            "@composer remove --optimize-autoloader --no-interaction sjorek/unicode-normalization-native-implementation sjorek/unicode-normalization-symfony-implementation sjorek/unicode-normalization-patchwork-implementation"
+        ],
+        "run:venv": [
+            "@run:venv-remove",
+            "@run:venv-deploy"
+        ],
+        "run:venv-deploy": [
+            "@composer venv:shell -v --lock",
+            "@composer venv:shell-hook -v --lock",
+            "@composer venv:link -v --lock",
+            "@composer venv:git-hook -v --lock"
+        ],
+        "run:venv-remove": [
+            "@composer venv:shell -v --remove",
+            "@composer venv:shell-hook -v --remove",
+            "@composer venv:link -v --remove",
+            "@composer venv:git-hook -v --remove"
         ]
     }
 }
