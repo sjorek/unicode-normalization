@@ -10,6 +10,7 @@ matrix:
       env: LINT=true CHECK_SECURITY=true CHECK_UPDATE=true
     - php: 7.2
     - php: nightly
+      env: NIGHTLY=true
   allow_failures:
     - php: nightly
 
@@ -17,6 +18,7 @@ cache:
   directories:
     - $HOME/.composer/cache/files
     - $HOME/.php-cs-fixer
+    - $HOME/vendor
 
 install:
 - phpenv config-rm xdebug.ini || true
@@ -42,7 +44,7 @@ script:
 - if [[ $CHECK_SECURITY = true ]]; then
     composer -v run:security-check-bugfix-for-travis;
   fi
-- if [[ $CHECK_UPDATE = true ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+- if [[ $CHECK_UPDATE = true ]]; then
     composer -v run:normalization-test-fixtures-update-check;
   fi
 
