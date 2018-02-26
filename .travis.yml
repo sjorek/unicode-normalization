@@ -7,7 +7,7 @@ matrix:
   include:
     - php: 7.0
     - php: 7.1
-      env: LINT=true CHECK_SECURITY=true
+      env: LINT=true CHECK_SECURITY=true CHECK_UPDATE=true
     - php: 7.2
     - php: nightly
   allow_failures:
@@ -32,15 +32,18 @@ install:
 script:
 - if [[ $LINT = true ]]; then
     composer validate;
-    composer unicode-normalization:cs-lint;
+    composer run:cs-lint;
   fi
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer unicode-normalization:test-all;
+    composer run:test-all;
   else
-    composer unicode-normalization:test;
+    composer run:test;
   fi
 - if [[ $CHECK_SECURITY = true ]]; then
-    composer -v unicode-normalization:security-check-bugfix-for-travis;
+    composer -v run:security-check-bugfix-for-travis;
+  fi
+- if [[ $CHECK_UPDATE = true ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+    composer -v run:normalization-test-fixtures-update-check;
   fi
 
 sudo: false
