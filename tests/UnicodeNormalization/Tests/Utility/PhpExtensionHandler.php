@@ -32,13 +32,13 @@ class PhpExtensionHandler
 
     public static function runWithout($extension, ...$extensions)
     {
-        $handler = new static(array_merge([$extension], $extensions));
+        $handler = new static(array_merge(is_array($extension) ? $extension : [$extension], $extensions));
         $handler->check();
     }
 
     public static function renderWithout($extension, ...$extensions)
     {
-        $handler = new static(array_merge([$extension], $extensions));
+        $handler = new static(array_merge(is_array($extension) ? $extension : [$extension], $extensions));
         return $handler->render();
     }
 
@@ -48,8 +48,8 @@ class PhpExtensionHandler
      */
     protected function __construct(array $extensions)
     {
-        $this->extensions = $extensions;
-        $this->loaded = in_array(true, array_map('extension_loaded', $extensions), true);
+        $this->extensions = array_filter($extensions);
+        $this->loaded = in_array(true, array_map('extension_loaded', $this->extensions), true);
         $this->envScanDir = getenv('PHP_INI_SCAN_DIR');
     }
 
