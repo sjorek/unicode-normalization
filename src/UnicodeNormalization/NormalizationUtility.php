@@ -134,6 +134,12 @@ class NormalizationUtility
      */
     public static function register()
     {
+        // Use the autoloader here !
+        if (!(class_exists('Normalizer', true) ||
+              class_alias(__NAMESPACE__ . '\\Implementation\\MissingNormalizer', 'Normalizer', true)))
+        {
+            return false;
+        }
         $normalizerClass = __NAMESPACE__ . '\\Normalizer';
         // Do not use the autoloader here !
         if (class_exists($normalizerClass, false)) {
@@ -190,52 +196,49 @@ class NormalizationUtility
      */
     public static function detectUnicodeVersion()
     {
-        if(extension_loaded('intl')) {
-            if (class_exists('IntlChar', true) && method_exists('IntlChar', 'getUnicodeVersion')) {
-                return implode('.', array_slice(\IntlChar::getUnicodeVersion(), 0, 3));
+        $candidates = [
+            NormalizationUtility::IMPLEMENTATION_SYMFONY,
+            NormalizationUtility::IMPLEMENTATION_PATCHWORK
+        ];
+        foreach($candidates as $candidate) {
+            if(class_exists($candidate, true) && is_a('Normalizer', $candidate, true)) {
+                // TODO replace hard-code unicode version with something better, especially for the Symfony implementation
+                return '7.0.0';
             }
-            $icuVersion = null;
-            if (defined('INTL_ICU_VERSION')) {
-                $icuVersion = INTL_ICU_VERSION;
-            } else {
-                try {
-                    $reflector = new \ReflectionExtension('intl');
-                    ob_start();
-                    $reflector->info();
-                    $output = strip_tags(ob_get_clean());
-                    $matches = null;
-                    preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
-                    $icuVersion = trim($matches[1]);
-                } catch (\ReflectionException $e) {
-                    $icuVersion = null;
-                }
+        }
+        if (class_exists('IntlChar', true) && method_exists('IntlChar', 'getUnicodeVersion')) {
+            return implode('.', array_slice(\IntlChar::getUnicodeVersion(), 0, 3));
+        }
+        $icuVersion = null;
+        if (defined('INTL_ICU_VERSION')) {
+            $icuVersion = INTL_ICU_VERSION;
+        } elseif(extension_loaded('intl')) {
+            try {
+                $reflector = new \ReflectionExtension('intl');
+                ob_start();
+                $reflector->info();
+                $output = strip_tags(ob_get_clean());
+                $matches = null;
+                preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
+                $icuVersion = trim($matches[1]);
+            } catch (\ReflectionException $e) {
+                $icuVersion = null;
             }
-            if ($icuVersion !== null) {
-                $icuVersion = array_shift(explode('.', $icuVersion));
-                // taken from http://source.icu-project.org/repos/icu/trunk/icu4j/main/classes/core/src/com/ibm/icu/util/VersionInfo.java
-                $icuToUnicodeVersionMap = [
-                    '49' => '6.1.0',
-                    '50' => '6.2.0',
-                    '52' => '6.3.0',
-                    '54' => '7.0.0',
-                    '56' => '8.0.0',
-                    '58' => '9.0.0',
-                    '60' => '10.0.0',
-                ];
-                if (isset($icuToUnicodeVersionMap[$icuVersion])) {
-                    return $icuToUnicodeVersionMap[$icuVersion];
-                }
-            }
-        } else {
-            $candidates = [
-                NormalizationUtility::IMPLEMENTATION_SYMFONY,
-                NormalizationUtility::IMPLEMENTATION_PATCHWORK
+        }
+        if ($icuVersion !== null) {
+            $icuVersion = array_shift(explode('.', $icuVersion));
+            // taken from http://source.icu-project.org/repos/icu/trunk/icu4j/main/classes/core/src/com/ibm/icu/util/VersionInfo.java
+            $icuToUnicodeVersionMap = [
+                '49' => '6.1.0',
+                '50' => '6.2.0',
+                '52' => '6.3.0',
+                '54' => '7.0.0',
+                '56' => '8.0.0',
+                '58' => '9.0.0',
+                '60' => '10.0.0',
             ];
-            foreach($candidates as $candidate) {
-                if(class_exists($candidate, true) && is_a('Normalizer', $candidate, true)) {
-                    // TODO replace hard-code unicode version with something better, especially for the Symfony implementation
-                    return '7.0.0';
-                }
+            if (isset($icuToUnicodeVersionMap[$icuVersion])) {
+                return $icuToUnicodeVersionMap[$icuVersion];
             }
         }
 
