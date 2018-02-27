@@ -52,7 +52,7 @@ class MacNormalizer extends Normalizer
         if ('' === $input || !preg_match('/[\x80-\xFF]/', $input)) {
             return $input;
         }
-        $result =  parent::normalize($input, self::NFD);
+        $result =  parent::normalize($input, self::NFC);
         if (null === $result || false === $result) {
             return false;
         }
@@ -73,7 +73,7 @@ class MacNormalizer extends Normalizer
         if ('' === $input) {
             return true;
         }
-        $result = parent::normalize($input, self::NFD);
+        $result = parent::normalize($input, self::NFC);
         if (null === $result || false === $result) {
             return false;
         }
