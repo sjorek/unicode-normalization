@@ -48,7 +48,7 @@
         "ext-zlib": "*",
         "friendsofphp/php-cs-fixer": "^2.7",
         "mikey179/vfsStream": "^1.6",
-        "phpunit/phpunit": "^6.4",
+        "phpunit/phpunit": "^6.5",
         "sensiolabs/security-checker": "^4.1"
     },
     "replace" : {
