@@ -18,12 +18,6 @@ php composer.phar require sjorek/unicode-normalization
 ```php
 <?php
 
-// Register normalization implementation (once)
-\Sjorek\UnicodeNormalization\Utility::register();
-
-// Register stream filter (once)
-\Sjorek\UnicodeNormalization\StreamFilter::register();
-
 /**
  * @var $stream        resource    The stream to filter.
  * @var $form          string      The form to normalize unicode to.
@@ -47,11 +41,6 @@ reading from the stream, and once again when writing to it.
 
 ```php
 <?php
-// Register normalization implementation
-\Sjorek\UnicodeNormalization\Utility::register();
-
-// Register stream filter
-\Sjorek\UnicodeNormalization\StreamFilter::register();
 
 $in_file = fopen('utf8-file.txt', 'r');
 $out_file = fopen('utf8-normalized-to-nfc-file.txt', 'w');
