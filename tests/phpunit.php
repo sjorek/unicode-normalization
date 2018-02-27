@@ -12,10 +12,8 @@ declare(strict_types=1);
  */
 
 namespace Sjorek\UnicodeNormalization\Tests {
-    foreach(Utility\Configuration::LOOSE_IMPLEMENTATIONS as $implementation) {
-        if (class_exists($implementation, true)) {
-            Utility\PhpExtensionHandler::runWithout('intl');
-        }
+    if (Utility\ConfigurationUtility::isPolyfillImplementation()) {
+        Utility\PhpExtensionHandler::runWithout('intl');
     }
 }
 

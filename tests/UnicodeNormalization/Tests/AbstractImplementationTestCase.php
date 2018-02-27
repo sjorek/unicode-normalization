@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Normalizer;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -24,12 +24,12 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
     /**
      * @return array
      */
-    public function provideCheckIsNormalizedData()
+    public function provideTestIsNormalizedData()
     {
         $this->setUpDataProvider();
 
-        $forms = static::$capabilities['forms'];
-        $strict = static::$capabilities['strict'];
+        $forms = Normalizer::getNormalizationForms();
+        $strict = true;
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -38,12 +38,12 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
         $s_nfkd = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ad544d286129e4bda0');
         $s_mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
-        $f_NFD = NormalizerInterface::NFD;
-        $f_NFKC = NormalizerInterface::NFKC;
-        $f_NFKD = NormalizerInterface::NFKD;
-        $f_MAC = NormalizerInterface::NFD_MAC;
+        $f_NONE = Normalizer::NONE;
+        $f_NFC = Normalizer::NFC;
+        $f_NFD = Normalizer::NFD;
+        $f_NFKC = Normalizer::NFKC;
+        $f_NFKD = Normalizer::NFKD;
+        $f_MAC = Normalizer::NFD_MAC;
 
         $data = [];
 
@@ -148,12 +148,10 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
      * @param bool     $assert
      * @param string   $string
      * @param null|int $form
-     * @test
-     * @runInSeparateProcess
-     * @dataProvider provideCheckIsNormalizedData
+     * @dataProvider provideTestIsNormalizedData
      * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
      */
-    public function checkIsNormalized($assert, $string, $form)
+    public function testIsNormalized($assert, $string, $form)
     {
         $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
         if ($assert) {
@@ -166,11 +164,11 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
     /**
      * @return array
      */
-    public function provideCheckNormalizeData()
+    public function provideTestNormalizeData()
     {
         $this->setUpDataProvider();
 
-        $forms = static::$capabilities['forms'];
+        $forms = Normalizer::getNormalizationForms();
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -179,12 +177,12 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
         $s_nfkd = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ad544d286129e4bda0');
         $s_mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
-        $f_NFD = NormalizerInterface::NFD;
-        $f_NFKC = NormalizerInterface::NFKC;
-        $f_NFKD = NormalizerInterface::NFKD;
-        $f_MAC = NormalizerInterface::NFD_MAC;
+        $f_NONE = Normalizer::NONE;
+        $f_NFC = Normalizer::NFC;
+        $f_NFD = Normalizer::NFD;
+        $f_NFKC = Normalizer::NFKC;
+        $f_NFKD = Normalizer::NFKD;
+        $f_MAC = Normalizer::NFD_MAC;
 
         $c = $s_nfc . $s_nfd . $s_nfkc . $s_nfkd;
         $c_plus_m = $c . $s_mac;
@@ -258,12 +256,10 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
      * @param false|string $same
      * @param string       $string
      * @param null|int     $form
-     * @test
-     * @runInSeparateProcess
-     * @dataProvider provideCheckNormalizeData
+     * @dataProvider provideTestNormalizeData
      * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
      */
-    public function checkNormalize($same, $string, $form)
+    public function testNormalize($same, $string, $form)
     {
         $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
         if (false !== $same) {
@@ -274,17 +270,53 @@ abstract class AbstractImplementationTestCase extends AbstractNormalizationTestC
     }
 
     /**
+     * @param false|string $same
+     * @param string       $string
+     * @param null|int     $form
+     * @dataProvider provideTestNormalizeData
+     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
+     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
+     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
+     */
+    public function testNormalizeTo($same, $string, $form)
+    {
+        $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
+        if (false !== $same) {
+            $this->assertSame($same, $this->subject->normalizeTo($string, $form));
+        } else {
+            $this->assertFalse($this->subject->normalizeTo($string, $form));
+        }
+    }
+
+    /**
+     * @param false|string $same
+     * @param string       $string
+     * @param null|int     $form
+     * @dataProvider provideTestNormalizeData
+     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
+     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
+     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
+     */
+    public function testNormalizeStringTo($same, $string, $form)
+    {
+        $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
+        if (false !== $same) {
+            $this->assertSame($same, $this->subject->normalizeStringTo($string, $form));
+        } else {
+            $this->assertFalse($this->subject->normalizeStringTo($string, $form));
+        }
+    }
+
+    /**
      * @param string                  $unicodeVersion
      * @param int                     $form
      * @param NormalizationTestReader $fileIterator
-     * @test
      * @large
      * @group conformance
-     * @runInSeparateProcess
      * @dataProvider provideConformanceTestData
      * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
      */
-    public function checkNormalizeConformance($unicodeVersion, $form, NormalizationTestReader $fileIterator)
+    public function testNormalizeConformance($unicodeVersion, $form, NormalizationTestReader $fileIterator)
     {
         $this->markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion);
         $this->markTestSkippedIfAppleIconvIsNotAvailable($form);

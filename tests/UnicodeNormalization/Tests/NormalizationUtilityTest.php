@@ -18,7 +18,7 @@ use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
 use Sjorek\UnicodeNormalization\Normalizer;
 use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
-use Sjorek\UnicodeNormalization\Tests\Utility\Configuration;
+use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -136,13 +136,11 @@ class NormalizationUtilityTest extends AbstractTestCase
     public function testIsStrictImplementation()
     {
         $isStrict = NormalizationUtility::isStrictImplementation();
-        foreach(Configuration::LOOSE_IMPLEMENTATIONS as $candidate) {
-            if (class_exists($candidate, true) && is_a('Normalizer', $candidate, true)) {
-                $this->assertFalse($isStrict);
-                return ;
-            }
+        if (ConfigurationUtility::isPolyfillImplementation()) {
+            $this->assertFalse($isStrict);
+        } else {
+            $this->assertTrue($isStrict);
         }
-        $this->assertTrue($isStrict);
     }
 
     // ///////////////////////////////////////////////////
@@ -186,12 +184,8 @@ class NormalizationUtilityTest extends AbstractTestCase
         $unicodeVersion = NormalizationUtility::detectUnicodeVersion();
         $this->assertSame(1, preg_match('/^[1-9][0-9]*\.[0-9]+\.[0-9]+$/', $unicodeVersion));
         $this->assertTrue(version_compare('0.0.0', $unicodeVersion, '<'));
-        foreach(Configuration::LOOSE_IMPLEMENTATIONS as $candidate) {
-            // Do not use the autoloader here !
-            if (class_exists($candidate, false) && is_a('Normalizer', $candidate, true)) {
-                $this->assertSame('7.0.0', $unicodeVersion);
-                return;
-            }
+        if (ConfigurationUtility::isPolyfillImplementation()) {
+            $this->assertSame('7.0.0', $unicodeVersion);
         }
     }
 

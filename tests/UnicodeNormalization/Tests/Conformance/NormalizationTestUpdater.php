@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Conformance;
 
 use Sjorek\UnicodeNormalization\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
 
 /**
  * An iterator to update "UnicodeNormalizationTest.X.Y.Z.txt" files from www.unicode.org.
@@ -41,12 +42,12 @@ class NormalizationTestUpdater implements \IteratorAggregate
      */
     public function __construct($version)
     {
-        if (!extension_loaded('mbstring')) {
-            throw new \RuntimeException('The required extension "mbstring" is missing.');
+        if (!function_exists('mb_chr')) {
+            throw new \RuntimeException('The extension "mbstring" or an appropriate polyfill is missing.');
         }
-        if (!NormalizationUtility::appleIconvIsAvailable()) {
+        if (!NormalizationUtility::isNfdMacCompatible()) {
             throw new \RuntimeException(
-                'The required extension "iconv" is either missing or does not support the "utf-8-mac" charset.'
+                'The extension "iconv" is either missing or does not support the "utf-8-mac" charset.'
             );
         }
         $source = NormalizationTestUtility::createDownloadUrl($version);
@@ -135,7 +136,8 @@ class NormalizationTestUpdater implements \IteratorAggregate
                 explode(' ', $string)
             );
 
-            if (2 === $index) {
+            // Should be NFC
+            if (1 === $index) {
                 $mac = implode(
                     '',
                     array_map(

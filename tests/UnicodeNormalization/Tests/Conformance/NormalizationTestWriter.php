@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Conformance;
 
+use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
+
 /**
  * A file object to write "UnicodeNormalizationTest.X.Y.Z.txt" fixture files.
  *

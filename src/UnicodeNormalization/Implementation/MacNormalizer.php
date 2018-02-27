@@ -20,7 +20,7 @@ namespace Sjorek\UnicodeNormalization\Implementation;
  * @see https://github.com/symfony/polyfill/blob/master/src/Intl/Normalizer/Normalizer.php#L56
  * @see https://github.com/tchwork/utf8/blob/master/src/Patchwork/PHP/Shim/Normalizer.php#L53
  */
-class MacNormalizer extends Normalizer
+class MacNormalizer extends NormalizerImpl
 {
     /**
      * Array of supported normalization forms

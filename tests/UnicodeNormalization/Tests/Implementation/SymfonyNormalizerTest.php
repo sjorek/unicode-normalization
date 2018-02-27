@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
-use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Tests\AbstractImplementationTestCase;
+use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
 
 /**
- * Testcase for Sjorek\UnicodeNormalization\Implementation\StubNormalizer.
+ * Testcase for Normalizer implementation from "symfony/polyfill-intl-normalizer" package.
  *
+ * @group symfony
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class SymfonyNormalizerTest extends AbstractImplementationTestCase
@@ -26,5 +27,5 @@ class SymfonyNormalizerTest extends AbstractImplementationTestCase
     /**
      * @var string
      */
-    const IMPLEMENTATION_CLASS = NormalizationUtility::IMPLEMENTATION_SYMFONY;
+    const IMPLEMENTATION_CLASS = ConfigurationUtility::SYMFONY_IMPLEMENTATION;
 }

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Conformance;
 
+use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
+
 /**
  * An iterator to read "NormalizationTest.X.Y.Z.txt" fixture files.
  *

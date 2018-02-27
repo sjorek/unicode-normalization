@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Conformance;
+namespace Sjorek\UnicodeNormalization\Tests;
 
 if ('cli' !== PHP_SAPI) {
     die('The script must be called from command line.' . PHP_EOL);
@@ -48,8 +48,8 @@ EOT;
             ],
             [
                 $argv[0],
-                NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST,
-                implode(' ', NormalizationTestUtility::KNOWN_UNICODE_VERSIONS)
+                Utility\NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST,
+                implode(' ', Utility\ConfigurationUtility::getKnownUnicodeVersions())
             ],
             implode(PHP_EOL, explode("\n", $usage)) . PHP_EOL
         );
@@ -62,7 +62,7 @@ EOT;
     }
 
     if (in_array('-c', $argv, true) || in_array('--check', $argv, true)) {
-        $current = NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST;
+        $current = Utility\NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST;
         if ($verbose) {
             echo sprintf(
                 'Current unicode version: %s' . PHP_EOL,
@@ -70,7 +70,7 @@ EOT;
             );
             echo 'Detecting latest unicode version ...' . PHP_EOL;
         }
-        $latest = NormalizationTestUtility::detectLatestVersion();
+        $latest = Utility\NormalizationTestUtility::detectLatestVersion();
         if (version_compare($current, $latest, '=')) {
             if ($verbose) {
                 echo 'The current unicode version is up-to-date.' . PHP_EOL;
@@ -87,7 +87,7 @@ EOT;
         }
     }
 
-    $versions = array_slice($argv, 1) ?: NormalizationTestUtility::KNOWN_UNICODE_VERSIONS;
+    $versions = array_slice($argv, 1) ?: Utility\ConfigurationUtility::getKnownUnicodeVersions();
 
     foreach ($versions as $version) {
         echo sprintf(
@@ -95,13 +95,13 @@ EOT;
             $version
         );
 
-        $updater = NormalizationTestUtility::createUpdater($version);
+        $updater = Utility\NormalizationTestUtility::createUpdater($version);
         echo sprintf(
             'Fetching tests from: %s' . PHP_EOL,
             $updater->getSource()
         );
 
-        $writer = NormalizationTestUtility::createWriter($version, $updater->getSource());
+        $writer = Utility\NormalizationTestUtility::createWriter($version, $updater->getSource());
         echo sprintf(
             'Writing tests to: %s' . PHP_EOL,
             $writer->getFilePath()

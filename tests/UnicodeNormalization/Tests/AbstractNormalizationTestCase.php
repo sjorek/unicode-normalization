@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestUtility;
+use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
+use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
 
 /**
  * Base test case class for all unit-tests.
@@ -28,15 +28,15 @@ class AbstractNormalizationTestCase extends AbstractTestCase
     /**
      * @var string
      */
-    const IMPLEMENTATION_CLASS = null;
+    const IMPLEMENTATION_CLASS = 'Normalizer';
 
     /**
      * @var array
      */
-    protected static $capabilities = null;
+    protected static $unicodeVersion = null;
 
     /**
-     * @var NormalizerInterface
+     * @var \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface
      */
     protected $subject;
 
@@ -67,7 +67,7 @@ class AbstractNormalizationTestCase extends AbstractTestCase
      */
     protected function setUpCommon()
     {
-        self::$capabilities = NormalizationUtility::detectCapabilities(static::IMPLEMENTATION_CLASS);
+        self::$unicodeVersion = Normalizer::getUnicodeVersion();
     }
 
     /**
@@ -78,32 +78,25 @@ class AbstractNormalizationTestCase extends AbstractTestCase
         static $iterators;
         $this->setUpDataProvider();
         $data = [];
-        foreach (static::$capabilities['forms'] as $form) {
-            if (NormalizerInterface::NONE === $form) {
-                continue;
-            }
-            foreach (NormalizationTestUtility::KNOWN_UNICODE_VERSIONS as $version) {
-                // append an additional '.0' as the php implementation internally uses a version quadruple
-                $version .= '.0';
-                // It is more self-explanatory if the test and not the data-provider skips the tests
-                // if (version_compare($unicodeVersion, static::$capabilities['level'], '>')) {
-                //    continue;
-                // }
+        $versions = ConfigurationUtility::getFixtureUnicodeVersions();
+        $forms = [Normalizer::NFC, Normalizer::NFD, Normalizer::NFKC, Normalizer::NFKD, Normalizer::NFD_MAC];
+        foreach ($forms as $form) {
+            foreach ($versions as $version) {
                 $caption = 'unicode version %s with normalization form %s (%s)';
                 switch ($form) {
-                    case NormalizerInterface::NFC:
+                    case Normalizer::NFC:
                         $caption = sprintf($caption, $version, $form, 'NFC');
                         break;
-                    case NormalizerInterface::NFD:
+                    case Normalizer::NFD:
                         $caption = sprintf($caption, $version, $form, 'NFD');
                         break;
-                    case NormalizerInterface::NFKC:
+                    case Normalizer::NFKC:
                         $caption = sprintf($caption, $version, $form, 'NFKC');
                         break;
-                    case NormalizerInterface::NFKD:
+                    case Normalizer::NFKD:
                         $caption = sprintf($caption, $version, $form, 'NFKD');
                         break;
-                    case NormalizerInterface::NFD_MAC:
+                    case Normalizer::NFD_MAC:
                         $caption = sprintf($caption, $version, $form, 'NFD_MAC');
                         break;
                 }
@@ -128,14 +121,14 @@ class AbstractNormalizationTestCase extends AbstractTestCase
     protected function getConformanceTestIterator(
         $unicodeVersion, $form, $lineNumber, $comment, array $codes)
     {
-        // $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
-        $f_NFD = NormalizerInterface::NFD;
-        $f_NFKC = NormalizerInterface::NFKC;
-        $f_NFKD = NormalizerInterface::NFKD;
-        $f_MAC = NormalizerInterface::NFD_MAC;
+        // $f_NONE = Normalizer::NONE;
+        $f_NFC = Normalizer::NFC;
+        $f_NFD = Normalizer::NFD;
+        $f_NFKC = Normalizer::NFKC;
+        $f_NFKD = Normalizer::NFKD;
+        $f_MAC = Normalizer::NFD_MAC;
 
-        $validForMac = preg_match('/^(EFBFBD)+$/', bin2hex($codes[5]));
+        $validForMac = preg_match('/EFBFBD/', bin2hex($codes[5])) === 0;
 
         if ($form === $f_NFC) {
             $message = sprintf(
@@ -222,12 +215,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
      */
     protected function markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion)
     {
-        if (version_compare($unicodeVersion, static::$capabilities['level'], '>')) {
+        if (version_compare($unicodeVersion, static::$unicodeVersion, '>')) {
             $this->markTestSkipped(
                 sprintf(
                     'Skipped test as unicode version %s is higher than the supported unicode conformance level %s.',
                     $unicodeVersion,
-                    static::$capabilities['level']
+                    static::$unicodeVersion
                 )
             );
         }
@@ -235,8 +228,8 @@ class AbstractNormalizationTestCase extends AbstractTestCase
 
     protected function markTestSkippedIfAppleIconvIsNotAvailable($form)
     {
-        if (NormalizerInterface::NFD_MAC === NormalizationUtility::parseForm($form) &&
-            !NormalizationUtility::appleIconvIsAvailable()) {
+        $form = NormalizationUtility::parseForm($form);
+        if (Normalizer::NFD_MAC === $form && !NormalizationUtility::isNfdMacCompatible()) {
             $this->markTestSkipped(
                 'Skipped test as "iconv" extension is either not available '
                 . 'or not able to handle "utf-8-mac" charset.'
@@ -250,14 +243,8 @@ class AbstractNormalizationTestCase extends AbstractTestCase
     protected function implementationIsAvailable()
     {
         return
-            null === static::IMPLEMENTATION_CLASS ||
-            (
-                class_exists(static::IMPLEMENTATION_CLASS, true) &&
-                (
-                    NormalizationUtility::registerImplementation(static::IMPLEMENTATION_CLASS) ||
-                    NormalizationUtility::getImplementation() === static::IMPLEMENTATION_CLASS
-                )
-            )
+            class_exists(static::IMPLEMENTATION_CLASS, true) &&
+            is_a('Normalizer', static::IMPLEMENTATION_CLASS, true)
         ;
     }
 

@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Implementation;
 
 
-if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
+if (!class_exists(__NAMESPACE__ . '\\NormalizerImpl', false)) {
     /**
      * Normalizer implementation (for IDE only).
      *
      * @see StrictNormalizer
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
-    class Normalizer extends BaseNormalizer
+    class NormalizerImpl extends BaseNormalizer
     {
     }
 }

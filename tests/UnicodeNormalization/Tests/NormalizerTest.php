@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\NormalizationUtility;
-
 /**
  * Testcase for Sjorek\UnicodeNormalization\Normalizer.
  *
@@ -22,56 +20,4 @@ use Sjorek\UnicodeNormalization\NormalizationUtility;
  */
 class NormalizerTest extends AbstractImplementationTestCase
 {
-    /**
-     * @var string
-     */
-    const IMPLEMENTATION_CLASS = NormalizationUtility::IMPLEMENTATION_INTL;
-
-    /**
-     * @param false|string $same
-     * @param string       $string
-     * @param null|int     $form
-     * @test
-     * @dataProvider provideCheckNormalizeData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
-     */
-    public function checkNormalizeTo($same, $string, $form)
-    {
-        $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
-        if (false !== $same) {
-            $this->assertSame($same, $this->subject->normalizeTo($string, $form));
-        } else {
-            $this->assertFalse($this->subject->normalizeTo($string, $form));
-        }
-    }
-
-    /**
-     * @param false|string $same
-     * @param string       $string
-     * @param null|int     $form
-     * @test
-     * @dataProvider provideCheckNormalizeData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
-     */
-    public function checkNormalizeStringTo($same, $string, $form)
-    {
-        $this->markTestSkippedIfAppleIconvIsNotAvailable($form);
-        if (false !== $same) {
-            $this->assertSame($same, $this->subject->normalizeStringTo($string, $form));
-        } else {
-            $this->assertFalse($this->subject->normalizeStringTo($string, $form));
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    protected function implementationIsAvailable()
-    {
-        return extension_loaded('intl') && parent::implementationIsAvailable();
-    }
 }

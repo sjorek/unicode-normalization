@@ -116,7 +116,7 @@ class NormalizationUtility
     public static function register()
     {
         $normalizerClass = __NAMESPACE__ . '\\Normalizer';
-        $implementationClass = __NAMESPACE__ . '\\Implementation\\Normalizer';
+        $implementationClass = __NAMESPACE__ . '\\Implementation\\NormalizerImpl';
         $baseClass = __NAMESPACE__ . '\\Implementation\\BaseNormalizer';
 
         // Use the autoloader here !

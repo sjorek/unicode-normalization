@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
-use Sjorek\UnicodeNormalization\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Tests\AbstractImplementationTestCase;
+use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
 
 /**
- * Testcase for Normalizer implementation from patchwork/utf8 package.
+ * Testcase for Normalizer implementation from "patchwork/utf8" package.
  *
+ * @group patchwork
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class PatchworkNormalizerTest extends AbstractImplementationTestCase
@@ -26,5 +27,5 @@ class PatchworkNormalizerTest extends AbstractImplementationTestCase
     /**
      * @var string
      */
-    const IMPLEMENTATION_CLASS = NormalizationUtility::IMPLEMENTATION_PATCHWORK;
+    const IMPLEMENTATION_CLASS = ConfigurationUtility::PATCHWORK_IMPLEMENTATION;
 }

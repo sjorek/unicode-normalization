@@ -11,7 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Conformance;
+namespace Sjorek\UnicodeNormalization\Tests\Utility;
+
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestUpdater;
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestWriter;
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
 
 /**
  * Utility functions dealing with "NormalizationTest.X.Y.Z.txt" fixture files.
@@ -20,11 +24,6 @@ namespace Sjorek\UnicodeNormalization\Tests\Conformance;
  */
 class NormalizationTestUtility
 {
-    /**
-     * @var array
-     */
-    const KNOWN_UNICODE_VERSIONS = ['6.3.0', '7.0.0', '8.0.0', '9.0.0', '10.0.0'];
-
     /**
      * @var string
      */

@@ -21,7 +21,7 @@ if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
      * @see Implementation\Normalizer
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
-    class Normalizer extends Implementation\Normalizer
+    class Normalizer extends Implementation\NormalizerImpl
     {
     }
 }
