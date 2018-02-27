@@ -15,7 +15,9 @@
          stopOnFailure="false"
          stopOnIncomplete="false"
          stopOnSkipped="false"
-         stopOnRisky="true"
+         stopOnRisky="false"
+         failOnRisky="true"
+         failOnWarning="true"
          syntaxCheck="false"
          colors="auto"
          verbose="true">
@@ -31,7 +33,7 @@
     </filter>
 
     <php>
-        <ini name="memory_limit" value="32M"/>
+        <ini name="memory_limit" value="16M"/>
     </php>
 
 </phpunit>
