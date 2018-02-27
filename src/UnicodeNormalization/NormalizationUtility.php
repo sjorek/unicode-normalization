@@ -134,23 +134,21 @@ class NormalizationUtility
      */
     public static function register()
     {
-        // Use the autoloader here !
-        if (!(class_exists('Normalizer', true) ||
-              class_alias(__NAMESPACE__ . '\\Implementation\\MissingNormalizer', 'Normalizer', true)))
-        {
-            return false;
-        }
         $normalizerClass = __NAMESPACE__ . '\\Normalizer';
-        // Do not use the autoloader here !
-        if (class_exists($normalizerClass, false)) {
-            return false;
-        }
         $implementationClass = __NAMESPACE__ . '\\Implementation\\Normalizer';
+        $baseClass = __NAMESPACE__ . '\\Implementation\\BaseNormalizer';
+
+        // Use the autoloader here !
+        if (!class_exists('Normalizer', true))
+        {
+            return
+                class_alias(__NAMESPACE__ . '\\Implementation\\MissingNormalizer', 'Normalizer', true) &&
+                class_exists($normalizerClass, true);
+        }
         // Do not use the autoloader here !
-        if (class_exists($implementationClass, false)) {
+        if (class_exists($normalizerClass, false) || class_exists($implementationClass, false)) {
             return false;
         }
-        $baseClass = __NAMESPACE__ . '\\Implementation\\BaseNormalizer';
         foreach([self::IMPLEMENTATION_SYMFONY, self::IMPLEMENTATION_PATCHWORK] as $looseImplementation) {
             // Use the autoloader here !
             if (class_exists($looseImplementation, true) && is_a('Normalizer', $looseImplementation, true)) {
