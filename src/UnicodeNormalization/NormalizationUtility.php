@@ -31,7 +31,7 @@ class NormalizationUtility
      * - Disable unicode-normalization     : 0,  false, null, empty
      * - Ignore/skip unicode-normalization : 1,  NONE, true, binary, default, validate
      * - Normalization form D              : 2,  NFD, FORM_D, D, form-d, decompose, collation
-     * - Normalization form D (mac)        : 32, NFD_MAC, FORM_D_MAC, D_MAC, form-d-mac, d-mac, mac
+     * - Normalization form D (mac)        : 18, NFD_MAC, FORM_D_MAC, D_MAC, form-d-mac, d-mac, mac
      * - Normalization form KD             : 3,  NFKD, FORM_KD, KD, form-kd
      * - Normalization form C              : 4,  NFC, FORM_C, C, form-c, compose, recompose, legacy, html5
      * - Normalization form KC             : 5,  NFKC, FORM_KC, KC, form-kc, matching
@@ -109,25 +109,6 @@ class NormalizationUtility
     }
 
     /**
-     * @var string
-     *
-     * @see \Symfony\Polyfill\Intl\Normalizer\Normalizer
-     * @see https://packagist.org/packages/symfony/polyfill-intl-normalizer
-     * @see https://github.com/symfony/polyfill-intl-normalizer
-     * @see https://github.com/symfony/polyfill/tree/master/src/Intl/Normalizer
-     */
-    const IMPLEMENTATION_SYMFONY = 'Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer';
-
-    /**
-     * @var string
-     *
-     * @see \Patchwork\\PHP\Shim\Normalizer
-     * @see https://packagist.org/packages/patchwork/utf8
-     * @see https://github.com/tchwork/utf8
-     */
-    const IMPLEMENTATION_PATCHWORK = 'Patchwork\\PHP\\Shim\\Normalizer';
-
-    /**
      * Registration method to be called by (an) bootstrap script like "src/UnicodeNormalization/bootstrap.php".
      *
      * @return boolean
@@ -149,12 +130,8 @@ class NormalizationUtility
         if (class_exists($normalizerClass, false) || class_exists($implementationClass, false)) {
             return false;
         }
-        foreach([self::IMPLEMENTATION_SYMFONY, self::IMPLEMENTATION_PATCHWORK] as $looseImplementation) {
-            // Use the autoloader here !
-            if (class_exists($looseImplementation, true) && is_a('Normalizer', $looseImplementation, true)) {
-                $baseClass = __NAMESPACE__ . '\\Implementation\\StrictNormalizer';
-                break;
-            }
+        if (!self::isStrictImplementation()) {
+            $baseClass = __NAMESPACE__ . '\\Implementation\\StrictNormalizer';
         }
         // Use the autoloader here !
         if (!class_alias($baseClass, $implementationClass, true)) {
@@ -165,6 +142,25 @@ class NormalizationUtility
         }
         // Use the autoloader here !
         return class_alias($implementationClass, $normalizerClass, true);
+    }
+
+    /**
+     * Return true if the \Normalizer implementation is strict.
+     * Strict implementations process every character in a string to determine if a string is normalized.
+     *
+     * @return bool
+     *
+     * @see \Symfony\Polyfill\Intl\Normalizer\Normalizer
+     * @see https://github.com/symfony/polyfill-intl-normalizer/blob/master/Normalizer.php#L56
+     * @see https://packagist.org/packages/symfony/polyfill-intl-normalizer
+     * @see \Patchwork\PHP\Shim\Normalizer
+     * @see https://github.com/tchwork/utf8/blob/master/src/Patchwork/PHP/Shim/Normalizer.php#L53
+     * @see https://packagist.org/packages/patchwork/utf8
+     */
+    public static function isStrictImplementation()
+    {
+        // déjà 훈쇼™⒜你
+        return \Normalizer::isNormalized(hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0'));
     }
 
     /**
@@ -194,15 +190,9 @@ class NormalizationUtility
      */
     public static function detectUnicodeVersion()
     {
-        $candidates = [
-            NormalizationUtility::IMPLEMENTATION_SYMFONY,
-            NormalizationUtility::IMPLEMENTATION_PATCHWORK
-        ];
-        foreach($candidates as $candidate) {
-            if(class_exists($candidate, true) && is_a('Normalizer', $candidate, true)) {
-                // TODO replace hard-code unicode version with something better, especially for the Symfony implementation
-                return '7.0.0';
-            }
+        if (!extension_loaded('intl')) {
+            // TODO replace hard-coded version with a real detection
+            return '7.0.0';
         }
         if (class_exists('IntlChar', true) && method_exists('IntlChar', 'getUnicodeVersion')) {
             return implode('.', array_slice(\IntlChar::getUnicodeVersion(), 0, 3));
@@ -210,7 +200,7 @@ class NormalizationUtility
         $icuVersion = null;
         if (defined('INTL_ICU_VERSION')) {
             $icuVersion = INTL_ICU_VERSION;
-        } elseif(extension_loaded('intl')) {
+        } else {
             try {
                 $reflector = new \ReflectionExtension('intl');
                 ob_start();

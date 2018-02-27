@@ -13,8 +13,12 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
+use Sjorek\UnicodeNormalization\Normalizer;
+use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
+use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
+use Sjorek\UnicodeNormalization\Tests\Utility\Configuration;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -25,7 +29,7 @@ class NormalizationUtilityTest extends AbstractTestCase
     // Tests concerning normalization form string parsing
     // ///////////////////////////////////////////////////
 
-    public function provideCheckParseFormData()
+    public function provideTestParseFormData()
     {
         $data = [];
         $matches = null;
@@ -74,153 +78,37 @@ class NormalizationUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     * @dataProvider provideCheckParseFormData
+     * @dataProvider provideTestParseFormData
      * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::parseForm()
      *
      * @param int   $expected
      * @param mixed $form
      */
-    public function checkParseForm($expected, $form)
+    public function testParseForm($expected, $form)
     {
         $this->assertSame($expected, NormalizationUtility::parseForm($form));
     }
 
     /**
-     * @test
      * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
      * @expectedExceptionCode       1398603947
      * @covers \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::parseForm()
      */
-    public function checkParseFormThrowsInvalidNormalizationFormException()
+    public function testParseFormThrowsInvalidNormalizationFormException()
     {
         NormalizationUtility::parseForm('nonsense');
     }
 
     // ///////////////////////////////////////////////////
-    // Tests concerning unicode capabilities
+    // Tests concerning implementation capabilities
     // ///////////////////////////////////////////////////
 
     /**
-     * @test
-     * @runInSeparateProcess
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::detectCapabilities()
+     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::isNfdMacCompatible()
      */
-    public function checkDetectUnicodeCapabilities()
-    {
-        $capabilities = NormalizationUtility::detectCapabilities();
-
-        $this->assertInternalType('array', $capabilities);
-
-        $keys = array_keys($capabilities);
-        $this->assertTrue(sort($keys));
-        $this->assertSame(['forms', 'level', 'strict'], $keys);
-
-        $this->assertArrayHasKey('forms', $capabilities);
-        $this->assertTrue(in_array(NormalizerInterface::NONE, $capabilities['forms'], true));
-
-        $this->assertArrayHasKey('level', $capabilities);
-        $this->assertTrue((bool) preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $capabilities['level']));
-        $this->assertTrue(version_compare('0.0.0.0', $capabilities['level'], '<='));
-
-        $this->assertArrayHasKey('strict', $capabilities);
-        $this->assertInternalType('bool', $capabilities['strict']);
-    }
-
-    // ///////////////////////////////////////////////////
-    // Tests concerning unicode normalizer implementation
-    // ///////////////////////////////////////////////////
-
-    /**
-     * @return string[][]
-     */
-    public function provideCheckRegisterImplementation()
-    {
-        return [
-            'intl extension' => [
-                NormalizationUtility::IMPLEMENTATION_INTL,
-            ],
-            'patchwork/utf8 package' => [
-                NormalizationUtility::IMPLEMENTATION_PATCHWORK,
-            ],
-            'symfony/polyfill-intl-normalizer package' => [
-                NormalizationUtility::IMPLEMENTATION_SYMFONY,
-            ],
-            'stub implementation' => [
-                NormalizationUtility::IMPLEMENTATION_STUB,
-            ],
-        ];
-    }
-
-    /**
-     * @test
-     * @runInSeparateProcess
-     * @dataProvider provideCheckRegisterImplementation
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::getImplementation()
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::registerImplementation()
-     *
-     * @param mixed $implementationClass
-     */
-    public function checkRegisterImplementation($implementationClass)
-    {
-        $this->assertTrue(NormalizationUtility::registerImplementation($implementationClass));
-        $this->assertFalse(NormalizationUtility::registerImplementation($implementationClass));
-        $this->assertSame($implementationClass, NormalizationUtility::getImplementation());
-        $this->assertTrue(
-            is_a(
-                \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::class,
-                $implementationClass,
-                true
-            )
-        );
-    }
-
-    /**
-     * @test
-     * @runInSeparateProcess
-     * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizerImplementation
-     * @expectedExceptionMessage    The given normalizer implementation does not exist: NoneExistentImplementation
-     * @expectedExceptionCode       1519042943
-     * @covers \Sjorek\UnicodeNormalization\Exception\InvalidNormalizerImplementation
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::registerImplementation()
-     */
-    public function checkRegisterImplementationThrowsInvalidNormalizerImplementation()
-    {
-        NormalizationUtility::registerImplementation('NoneExistentImplementation');
-    }
-
-    /**
-     * @test
-     * @runInSeparateProcess
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::getImplementation()
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::registerImplementation()
-     */
-    public function checkGetImplementation()
-    {
-        $this->assertTrue(
-            in_array(
-                NormalizationUtility::getImplementation(),
-                [
-                    NormalizationUtility::IMPLEMENTATION_INTL,
-                    NormalizationUtility::IMPLEMENTATION_SYMFONY,
-                    NormalizationUtility::IMPLEMENTATION_PATCHWORK,
-                    NormalizationUtility::IMPLEMENTATION_STUB,
-                ],
-                true
-            )
-        );
-    }
-
-    // ///////////////////////////////////////////////////
-    // Tests concerning iconv implementation
-    // ///////////////////////////////////////////////////
-
-    /**
-     * @test
-     */
-    public function checkAppleIconvIsAvailable()
+    public function testIsNfdMacCompatible()
     {
         $expected = extension_loaded('iconv');
         if ($expected) {
@@ -228,7 +116,8 @@ class NormalizationUtilityTest extends AbstractTestCase
             error_reporting(E_ALL);
             set_error_handler(
                 function ($errno, $errstr, $errfile, $errline) use (&$expected) {
-                    if ('iconv(): Wrong charset' === substr($errstr, 0, strlen('iconv(): Wrong charset'))) {
+                    $message = 'iconv(): Wrong charset';
+                    if ($message === substr($errstr, 0, strlen($message))) {
                         $expected = false;
                     }
                 },
@@ -238,6 +127,92 @@ class NormalizationUtilityTest extends AbstractTestCase
             restore_error_handler();
             error_reporting($level);
         }
-        $this->assertSame($expected, NormalizationUtility::appleIconvIsAvailable());
+        $this->assertSame($expected, NormalizationUtility::isNfdMacCompatible());
     }
+
+    /**
+     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::isStrictImplementation();
+     */
+    public function testIsStrictImplementation()
+    {
+        $isStrict = NormalizationUtility::isStrictImplementation();
+        foreach(Configuration::LOOSE_IMPLEMENTATIONS as $candidate) {
+            if (class_exists($candidate, true) && is_a('Normalizer', $candidate, true)) {
+                $this->assertFalse($isStrict);
+                return ;
+            }
+        }
+        $this->assertTrue($isStrict);
+    }
+
+    // ///////////////////////////////////////////////////
+    // Tests concerning implementation registry
+    // ///////////////////////////////////////////////////
+
+    /**
+     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::register()
+     */
+    public function testRegister()
+    {
+        $this->assertFalse(NormalizationUtility::register());
+        $this->assertSame(
+            NormalizationUtility::isNfdMacCompatible(),
+            is_a(Normalizer::class, MacNormalizer::class, true)
+        );
+        $this->assertSame(
+            NormalizationUtility::isStrictImplementation(),
+            // strict implementations should not inherit the strict-enforcing facade
+            !is_a(Normalizer::class, StrictNormalizer::class, true)
+        );
+    }
+
+    // ///////////////////////////////////////////////////
+    // Tests concerning unicode capabilities
+    // ///////////////////////////////////////////////////
+
+    /**
+     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::detectUnicodeVersion()
+     */
+    public function testDetectUnicodeVersion()
+    {
+        // Use the autoloader here !
+        if (is_a('Normalizer', MissingNormalizer::class, true)) {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionCode(1519488534);
+            $this->expectExceptionMessage('Could not determine unicode version.');
+            NormalizationUtility::detectUnicodeVersion();
+            return;
+        }
+        $unicodeVersion = NormalizationUtility::detectUnicodeVersion();
+        $this->assertSame(1, preg_match('/^[1-9][0-9]*\.[0-9]+\.[0-9]+$/', $unicodeVersion));
+        $this->assertTrue(version_compare('0.0.0', $unicodeVersion, '<'));
+        foreach(Configuration::LOOSE_IMPLEMENTATIONS as $candidate) {
+            // Do not use the autoloader here !
+            if (class_exists($candidate, false) && is_a('Normalizer', $candidate, true)) {
+                $this->assertSame('7.0.0', $unicodeVersion);
+                return;
+            }
+        }
+    }
+
+    // /**
+    //  * @runInSeparateProcess
+    //  * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::detectCapabilities()
+    //  */
+    // public function testDetectUnicodeCapabilities()
+    // {
+    //     $capabilities = NormalizationUtility::detectCapabilities();
+    //     $this->assertInternalType('array', $capabilities);
+    //     $keys = array_keys($capabilities);
+    //     $this->assertTrue(sort($keys));
+    //     $this->assertSame(['forms', 'level', 'strict'], $keys);
+    //     $this->assertArrayHasKey('forms', $capabilities);
+    //     $this->assertTrue(in_array(NormalizerInterface::NONE, $capabilities['forms'], true));
+    //     $this->assertArrayHasKey('level', $capabilities);
+    //     $this->assertTrue((bool) preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $capabilities['level']));
+    //     $this->assertTrue(version_compare('0.0.0.0', $capabilities['level'], '<='));
+    //     $this->assertArrayHasKey('strict', $capabilities);
+    //     $this->assertInternalType('bool', $capabilities['strict']);
+    // }
+
 }
