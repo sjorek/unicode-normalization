@@ -58,10 +58,11 @@ class AbstractNormalizationTestCase extends AbstractTestCase
                 $data[$caption] = [
                     $version,
                     NormalizationUtility::parseForm($form),
-                    NormalizationTestUtility::createReader($version)
+                    NormalizationTestUtility::createReader($version),
                 ];
             }
         }
+
         return $data;
     }
 
@@ -76,11 +77,10 @@ class AbstractNormalizationTestCase extends AbstractTestCase
      */
     protected function getConformanceTestIterator($unicodeVersion, $form, $lineNumber, $comment, array $codes)
     {
-
         // NFD_MAC is sometimes lossy and can't be converted back to other forms
-        $validForMac = preg_match('/EFBFBD/i', bin2hex($codes[5])) === 0;
+        $validForMac = 0 === preg_match('/EFBFBD/i', bin2hex($codes[5]));
 
-        if ($form === Normalizer::NFC) {
+        if (Normalizer::NFC === $form) {
             $message = sprintf(
                 'Normalize to NFC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -92,12 +92,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[3], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[1], $codes[5]];
-            //} else {
+                //} else {
             //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === Normalizer::NFD) {
+        if (Normalizer::NFD === $form) {
             $message = sprintf(
                 'Normalize to NFD for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -109,12 +109,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[4], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[2], $codes[5]];
-            // } else {
+                // } else {
             //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === Normalizer::NFKC) {
+        if (Normalizer::NFKC === $form) {
             $message = sprintf(
                 'Normalize to NFKC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -126,12 +126,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[3], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[3], $codes[5]];
-            // } else {
+                // } else {
             //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === Normalizer::NFKD) {
+        if (Normalizer::NFKD === $form) {
             $message = sprintf(
                 'Normalize to NFKD for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -143,12 +143,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[4], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[4], $codes[5]];
-            // } else {
+                // } else {
             //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === Normalizer::NFD_MAC) {
+        if (Normalizer::NFD_MAC === $form) {
             $message = sprintf(
                 'Normalize to NFD_MAC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -159,7 +159,7 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             if ($validForMac) {
                 yield sprintf($message, '4 (NFKC)') => [$codes[4], $codes[3]];
                 yield sprintf($message, '5 (NFKD)') => [$codes[4], $codes[4]];
-            // } else {
+                // } else {
             //    yield sprintf($message, '4 (NFKC)') => [$this->subject->normalize($codes[3], $form), $codes[3]];
             //    yield sprintf($message, '5 (NFKD)') => [$this->subject->normalize($codes[4], $form), $codes[4]];
             }

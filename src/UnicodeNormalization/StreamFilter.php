@@ -88,12 +88,12 @@ class StreamFilter extends \php_user_filter
     const BYTE_MASK = 0b11111111;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected static $namespace = null;
 
     /**
-     * @var NormalizerInterface|null
+     * @var null|NormalizerInterface
      */
     protected static $normalizer = null;
 
@@ -116,10 +116,10 @@ class StreamFilter extends \php_user_filter
             return false;
         }
         if (stream_filter_register($namespace, static::class) &&
-            stream_filter_register(sprintf('%s.*', $namespace), static::class))
-        {
+            stream_filter_register(sprintf('%s.*', $namespace), static::class)) {
             static::$namespace = $namespace;
             static::$normalizer = $normalizer ?: new Normalizer();
+
             return true;
         }
 

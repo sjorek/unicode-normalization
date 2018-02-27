@@ -261,7 +261,7 @@ interface NormalizerInterface
     /**
      * Get the supported unicode normalization forms as array.
      *
-     * @return integer[]
+     * @return int[]
      */
     public static function getNormalizationForms();
 }

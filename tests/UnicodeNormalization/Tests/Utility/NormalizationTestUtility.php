@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestUpdater;
 use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestWriter;
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
 
 /**
  * Utility functions dealing with "NormalizationTest.X.Y.Z.txt" fixture files.
@@ -63,12 +63,14 @@ EOT;
 
     /**
      * @see \Sjorek\UnicodeNormalization\NormalizationUtility::MAP_ICU_TO_UNICODE_VERSION
+     *
      * @var string
      */
     const UPDATE_CHECK_VERSION_LATEST = '10.0.0';
 
     /**
      * @param string $version
+     *
      * @return NormalizationTestUpdater
      */
     public static function createUpdater($version)
@@ -79,17 +81,20 @@ EOT;
     /**
      * @param string $version
      * @param string $source
+     *
      * @return NormalizationTestWriter
      */
     public static function createWriter($version, $source)
     {
         $writer = new NormalizationTestWriter($version);
         $writer->add(str_replace(['%source'], [$source], self::TEST_FILE_HEADER));
+
         return $writer;
     }
 
     /**
      * @param string $version
+     *
      * @return NormalizationTestReader
      */
     public static function createReader($version)
@@ -99,6 +104,7 @@ EOT;
 
     /**
      * @param string $version
+     *
      * @return string
      */
     public static function createDownloadUrl($version)
@@ -108,6 +114,7 @@ EOT;
 
     /**
      * @param string $version
+     *
      * @return string
      */
     public static function createFilePath($version)
@@ -117,7 +124,9 @@ EOT;
 
     /**
      * @param string $filePath
+     *
      * @throws \RuntimeException
+     *
      * @return string
      */
     public static function applyGzip($filePath)
@@ -129,17 +138,19 @@ EOT;
                 throw new \RuntimeException('Gzip compression is not supported.');
             }
         }
+
         return $filePath;
     }
 
     /**
      * @throws \RuntimeException
+     *
      * @return string
      */
     public static function detectLatestVersion()
     {
         $content = file_get_contents(self::UPDATE_CHECK_URL);
-        if ($content === false) {
+        if (false === $content) {
             throw new \RuntimeException(sprintf('Could not fetch version check url: %s', self::UPDATE_CHECK_URL));
         }
 

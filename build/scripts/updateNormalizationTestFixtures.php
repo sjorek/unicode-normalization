@@ -27,7 +27,6 @@ if (!file_exists('vendor/autoload.php')) {
 require 'vendor/autoload.php';
 
 try {
-
     if (in_array('-h', $argv, true) || in_array('--help', $argv, true)) {
         $usage = <<<EOT
 Usage:
@@ -49,7 +48,7 @@ EOT;
             [
                 $argv[0],
                 Utility\NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST,
-                implode(' ', Utility\ConfigurationUtility::getKnownUnicodeVersions())
+                implode(' ', Utility\ConfigurationUtility::getKnownUnicodeVersions()),
             ],
             implode(PHP_EOL, explode("\n", $usage)) . PHP_EOL
         );
@@ -58,16 +57,13 @@ EOT;
 
     $verbose = in_array('-v', $argv, true) || in_array('--verbose', $argv, true);
     if ($verbose) {
-        $argv = array_filter($argv, function($arg) { return !in_array($arg, ['-v', '--verbose'], true); });
+        $argv = array_filter($argv, function ($arg) { return !in_array($arg, ['-v', '--verbose'], true); });
     }
 
     if (in_array('-c', $argv, true) || in_array('--check', $argv, true)) {
         $current = Utility\NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST;
         if ($verbose) {
-            echo sprintf(
-                'Current unicode version: %s' . PHP_EOL,
-                $current
-            );
+            echo sprintf('Current unicode version: %s' . PHP_EOL, $current);
             echo 'Detecting latest unicode version ...' . PHP_EOL;
         }
         $latest = Utility\NormalizationTestUtility::detectLatestVersion();
@@ -76,15 +72,11 @@ EOT;
                 echo 'The current unicode version is up-to-date.' . PHP_EOL;
             }
             exit(0);
-        } else {
-            if ($verbose) {
-                echo sprintf(
-                    'A new unicode version has been released: %s' .PHP_EOL,
-                    $latest
-                );
-            }
-            exit(1);
         }
+        if ($verbose) {
+            echo sprintf('A new unicode version has been released: %s' . PHP_EOL, $latest);
+        }
+        exit(1);
     }
 
     $versions = array_slice($argv, 1) ?: Utility\ConfigurationUtility::getKnownUnicodeVersions();
@@ -107,7 +99,7 @@ EOT;
             $writer->getFilePath()
         );
 
-        $amount  = 0;
+        $amount = 0;
         foreach ($updater as $lineNumber => $data) {
             list($line, $comment) = $data;
             if ($comment) {

@@ -193,6 +193,7 @@ class StreamFilterTest extends AbstractNormalizationTestCase
      *              ["none", "with normalization form expression"]
      *
      * @param mixed $form
+     * @param mixed $message
      */
     public function testOnCreate($form, $message)
     {

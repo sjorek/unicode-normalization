@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Implementation;
 
-
 use Sjorek\UnicodeNormalization\Exception\InvalidNormalizerImplementation;
 
 /**
@@ -33,14 +32,16 @@ final class MissingNormalizer
     const FORM_KC = self::NONE;
     const NFKC = self::NONE;
 
-
     /**
      * Throw a InvalidNormalizerImplementation on every normalization attempt.
+     *
      * @param string $input
-     * @param int $form
+     * @param int    $form
+     *
      * @throws InvalidNormalizerImplementation
      */
-    public static function normalize ($input, $form = null) {
+    public static function normalize($input, $form = null)
+    {
         throw new InvalidNormalizerImplementation(
             'A unicode normalizer implementation is missing. '
             . 'Please install the "intl"-extension or one of the suggested polyfills.',
@@ -50,11 +51,14 @@ final class MissingNormalizer
 
     /**
      * Throw a InvalidNormalizerImplementation on every normalization check.
+     *
      * @param string $input
-     * @param int $form
+     * @param int    $form
+     *
      * @throws InvalidNormalizerImplementation
      */
-    public static function isNormalized ($input, $form = null) {
+    public static function isNormalized($input, $form = null)
+    {
         throw new InvalidNormalizerImplementation(
             'A unicode normalizer implementation is missing. '
             . 'Please install the "intl"-extension or one of the suggested polyfills.',

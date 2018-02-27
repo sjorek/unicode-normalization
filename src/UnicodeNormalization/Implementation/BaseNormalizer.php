@@ -41,7 +41,7 @@ use Sjorek\UnicodeNormalization\NormalizationUtility;
 class BaseNormalizer implements NormalizerInterface
 {
     /**
-     * Array of supported normalization forms
+     * Array of supported normalization forms.
      *
      * @var array
      */
@@ -50,7 +50,7 @@ class BaseNormalizer implements NormalizerInterface
         self::NFD,
         self::NFKD,
         self::NFC,
-        self::NFKC
+        self::NFKC,
     ];
 
     /**
@@ -110,6 +110,7 @@ class BaseNormalizer implements NormalizerInterface
     public function normalize($input, $form = null)
     {
         $form = $this->getFormArgument($form);
+
         return \Normalizer::normalize($input, $form);
     }
 
@@ -121,6 +122,7 @@ class BaseNormalizer implements NormalizerInterface
     public function isNormalized($input, $form = null)
     {
         $form = $this->getFormArgument($form);
+
         return \Normalizer::isNormalized($input, $form);
     }
 
@@ -134,6 +136,7 @@ class BaseNormalizer implements NormalizerInterface
         if ($this->isNormalized($input, $form)) {
             return $input;
         }
+
         return $this->normalize($input, $form);
     }
 
@@ -148,12 +151,15 @@ class BaseNormalizer implements NormalizerInterface
         if (self::NONE < $form) {
             return $this->normalizeTo($input, $form);
         }
+
         return $input;
     }
 
     /**
      * @param int $form
+     *
      * @throws InvalidNormalizationForm
+     *
      * @return int
      */
     protected function getFormArgument($form)
@@ -170,7 +176,6 @@ class BaseNormalizer implements NormalizerInterface
         );
     }
 
-
     protected static $unicodeVersion = null;
 
     /**
@@ -180,9 +185,10 @@ class BaseNormalizer implements NormalizerInterface
      */
     public static function getUnicodeVersion()
     {
-        if (self::$unicodeVersion === null) {
+        if (null === self::$unicodeVersion) {
             return self::$unicodeVersion = NormalizationUtility::detectUnicodeVersion();
         }
+
         return self::$unicodeVersion;
     }
 

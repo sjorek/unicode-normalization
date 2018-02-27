@@ -39,30 +39,32 @@ class ConfigurationUtility
     const POLYFILL_IMPLEMENTATIONS = [self::SYMFONY_IMPLEMENTATION, self::PATCHWORK_IMPLEMENTATION];
 
     /**
-     * @return boolean
+     * @return bool
      */
     public static function isPolyfillImplementation()
     {
         if (self::isPolyfillAvailable()) {
-            foreach(self::POLYFILL_IMPLEMENTATIONS as $implementation) {
+            foreach (self::POLYFILL_IMPLEMENTATIONS as $implementation) {
                 if (is_a('Normalizer', $implementation, true)) {
                     return true;
                 }
             }
         }
+
         return false;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public static function isPolyfillAvailable()
     {
-        foreach(self::POLYFILL_IMPLEMENTATIONS as $implementation) {
+        foreach (self::POLYFILL_IMPLEMENTATIONS as $implementation) {
             if (class_exists($implementation, true)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -72,12 +74,13 @@ class ConfigurationUtility
     public static function getFixtureUnicodeVersions()
     {
         $versions = array_map(
-            function($filename) {
+            function ($filename) {
                 return substr(basename($filename, '.txt.gz'), 18);
             },
             glob(__DIR__ . '/../Fixtures/NormalizationTest*.txt.gz')
         );
         usort($versions, 'version_compare');
+
         return $versions;
     }
 

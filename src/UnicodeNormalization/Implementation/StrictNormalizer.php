@@ -17,19 +17,21 @@ namespace Sjorek\UnicodeNormalization\Implementation;
  * Class for normalizing unicode, strictly determining if a string is normalized.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
+ *
  * @see https://github.com/symfony/polyfill/blob/master/src/Intl/Normalizer/Normalizer.php#L56
  * @see https://github.com/tchwork/utf8/blob/master/src/Patchwork/PHP/Shim/Normalizer.php#L53
  */
 class StrictNormalizer extends BaseNormalizer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized()
      */
     public function isNormalized($input, $form = null)
     {
         $form = $this->getFormArgument($form);
-        if ($form === self::NONE) {
+        if (self::NONE === $form) {
             return false;
         }
         if (parent::isNormalized($input, $form)) {
@@ -41,6 +43,7 @@ class StrictNormalizer extends BaseNormalizer
         if (null === $result || false === $result) {
             return false;
         }
+
         return $result === $input;
     }
 }

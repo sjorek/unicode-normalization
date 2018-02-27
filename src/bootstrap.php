@@ -15,4 +15,3 @@ namespace Sjorek\UnicodeNormalization {
     NormalizationUtility::register();
     StreamFilter::register();
 }
-

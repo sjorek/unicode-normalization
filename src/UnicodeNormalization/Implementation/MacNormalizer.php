@@ -17,12 +17,13 @@ namespace Sjorek\UnicodeNormalization\Implementation;
  * Class for normalizing unicode, supporting a special normalization form NFD_MAC.
  *
  * @see NormalizerInterface::NFD_MAC
+ *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class MacNormalizer extends NormalizerImpl
 {
     /**
-     * Array of supported normalization forms
+     * Array of supported normalization forms.
      *
      * @var array
      */
@@ -32,11 +33,12 @@ class MacNormalizer extends NormalizerImpl
         self::NFKD,
         self::NFC,
         self::NFKC,
-        self::NFD_MAC
+        self::NFD_MAC,
     ];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize()
      */
     public function normalize($input, $form = null)
@@ -52,7 +54,7 @@ class MacNormalizer extends NormalizerImpl
         if ('' === $input || !preg_match('/[\x80-\xFF]/', $input)) {
             return $input;
         }
-        $result =  parent::normalize($input, self::NFD);
+        $result = parent::normalize($input, self::NFD);
         if (null === $result || false === $result) {
             return false;
         }
@@ -61,7 +63,8 @@ class MacNormalizer extends NormalizerImpl
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized()
      */
     public function isNormalized($input, $form = null)

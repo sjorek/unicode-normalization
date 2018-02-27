@@ -22,4 +22,3 @@ namespace Sjorek\UnicodeNormalization\Tests {
         Utility\PhpExtensionHandler::runWithout('xdebug');
     }
 }
-

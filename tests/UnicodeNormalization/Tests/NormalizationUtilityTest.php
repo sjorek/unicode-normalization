@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\NormalizationUtility;
-use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
-use Sjorek\UnicodeNormalization\Normalizer;
 use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
+use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
+use Sjorek\UnicodeNormalization\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Normalizer;
 use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
 
 /**
@@ -179,6 +179,7 @@ class NormalizationUtilityTest extends AbstractTestCase
             $this->expectExceptionCode(1519488534);
             $this->expectExceptionMessage('Could not determine unicode version.');
             NormalizationUtility::detectUnicodeVersion();
+
             return;
         }
         $unicodeVersion = NormalizationUtility::detectUnicodeVersion();

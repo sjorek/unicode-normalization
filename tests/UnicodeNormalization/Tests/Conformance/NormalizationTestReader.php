@@ -34,6 +34,7 @@ class NormalizationTestReader implements \IteratorAggregate
 
     /**
      * @param string $version
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -54,7 +55,7 @@ class NormalizationTestReader implements \IteratorAggregate
      */
     public function getIterator()
     {
-        if ($this->iterator === null) {
+        if (null === $this->iterator) {
             $this->iterator = new \NoRewindIterator(new \SplFileObject($this->filePath, 'r', false));
         }
 

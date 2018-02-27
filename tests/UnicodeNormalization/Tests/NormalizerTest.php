@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Normalizer;
+use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
 
 /**
@@ -371,5 +371,4 @@ class NormalizerTest extends AbstractNormalizationTestCase
             }
         }
     }
-
 }

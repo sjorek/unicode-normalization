@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization;
 
-
 if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
     /**
      * Normalizer implementation (for IDE only).
      *
      * @see Implementation\Normalizer
+     *
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
     class Normalizer extends Implementation\NormalizerImpl

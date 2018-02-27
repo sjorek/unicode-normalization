@@ -111,7 +111,7 @@ class NormalizationUtility
     /**
      * Registration method to be called by (an) bootstrap script like "src/UnicodeNormalization/bootstrap.php".
      *
-     * @return boolean
+     * @return bool
      */
     public static function register()
     {
@@ -120,8 +120,7 @@ class NormalizationUtility
         $baseClass = __NAMESPACE__ . '\\Implementation\\BaseNormalizer';
 
         // Use the autoloader here !
-        if (!class_exists('Normalizer', true))
-        {
+        if (!class_exists('Normalizer', true)) {
             return
                 class_alias(__NAMESPACE__ . '\\Implementation\\MissingNormalizer', 'Normalizer', true) &&
                 class_exists($normalizerClass, true);
@@ -138,7 +137,7 @@ class NormalizationUtility
             return false;
         }
         if (self::isNfdMacCompatible()) {
-            $implementationClass  = __NAMESPACE__ . '\\Implementation\\MacNormalizer';
+            $implementationClass = __NAMESPACE__ . '\\Implementation\\MacNormalizer';
         }
         // Use the autoloader here !
         return class_alias($implementationClass, $normalizerClass, true);
@@ -185,7 +184,9 @@ class NormalizationUtility
 
     /**
      * Get the supported unicode version level as version triple ("X.Y.Z").
+     *
      * @throws \RuntimeException
+     *
      * @return string
      */
     public static function detectUnicodeVersion()
@@ -213,7 +214,7 @@ class NormalizationUtility
                 $icuVersion = null;
             }
         }
-        if ($icuVersion !== null) {
+        if (null !== $icuVersion) {
             $icuVersion = array_shift(explode('.', $icuVersion));
             // taken from http://source.icu-project.org/repos/icu/trunk/icu4j/main/classes/core/src/com/ibm/icu/util/VersionInfo.java
             $icuToUnicodeVersionMap = [

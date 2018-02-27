@@ -37,6 +37,7 @@ class NormalizationTestUpdater implements \IteratorAggregate
      * Constructor.
      *
      * @param $version string
+     *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
@@ -52,16 +53,17 @@ class NormalizationTestUpdater implements \IteratorAggregate
         }
         $source = NormalizationTestUtility::createDownloadUrl($version);
         $scheme = parse_url($source, PHP_URL_SCHEME);
-        if ($scheme === false) {
+        if (false === $scheme) {
             throw new \InvalidArgumentException(sprintf('Invalid url "%s" given.', $source));
-        } elseif ($scheme === 'http' || $scheme === 'https') {
+        }
+        if ('http' === $scheme || 'https' === $scheme) {
             $headers = @get_headers($source);
-            if ($headers === false ||
+            if (false === $headers ||
                 empty(
                     array_filter(
                         $headers,
                         function ($header) {
-                            return strpos(strtoupper($header), '200 OK') !== false;
+                            return false !== strpos(strtoupper($header), '200 OK');
                         }
                     )
                 )
@@ -79,9 +81,10 @@ class NormalizationTestUpdater implements \IteratorAggregate
      */
     public function getIterator()
     {
-        if ($this->iterator === null) {
+        if (null === $this->iterator) {
             $this->iterator = new \NoRewindIterator(new \SplFileObject($this->source, 'r', false));
         }
+
         return (function () {
             $mbEncoding = null;
             if (MB_OVERLOAD_STRING & (int) ini_get('mbstring.func_overload')) {

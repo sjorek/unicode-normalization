@@ -35,12 +35,12 @@ class NormalizationTestWriter extends \SplFileObject
     public function __construct($version)
     {
         $filePath = NormalizationTestUtility::createFilePath($version);
-        if (!file_exists($filePath) && !is_writeable(dirname($filePath))){
+        if (!file_exists($filePath) && !is_writable(dirname($filePath))) {
             throw new \InvalidArgumentException(
                 sprintf('The target folder is not writable: %s', dirname($filePath))
             );
         }
-        if (file_exists($filePath) && !is_writeable($filePath)) {
+        if (file_exists($filePath) && !is_writable($filePath)) {
             throw new \InvalidArgumentException(
                 sprintf('The target file is not writable: %s', $filePath)
             );

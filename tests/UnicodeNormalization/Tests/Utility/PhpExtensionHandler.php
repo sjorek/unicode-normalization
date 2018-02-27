@@ -39,11 +39,13 @@ class PhpExtensionHandler
     public static function renderWithout($extension, ...$extensions)
     {
         $handler = new static(array_merge(is_array($extension) ? $extension : [$extension], $extensions));
+
         return $handler->render();
     }
 
     /**
-     * Constructor
+     * Constructor.
+     *
      * @param string[] $extensions
      */
     protected function __construct(array $extensions)
@@ -54,7 +56,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Checks if any extension is loaded and the process needs to be restarted
+     * Checks if any extension is loaded and the process needs to be restarted.
      *
      * If so, then a tmp ini is created with the extension's ini entry commented
      * out. If additional inis have been loaded, these are combined into the tmp
@@ -68,7 +70,7 @@ class PhpExtensionHandler
      */
     protected function check()
     {
-        $args = explode('|', strval(getenv(self::ENV_ALLOW)), 2);
+        $args = explode('|', (string) (getenv(self::ENV_ALLOW)), 2);
 
         if ($this->needsRestart($args[0])) {
             if ($this->prepareRestart()) {
@@ -86,7 +88,7 @@ class PhpExtensionHandler
             if (false !== $this->envScanDir) {
                 // $args[1] contains the original value
                 if (isset($args[1])) {
-                    putenv('PHP_INI_SCAN_DIR='.$args[1]);
+                    putenv('PHP_INI_SCAN_DIR=' . $args[1]);
                 } else {
                     putenv('PHP_INI_SCAN_DIR');
                 }
@@ -95,7 +97,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns the rendered php ini
+     * Returns the rendered php ini.
      *
      * @return string
      */
@@ -105,7 +107,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Executes the restarted command then deletes the tmp ini
+     * Executes the restarted command then deletes the tmp ini.
      *
      * @param string $command
      */
@@ -122,7 +124,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns true if a restart is needed
+     * Returns true if a restart is needed.
      *
      * @param string $allow Environment value
      *
@@ -138,7 +140,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns true if everything was written for the restart
+     * Returns true if everything was written for the restart.
      *
      * If any of the following fails (however unlikely) we must return false to
      * stop potential recursion:
@@ -161,7 +163,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns true if the tmp ini file was written
+     * Returns true if the tmp ini file was written.
      *
      * The filename is passed as the -c option when the process restarts.
      *
@@ -179,7 +181,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns the rendered php.ini
+     * Returns the rendered php.ini.
      *
      * @param array $iniPaths Locations reported by the current process
      *
@@ -202,9 +204,9 @@ class PhpExtensionHandler
             }
         }
 
-        $content .= 'allow_url_fopen='.ini_get('allow_url_fopen') . PHP_EOL;
-        $content .= 'disable_functions="'.ini_get('disable_functions').'"' . PHP_EOL;
-        $content .= 'memory_limit='.ini_get('memory_limit') . PHP_EOL;
+        $content .= 'allow_url_fopen=' . ini_get('allow_url_fopen') . PHP_EOL;
+        $content .= 'disable_functions="' . ini_get('disable_functions') . '"' . PHP_EOL;
+        $content .= 'memory_limit=' . ini_get('memory_limit') . PHP_EOL;
 
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             // Work-around for PHP windows bug, see issue #6052
@@ -215,20 +217,20 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns the restart command line
+     * Returns the restart command line.
      *
      * @return string
      */
     private function getCommand()
     {
-        $phpArgs = array(PHP_BINARY, '-c', $this->tmpIni);
+        $phpArgs = [PHP_BINARY, '-c', $this->tmpIni];
         $params = array_merge($phpArgs, $this->getScriptArgs($_SERVER['argv']));
 
-        return implode(' ', array_map(array($this, 'escape'), $params));
+        return implode(' ', array_map([$this, 'escape'], $params));
     }
 
     /**
-     * Returns true if the restart environment variables were set
+     * Returns true if the restart environment variables were set.
      *
      * @param bool  $additional Whether there were additional inis
      * @param array $iniPaths   Locations reported by the current process
@@ -243,23 +245,23 @@ class PhpExtensionHandler
         }
 
         // Make original inis available to restarted process
-        if (!putenv(self::ENV_ORIGINAL.'='.implode(PATH_SEPARATOR, $iniPaths))) {
+        if (!putenv(self::ENV_ORIGINAL . '=' . implode(PATH_SEPARATOR, $iniPaths))) {
             return false;
         }
 
         // Flag restarted process and save env scan dir state
-        $args = array(self::RESTART_ID);
+        $args = [self::RESTART_ID];
 
         if (false !== $this->envScanDir) {
             // Save current PHP_INI_SCAN_DIR
             $args[] = $this->envScanDir;
         }
 
-        return putenv(self::ENV_ALLOW.'='.implode('|', $args));
+        return putenv(self::ENV_ALLOW . '=' . implode('|', $args));
     }
 
     /**
-     * Returns the restart script arguments, adding required options
+     * Returns the restart script arguments, adding required options.
      *
      * @param array $args The argv array
      *
@@ -277,7 +279,7 @@ class PhpExtensionHandler
     }
 
     /**
-     * Returns an array of php.ini locations with at least one entry
+     * Returns an array of php.ini locations with at least one entry.
      *
      * The equivalent of calling php_ini_loaded_file then php_ini_scanned_files.
      * The loaded ini location is the first entry and may be empty.
@@ -292,7 +294,7 @@ class PhpExtensionHandler
             return explode(PATH_SEPARATOR, $env);
         }
 
-        $paths = array(strval(php_ini_loaded_file()));
+        $paths = [(string) (php_ini_loaded_file())];
 
         if ($scanned = php_ini_scanned_files()) {
             $paths = array_merge($paths, array_map('trim', explode(',', $scanned)));
@@ -319,20 +321,20 @@ class PhpExtensionHandler
         }
 
         $dquotes = 0;
-        $quote = strpbrk($arg, " \t") !== false || $arg === '';
+        $quote = false !== strpbrk($arg, " \t") || '' === $arg;
         $arg = preg_replace('/(\\\\*)"/', '$1$1\\"', $arg, -1, $dquotes);
 
         if ($meta) {
             $meta = $dquotes || preg_match('/%[^%]+%/', $arg);
 
             if (!$meta && !$quote) {
-                $quote = strpbrk($arg, '^&|<>()') !== false;
+                $quote = false !== strpbrk($arg, '^&|<>()');
             }
         }
 
         if ($quote) {
             $arg = preg_replace('/(\\\\*)$/', '$1$1', $arg);
-            $arg = '"'.$arg.'"';
+            $arg = '"' . $arg . '"';
         }
 
         if ($meta) {
@@ -341,5 +343,4 @@ class PhpExtensionHandler
 
         return $arg;
     }
-
 }
