@@ -188,25 +188,4 @@ class NormalizationUtilityTest extends AbstractTestCase
             $this->assertSame('7.0.0', $unicodeVersion);
         }
     }
-
-    // /**
-    //  * @runInSeparateProcess
-    //  * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::detectCapabilities()
-    //  */
-    // public function testDetectUnicodeCapabilities()
-    // {
-    //     $capabilities = NormalizationUtility::detectCapabilities();
-    //     $this->assertInternalType('array', $capabilities);
-    //     $keys = array_keys($capabilities);
-    //     $this->assertTrue(sort($keys));
-    //     $this->assertSame(['forms', 'level', 'strict'], $keys);
-    //     $this->assertArrayHasKey('forms', $capabilities);
-    //     $this->assertTrue(in_array(NormalizerInterface::NONE, $capabilities['forms'], true));
-    //     $this->assertArrayHasKey('level', $capabilities);
-    //     $this->assertTrue((bool) preg_match('/[0-9]+\.[0-9]+\.[0-9]+/', $capabilities['level']));
-    //     $this->assertTrue(version_compare('0.0.0.0', $capabilities['level'], '<='));
-    //     $this->assertArrayHasKey('strict', $capabilities);
-    //     $this->assertInternalType('bool', $capabilities['strict']);
-    // }
-
 }

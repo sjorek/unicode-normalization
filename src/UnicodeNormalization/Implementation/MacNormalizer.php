@@ -16,9 +16,8 @@ namespace Sjorek\UnicodeNormalization\Implementation;
 /**
  * Class for normalizing unicode, supporting a special normalization form NFD_MAC.
  *
+ * @see NormalizerInterface::NFD_MAC
  * @author Stephan Jorek <stephan.jorek@gmail.com>
- * @see https://github.com/symfony/polyfill/blob/master/src/Intl/Normalizer/Normalizer.php#L56
- * @see https://github.com/tchwork/utf8/blob/master/src/Patchwork/PHP/Shim/Normalizer.php#L53
  */
 class MacNormalizer extends NormalizerImpl
 {
@@ -32,7 +31,8 @@ class MacNormalizer extends NormalizerImpl
         self::NFD,
         self::NFKD,
         self::NFC,
-        self::NFKC
+        self::NFKC,
+        self::NFD_MAC
     ];
 
     /**
@@ -52,7 +52,7 @@ class MacNormalizer extends NormalizerImpl
         if ('' === $input || !preg_match('/[\x80-\xFF]/', $input)) {
             return $input;
         }
-        $result =  parent::normalize($input, self::NFC);
+        $result =  parent::normalize($input, self::NFD);
         if (null === $result || false === $result) {
             return false;
         }
@@ -73,7 +73,7 @@ class MacNormalizer extends NormalizerImpl
         if ('' === $input) {
             return true;
         }
-        $result = parent::normalize($input, self::NFC);
+        $result = parent::normalize($input, self::NFD);
         if (null === $result || false === $result) {
             return false;
         }

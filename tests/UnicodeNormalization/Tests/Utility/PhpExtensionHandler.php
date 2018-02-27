@@ -111,6 +111,8 @@ class PhpExtensionHandler
      */
     private function restart($command)
     {
+        echo PHP_EOL . 'Restart: ' . $command . PHP_EOL;
+
         $exitCode = 1;
         passthru($command, $exitCode);
 

@@ -84,53 +84,53 @@
         ],
         "run:test": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=symfony --exclude-group=patchwork --exclude-group=large",
+            "phpunit -v --exclude-group=implementation,large",
             "@run:require-symfony-implementation",
-            "phpunit -v --group=symfony --exclude-group=large",
+            "phpunit -v --exclude-group=implementation,large",
             "@run:require-patchwork-implementation",
-            "phpunit -v --group=patchwork --exclude-group=large",
+            "phpunit -v --exclude-group=implementation,large",
             "@run:remove-implementation-packages"
          ],
         "run:test-all": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=symfony --exclude-group=patchwork",
+            "phpunit -v --exclude-group=implementation",
             "@run:require-symfony-implementation",
-            "phpunit -v --group=symfony",
+            "phpunit -v --exclude-group=implementation",
             "@run:require-patchwork-implementation",
-            "phpunit -v --group=patchwork",
+            "phpunit -v --exclude-group=implementation",
             "@run:remove-implementation-packages"
         ],
         "run:test-large": [
             "@run:require-native-implementation",
-            "phpunit -v --group=large",
+            "phpunit -v --exclude-group=implementation --group=large",
             "@run:require-symfony-implementation",
-            "phpunit -v --group=large",
+            "phpunit -v --exclude-group=implementation --group=large",
             "@run:require-patchwork-implementation",
-            "phpunit -v --group=large",
+            "phpunit -v --exclude-group=implementation --group=large",
             "@run:remove-implementation-packages"
         ],
         "run:test-conformance": [
             "@run:require-native-implementation",
-            "phpunit -v --group=conformance",
+            "phpunit -v --exclude-group=implementation --group=conformance",
             "@run:require-symfony-implementation",
-            "phpunit -v --group=conformance",
+            "phpunit -v --exclude-group=implementation --group=conformance",
             "@run:require-patchwork-implementation",
-            "phpunit -v --group=conformance",
+            "phpunit -v --exclude-group=implementation --group=conformance",
             "@run:remove-implementation-packages"
         ],
         "run:test-coverage": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=symfony --exclude-group=patchwork --exclude-group=large --coverage-text",
+            "phpunit -v --exclude-group=implementation,large --coverage-text",
             "@run:remove-implementation-packages"
         ],
-        "run:test-all-coverage": [
+        "run:test-coverage-all": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=symfony --exclude-group=patchwork --coverage-text",
+            "phpunit -v --exclude-group=implementation --coverage-text",
             "@run:remove-implementation-packages"
         ],
         "run:coverage": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=large --coverage-html coverage",
+            "phpunit -v --exclude-group=implementation,large --coverage-html coverage",
             "@run:remove-implementation-packages"
         ],
         "run:cs-lint": [
@@ -153,15 +153,18 @@
         ],
         "run:require-native-implementation": [
             "@run:remove-implementation-packages",
-            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-implementation:@dev"
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-implementation:@dev",
+            "phpunit -v --group=native"
         ],
         "run:require-symfony-implementation": [
             "@run:remove-implementation-packages",
-            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-implementation:@dev"
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-implementation:@dev",
+            "phpunit -v --group=symfony"
         ],
         "run:require-patchwork-implementation": [
             "@run:remove-implementation-packages",
-            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-implementation:@dev"
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-implementation:@dev",
+            "phpunit -v --group=patchwork"
         ],
         "run:remove-implementation-packages": [
             "@composer remove --optimize-autoloader --no-interaction sjorek/unicode-normalization-native-implementation sjorek/unicode-normalization-symfony-implementation sjorek/unicode-normalization-patchwork-implementation"

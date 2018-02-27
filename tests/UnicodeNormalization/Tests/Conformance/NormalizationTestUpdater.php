@@ -136,8 +136,8 @@ class NormalizationTestUpdater implements \IteratorAggregate
                 explode(' ', $string)
             );
 
-            // Should be NFC
-            if (1 === $index) {
+            // Should be NFD
+            if (2 === $index) {
                 $mac = implode(
                     '',
                     array_map(

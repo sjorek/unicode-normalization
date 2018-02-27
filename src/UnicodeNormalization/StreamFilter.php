@@ -24,7 +24,10 @@ use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
  */
 class StreamFilter extends \php_user_filter
 {
-    const NAMESPACE = 'convert.unicode-normalization';
+    /**
+     * @var string
+     */
+    const DEFAULT_NAMESPACE = 'convert.unicode-normalization';
 
     /**
      * 0x80 for 0b0xxxxxxx.
@@ -85,14 +88,14 @@ class StreamFilter extends \php_user_filter
     const BYTE_MASK = 0b11111111;
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected static $namespace;
+    protected static $namespace = null;
 
     /**
-     * @var NormalizerInterface
+     * @var NormalizerInterface|null
      */
-    protected static $normalizer;
+    protected static $normalizer = null;
 
     /**
      * @var int
@@ -105,22 +108,22 @@ class StreamFilter extends \php_user_filter
      *
      * @return bool
      */
-    public static function register($namespace = self::NAMESPACE, NormalizerInterface $normalizer = null)
+    public static function register($namespace = self::DEFAULT_NAMESPACE, NormalizerInterface $normalizer = null)
     {
-        // already registered or missing dependency ?
-        if (null !== static::$namespace) {
+        // already registered or invalid namespace ?
+        // TODO throw an exception for invalid namespaces?
+        if (null !== static::$namespace || '.*' === substr($namespace, -2)) {
             return false;
         }
-        $result = stream_filter_register($namespace, static::class);
-        if (true === $result) {
-            $result = stream_filter_register(sprintf('%s.*', $namespace), __CLASS__);
-        }
-        if (true === $result) {
+        if (stream_filter_register($namespace, static::class) &&
+            stream_filter_register(sprintf('%s.*', $namespace), static::class))
+        {
             static::$namespace = $namespace;
             static::$normalizer = $normalizer ?: new Normalizer();
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -132,11 +135,11 @@ class StreamFilter extends \php_user_filter
      */
     public function onCreate()
     {
-        if ($this->filtername === static::$namespace) {
+        if (static::$namespace === $this->filtername) {
             if (isset($this->params)) {
                 $this->form = NormalizationUtility::parseForm($this->params);
             } else {
-                $this->form = static::$normalizer->getForm();
+                $this->form = self::$normalizer->getForm();
             }
 
             return true;
@@ -145,7 +148,7 @@ class StreamFilter extends \php_user_filter
             list($form, $namespace) = explode('.', strrev($this->filtername), 2);
             $namespace = strrev($namespace);
             $form = strrev($form);
-            if ($namespace === static::$namespace) {
+            if (static::$namespace === $namespace) {
                 $this->form = NormalizationUtility::parseForm($form);
 
                 return true;

@@ -26,11 +26,6 @@ use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
 class AbstractNormalizationTestCase extends AbstractTestCase
 {
     /**
-     * @var string
-     */
-    const IMPLEMENTATION_CLASS = 'Normalizer';
-
-    /**
      * @var array
      */
     protected static $unicodeVersion = null;
@@ -41,33 +36,14 @@ class AbstractNormalizationTestCase extends AbstractTestCase
     protected $subject;
 
     /**
-     * This method will be called before any dataProvider continues its setUp.
-     * Override as needed.
-     */
-    protected function setUpDataProvider()
-    {
-        $this->setUpCommon();
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
     {
-        $this->markTestSkippedIfImplementationIsUnavailable();
-        $this->setUpCommon();
-        $this->subject = new Normalizer();
-    }
-
-    /**
-     * Setup common stuff. Called by setUpDataProvider and setUp.
-     * Override as needed.
-     */
-    protected function setUpCommon()
-    {
         self::$unicodeVersion = Normalizer::getUnicodeVersion();
+        $this->subject = new Normalizer();
     }
 
     /**
@@ -75,35 +51,15 @@ class AbstractNormalizationTestCase extends AbstractTestCase
      */
     public function provideConformanceTestData()
     {
-        static $iterators;
-        $this->setUpDataProvider();
         $data = [];
-        $versions = ConfigurationUtility::getFixtureUnicodeVersions();
-        $forms = [Normalizer::NFC, Normalizer::NFD, Normalizer::NFKC, Normalizer::NFKD, Normalizer::NFD_MAC];
-        foreach ($forms as $form) {
-            foreach ($versions as $version) {
-                $caption = 'unicode version %s with normalization form %s (%s)';
-                switch ($form) {
-                    case Normalizer::NFC:
-                        $caption = sprintf($caption, $version, $form, 'NFC');
-                        break;
-                    case Normalizer::NFD:
-                        $caption = sprintf($caption, $version, $form, 'NFD');
-                        break;
-                    case Normalizer::NFKC:
-                        $caption = sprintf($caption, $version, $form, 'NFKC');
-                        break;
-                    case Normalizer::NFKD:
-                        $caption = sprintf($caption, $version, $form, 'NFKD');
-                        break;
-                    case Normalizer::NFD_MAC:
-                        $caption = sprintf($caption, $version, $form, 'NFD_MAC');
-                        break;
-                }
-                if (!isset($iterators[$version])) {
-                    $iterators[$version] = NormalizationTestUtility::createReader($version);
-                }
-                $data[$caption] = [$version, $form, $iterators[$version]];
+        foreach (ConfigurationUtility::getFixtureUnicodeVersions() as $version) {
+            foreach (['NFC', 'NFD', 'NFKC', 'NFKD', 'NFD_MAC'] as $form) {
+                $caption = sprintf('unicode version %s with normalization form %s', $version, $form);
+                $data[$caption] = [
+                    $version,
+                    NormalizationUtility::parseForm($form),
+                    NormalizationTestUtility::createReader($version)
+                ];
             }
         }
         return $data;
@@ -118,19 +74,13 @@ class AbstractNormalizationTestCase extends AbstractTestCase
      *
      * @return \Generator
      */
-    protected function getConformanceTestIterator(
-        $unicodeVersion, $form, $lineNumber, $comment, array $codes)
+    protected function getConformanceTestIterator($unicodeVersion, $form, $lineNumber, $comment, array $codes)
     {
-        // $f_NONE = Normalizer::NONE;
-        $f_NFC = Normalizer::NFC;
-        $f_NFD = Normalizer::NFD;
-        $f_NFKC = Normalizer::NFKC;
-        $f_NFKD = Normalizer::NFKD;
-        $f_MAC = Normalizer::NFD_MAC;
 
-        $validForMac = preg_match('/EFBFBD/', bin2hex($codes[5])) === 0;
+        // NFD_MAC is sometimes lossy and can't be converted back to other forms
+        $validForMac = preg_match('/EFBFBD/i', bin2hex($codes[5])) === 0;
 
-        if ($form === $f_NFC) {
+        if ($form === Normalizer::NFC) {
             $message = sprintf(
                 'Normalize to NFC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -142,10 +92,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[3], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[1], $codes[5]];
+            //} else {
+            //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === $f_NFD) {
+        if ($form === Normalizer::NFD) {
             $message = sprintf(
                 'Normalize to NFD for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -157,10 +109,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[4], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[2], $codes[5]];
+            // } else {
+            //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === $f_NFKC) {
+        if ($form === Normalizer::NFKC) {
             $message = sprintf(
                 'Normalize to NFKC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -172,10 +126,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[3], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[3], $codes[5]];
+            // } else {
+            //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === $f_NFKD) {
+        if ($form === Normalizer::NFKD) {
             $message = sprintf(
                 'Normalize to NFKD for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -187,10 +143,12 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '5 (NFKD)') => [$codes[4], $codes[4]];
             if ($validForMac) {
                 yield sprintf($message, '6 (NFD_MAC)') => [$codes[4], $codes[5]];
+            // } else {
+            //    yield sprintf($message, '6 (NFD_MAC)') => [$this->subject->normalize($codes[5], $form), $codes[5]];
             }
         }
 
-        if ($form === $f_MAC) {
+        if ($form === Normalizer::NFD_MAC) {
             $message = sprintf(
                 'Normalize to NFD_MAC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -199,10 +157,13 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             yield sprintf($message, '2 (NFC)') => [$codes[5], $codes[1]];
             yield sprintf($message, '3 (NFD)') => [$codes[5], $codes[2]];
             if ($validForMac) {
-                yield sprintf($message, '4 (NFKC)') => [$codes[3], $codes[3]];
+                yield sprintf($message, '4 (NFKC)') => [$codes[4], $codes[3]];
                 yield sprintf($message, '5 (NFKD)') => [$codes[4], $codes[4]];
-                yield sprintf($message, '6 (NFD_MAC)') => [$codes[5], $codes[5]];
+            // } else {
+            //    yield sprintf($message, '4 (NFKC)') => [$this->subject->normalize($codes[3], $form), $codes[3]];
+            //    yield sprintf($message, '5 (NFKD)') => [$this->subject->normalize($codes[4], $form), $codes[4]];
             }
+            yield sprintf($message, '6 (NFD_MAC)') => [$codes[5], $codes[5]];
         }
     }
 
@@ -226,33 +187,13 @@ class AbstractNormalizationTestCase extends AbstractTestCase
         }
     }
 
-    protected function markTestSkippedIfAppleIconvIsNotAvailable($form)
+    protected function markTestSkippedIfNfdMacIsNotSupported($form)
     {
         $form = NormalizationUtility::parseForm($form);
-        if (Normalizer::NFD_MAC === $form && !NormalizationUtility::isNfdMacCompatible()) {
+        if (Normalizer::NFD_MAC === $form && !in_array($form, Normalizer::getNormalizationForms(), true)) {
             $this->markTestSkipped(
                 'Skipped test as "iconv" extension is either not available '
                 . 'or not able to handle "utf-8-mac" charset.'
-            );
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    protected function implementationIsAvailable()
-    {
-        return
-            class_exists(static::IMPLEMENTATION_CLASS, true) &&
-            is_a('Normalizer', static::IMPLEMENTATION_CLASS, true)
-        ;
-    }
-
-    protected function markTestSkippedIfImplementationIsUnavailable()
-    {
-        if (!$this->implementationIsAvailable()) {
-            $this->markTestSkipped(
-                sprintf('Skipped test, as "%s" is not available.', static::IMPLEMENTATION_CLASS)
             );
         }
     }

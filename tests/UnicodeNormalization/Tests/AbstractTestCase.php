@@ -34,7 +34,7 @@ class AbstractTestCase extends TestCase
      *
      * @return mixed
      */
-    protected function callProtectedMethod($objectOrClass, $methodName, array $arguments = [])
+    protected function callProtectedMethod($objectOrClass, $methodName, ...$arguments)
     {
         $class = new \ReflectionClass(is_object($objectOrClass) ? get_class($objectOrClass) : $objectOrClass);
         $method = $class->getMethod($methodName);

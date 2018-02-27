@@ -91,7 +91,6 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @test
      * @testWith                       [""]
      *                                 ["relative\/path"]
      *                                 ["vfs:\/\/root\/path-does-not-exist"]
@@ -101,7 +100,7 @@ class FilesystemUtilityTest extends AbstractTestCase
      *
      * @param mixed $path
      */
-    public function checkDetectCapabilitiesForPathWithInvalidPath($path)
+    public function testDetectCapabilitiesForPathWithInvalidPath($path)
     {
         FilesystemUtility::detectCapabilitiesForPath($path, $this->fs);
     }
@@ -128,7 +127,7 @@ class FilesystemUtilityTest extends AbstractTestCase
     /**
      * @return array
      */
-    public function provideCheckDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData()
+    public function provideTestDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData()
     {
         $data = [
             [self::UNSUPPORTED_LOCALES, 'ASCII'],
@@ -141,13 +140,12 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     * @dataProvider provideCheckDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
+     * @dataProvider provideTestDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
      *
      * @param mixed $locale
      * @param mixed $charset
      */
-    public function checkDetectCapabilitiesForPathWithUnsupportedLocaleAndCharset($locale, $charset)
+    public function testDetectCapabilitiesForPathWithUnsupportedLocaleAndCharset($locale, $charset)
     {
         $locale = $this->assertSetLocale($locale);
         $charset = $this->assertSetCharset($charset);
@@ -185,13 +183,12 @@ class FilesystemUtilityTest extends AbstractTestCase
         'C.UTF-8', 'C.UTF8', ];
 
     /**
-     * @test
      * @runInSeparateProcess
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^The detection folder already exists: /
      * @expectedExceptionCode          1519131257
      */
-    public function checkDetectCapabilitiesForPathWithExistingDetectionFolder()
+    public function testDetectCapabilitiesForPathWithExistingDetectionFolder()
     {
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);
         $charset = $this->assertSetCharset('UTF-8');
@@ -206,12 +203,11 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @test
      * @runInSeparateProcess
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^Failed to create "vfs:\/\/root\/[^"]+"/
      */
-    public function checkDetectCapabilitiesForPathWithWriteProtection()
+    public function testDetectCapabilitiesForPathWithWriteProtection()
     {
         vfs\vfsStreamWrapper::unregister();
         $vfs = vfs\vfsStream::setup('root', 0555);
@@ -226,9 +222,9 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @test
+     * @runInSeparateProcess
      */
-    public function checkDetectCapabilitiesForPath()
+    public function testDetectCapabilitiesForPath()
     {
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);
         $charset = $this->assertSetCharset('UTF-8');
