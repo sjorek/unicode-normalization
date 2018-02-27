@@ -23,7 +23,7 @@ cache:
 install:
 - phpenv config-rm xdebug.ini || true
 - travis_retry composer self-update
-- composer diagnose
+- echo composer diagnose
 - if [[ $NIGHTLY = true ]]; then
     composer remove --dev friendsofphp/php-cs-fixer;
     composer validate;

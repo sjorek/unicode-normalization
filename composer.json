@@ -85,6 +85,9 @@
         "run:test": [
             "@run:require-native-implementation",
             "phpunit -v --exclude-group=implementation,large",
+            "@run:remove-implementation-packages"
+        ],
+        "run:test-polyfills": [
             "@run:require-symfony-implementation",
             "phpunit -v --exclude-group=implementation,large",
             "@run:require-patchwork-implementation",
@@ -94,6 +97,9 @@
         "run:test-all": [
             "@run:require-native-implementation",
             "phpunit -v --exclude-group=implementation",
+            "@run:remove-implementation-packages"
+        ],
+        "run:test-all-ployfills": [
             "@run:require-symfony-implementation",
             "phpunit -v --exclude-group=implementation",
             "@run:require-patchwork-implementation",
@@ -103,6 +109,9 @@
         "run:test-large": [
             "@run:require-native-implementation",
             "phpunit -v --exclude-group=implementation --group=large",
+            "@run:remove-implementation-packages"
+        ],
+        "run:test-large-polyfills": [
             "@run:require-symfony-implementation",
             "phpunit -v --exclude-group=implementation --group=large",
             "@run:require-patchwork-implementation",
@@ -112,6 +121,9 @@
         "run:test-conformance": [
             "@run:require-native-implementation",
             "phpunit -v --exclude-group=implementation --group=conformance",
+            "@run:remove-implementation-packages"
+        ],
+        "run:test-conformance-polyfills": [
             "@run:require-symfony-implementation",
             "phpunit -v --exclude-group=implementation --group=conformance",
             "@run:require-patchwork-implementation",
