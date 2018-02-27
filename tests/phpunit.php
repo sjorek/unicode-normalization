@@ -12,11 +12,10 @@ declare(strict_types=1);
  */
 
 namespace Sjorek\UnicodeNormalization\Tests {
-    if (false !== getenv('PHP_EXTENSION_HANDLER_RUN_WITHOUT')) {
-        Utility\PhpExtensionHandler::runWithout(explode(',', getenv('PHP_EXTENSION_HANDLER_RUN_WITHOUT')));
-    }
-    if (false !== strpos($_SERVER['argv'][0], 'php-cs-fixer')) {
-        Utility\PhpExtensionHandler::runWithout('xdebug');
+    foreach(Utility\Configuration::LOOSE_IMPLEMENTATIONS as $implementation) {
+        if (class_exists($implementation, true)) {
+            Utility\PhpExtensionHandler::runWithout('intl');
+        }
     }
 }
 
