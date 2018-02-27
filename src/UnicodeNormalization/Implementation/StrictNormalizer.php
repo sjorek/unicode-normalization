@@ -29,6 +29,9 @@ class StrictNormalizer extends BaseNormalizer
     public function isNormalized($input, $form = null)
     {
         $form = $this->getFormArgument($form);
+        if ($form === self::NONE) {
+            return false;
+        }
         if (parent::isNormalized($input, $form)) {
             return true;
         }
