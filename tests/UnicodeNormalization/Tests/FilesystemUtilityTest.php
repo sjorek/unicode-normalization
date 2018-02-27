@@ -183,7 +183,6 @@ class FilesystemUtilityTest extends AbstractTestCase
         'C.UTF-8', 'C.UTF8', ];
 
     /**
-     * @runInSeparateProcess
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^The detection folder already exists: /
      * @expectedExceptionCode          1519131257
@@ -203,7 +202,6 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @runInSeparateProcess
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^Failed to create "vfs:\/\/root\/[^"]+"/
      */
@@ -221,9 +219,6 @@ class FilesystemUtilityTest extends AbstractTestCase
         ini_set('default_charset', $charset);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testDetectCapabilitiesForPath()
     {
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);

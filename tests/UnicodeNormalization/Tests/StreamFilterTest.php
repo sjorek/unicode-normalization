@@ -172,9 +172,6 @@ class StreamFilterTest extends AbstractNormalizationTestCase
     // StreamFilter::register() method tests
     // ////////////////////////////////////////////////////////////////
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testRegister()
     {
         $ns = StreamFilter::DEFAULT_NAMESPACE;
@@ -210,7 +207,6 @@ class StreamFilterTest extends AbstractNormalizationTestCase
     }
 
     /**
-     * @runInSeparateProcess
      * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
      * @expectedExceptionCode       1398603947
@@ -223,7 +219,6 @@ class StreamFilterTest extends AbstractNormalizationTestCase
     }
 
     /**
-     * @runInSeparateProcess
      * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
      * @expectedExceptionCode       1398603947

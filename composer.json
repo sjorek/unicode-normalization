@@ -90,7 +90,7 @@
             "@run:require-patchwork-implementation",
             "phpunit -v --exclude-group=implementation,large",
             "@run:remove-implementation-packages"
-         ],
+        ],
         "run:test-all": [
             "@run:require-native-implementation",
             "phpunit -v --exclude-group=implementation",

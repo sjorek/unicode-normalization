@@ -1,5 +1,6 @@
 {
     "name": "sjorek/unicode-normalization-symfony-implementation",
+    "version": "0.0.0",
     "description" : "This package provides symfony's polyfill implementations for the 'sjorek/unicode-normalization' package - please do not install this package directly.",
     "homepage" : "https://sjorek.github.io/unicode-normalization/",
     "license": "BSD-3-Clause",
