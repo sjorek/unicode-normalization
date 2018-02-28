@@ -39,7 +39,6 @@
     },
     "require" : {
         "php": ">=7.0",
-        "sjorek/unicode-normalization-native-implementation": "@dev",
         "symfony/filesystem": "^3.4"
     },
     "require-dev" : {
@@ -84,9 +83,7 @@
             "@run:remove-implementation-packages"
         ],
         "run:test": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation,large",
-            "@run:remove-implementation-packages"
+            "phpunit -v --colors=always --exclude-group=implementation,large"
         ],
         "run:test-polyfills": [
             "@run:require-symfony-implementation",
@@ -96,9 +93,7 @@
             "@run:remove-implementation-packages"
         ],
         "run:test-all": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation",
-            "@run:remove-implementation-packages"
+            "phpunit -v --colors=always --exclude-group=implementation"
         ],
         "run:test-all-ployfills": [
             "@run:require-symfony-implementation",
@@ -108,9 +103,7 @@
             "@run:remove-implementation-packages"
         ],
         "run:test-large": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation --group=large",
-            "@run:remove-implementation-packages"
+            "phpunit -v --colors=always --exclude-group=implementation --group=large"
         ],
         "run:test-large-polyfills": [
             "@run:require-symfony-implementation",
@@ -120,9 +113,7 @@
             "@run:remove-implementation-packages"
         ],
         "run:test-conformance": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation --group=conformance",
-            "@run:remove-implementation-packages"
+            "phpunit -v --colors=always --exclude-group=implementation --group=conformance"
         ],
         "run:test-conformance-polyfills": [
             "@run:require-symfony-implementation",
@@ -132,19 +123,16 @@
             "@run:remove-implementation-packages"
         ],
         "run:test-coverage": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-text",
-            "@run:remove-implementation-packages"
+            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-text"
         ],
         "run:test-coverage-all": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation --coverage-text",
-            "@run:remove-implementation-packages"
+            "phpunit -v --colors=always --exclude-group=implementation --coverage-text"
         ],
-        "run:coverage": [
-            "@run:require-native-implementation",
-            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-html coverage",
-            "@run:remove-implementation-packages"
+        "run:coverage-html": [
+            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-html coverage"
+        ],
+        "run:coverage-clover": [
+            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-clover coverage.xml"
         ],
         "run:cs-lint": [
             "php-cs-fixer fix --ansi --diff --stop-on-violation --verbose --dry-run"
