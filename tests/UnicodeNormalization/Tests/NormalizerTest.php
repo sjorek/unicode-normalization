@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests;
 
 use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
+use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
  * Testcase for Sjorek\UnicodeNormalization\Normalizer.

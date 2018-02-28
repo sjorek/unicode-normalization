@@ -22,7 +22,7 @@ namespace Sjorek\UnicodeNormalization\Validation\Implementation;
 class StringValidatorBugfix65732 extends StringValidatorImpl
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @see StringValidatorImpl::filter()
      */

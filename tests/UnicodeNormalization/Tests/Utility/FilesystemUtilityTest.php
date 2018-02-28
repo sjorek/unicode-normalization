@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
 use org\bovigo\vfs;
-use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
+use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 
 if (!class_exists(__NAMESPACE__ . '\\Filesystem', false)) {
     /**

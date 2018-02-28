@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Helper\Conformance;
 
-use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
  * An iterator to update "UnicodeNormalizationTest.X.Y.Z.txt" files from www.unicode.org.

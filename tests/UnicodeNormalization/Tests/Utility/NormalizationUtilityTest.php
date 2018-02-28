@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
 use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
-use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
-use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
+use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>

@@ -15,16 +15,17 @@ namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
 use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
-use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Normalizer;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
-use Sjorek\UnicodeNormalization\Validation\StringValidator;
-use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732;
+use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
+use Sjorek\UnicodeNormalization\Validation\StringValidator;
 
 /**
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\AutoloadUtility
+ *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class AutoloadUtilityTest extends AbstractTestCase
@@ -35,6 +36,7 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::register()
+     *
      * @see AutoloadUtility::register()
      */
     public function testRegister()
@@ -45,6 +47,7 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::registerNormalizer()
+     *
      * @see AutoloadUtility::registerNormalizer()
      */
     public function testRegisterNormalizer()
@@ -64,6 +67,7 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::registerStringValidator()
+     *
      * @see AutoloadUtility::registerStringValidator()
      */
     public function testRegisterStringValidator()

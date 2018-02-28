@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Utility;
 
+use Sjorek\UnicodeNormalization\Filesystem\Filesystem;
+use Sjorek\UnicodeNormalization\Filesystem\FilesystemInterface;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Sjorek\UnicodeNormalization\Filesystem\Filesystem;
-use Sjorek\UnicodeNormalization\Filesystem\FilesystemInterface;
 
 /**
  * Class to detect unicode filesystem capabilities.

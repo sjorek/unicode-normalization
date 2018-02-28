@@ -97,7 +97,7 @@ class AutoloadUtility
     }
 
     /**
-     * Return the root namespace of the 'sjorek/unicode-normalization' package
+     * Return the root namespace of the 'sjorek/unicode-normalization' package.
      *
      * @return string
      */

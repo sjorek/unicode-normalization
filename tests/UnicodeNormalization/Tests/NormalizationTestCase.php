@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Normalizer;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
  * Base test case class for all unit-tests.

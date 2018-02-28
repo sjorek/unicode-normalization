@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Normalizer;
 use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
  * Test case class for unicode normalization conformance unit-tests.

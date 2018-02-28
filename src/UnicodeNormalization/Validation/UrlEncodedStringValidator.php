@@ -45,6 +45,7 @@ class UrlEncodedStringValidator
      * @param string $uri     The uri to filter
      * @param int    $form    [optional] normalization form to check against, overriding the default
      * @param string $charset [optional] charset to convert from, default is `mb_detect_encoding()` or ISO-8859-1
+     * @param mixed  $input
      *
      * @return false|string
      *
@@ -83,7 +84,7 @@ class UrlEncodedStringValidator
             $input
         );
 
-        return $input === null ? false : $input;
+        return null === $input ? false : $input;
     }
 
     /**
