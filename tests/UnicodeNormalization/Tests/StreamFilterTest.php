@@ -18,6 +18,8 @@ use Sjorek\UnicodeNormalization\StreamFilter;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\StreamFilter
+ *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class StreamFilterTest extends ConformanceTestCase
@@ -46,6 +48,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::getCodePointSize
      * @dataProvider provideTestGetCodePointSizeData
      *
      * @param int    $expected
@@ -148,6 +151,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::processStringFragment
      * @dataProvider provideTestProcessStringFragmentData
      *
      * @param array|false $expected
@@ -172,6 +176,9 @@ class StreamFilterTest extends ConformanceTestCase
     // StreamFilter::register() method tests
     // ////////////////////////////////////////////////////////////////
 
+    /**
+     * @covers ::register
+     */
     public function testRegister()
     {
         $ns = StreamFilter::DEFAULT_NAMESPACE;
@@ -189,6 +196,7 @@ class StreamFilterTest extends ConformanceTestCase
     // ////////////////////////////////////////////////////////////////
 
     /**
+     * @covers ::onCreate
      * @testWith    [1, "with normalization form value"]
      *              ["none", "with normalization form expression"]
      *
@@ -208,6 +216,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::onCreate
      * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
      * @expectedExceptionCode       1398603947
@@ -220,6 +229,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::onCreate
      * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
      * @expectedExceptionCode       1398603947
@@ -256,6 +266,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::filter
      * @dataProvider provideTestFilterWithParameterData
      *
      * @param string $expected
@@ -308,6 +319,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::filter
      * @dataProvider provideTestFilterWithNamespaceData
      *
      * @param string $expected
@@ -328,6 +340,7 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::filter
      * @large
      * @group conformance
      * @dataProvider provideConformanceTestData

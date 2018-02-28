@@ -19,7 +19,7 @@ use Sjorek\UnicodeNormalization\Validation\StringValidator;
 use Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator;
 
 /**
- * Testcase for Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator.
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
@@ -109,6 +109,7 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
     }
 
     /**
+     * @covers ::filter
      * @dataProvider provideTestFilterData
      *
      * @param bool        $expected
@@ -180,6 +181,7 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
     }
 
     /**
+     * @covers ::isValid
      * @dataProvider provideTestIsValidData
      *
      * @param bool        $expected

@@ -18,7 +18,7 @@ use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
- * Testcase for Sjorek\UnicodeNormalization\Normalizer.
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Normalizer
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
@@ -181,11 +181,12 @@ class NormalizerTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::isNormalized
+     * @dataProvider provideTestIsNormalizedData
+     *
      * @param bool     $assert
      * @param string   $string
      * @param null|int $form
-     * @dataProvider provideTestIsNormalizedData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
      */
     public function testIsNormalized($assert, $string, $form)
     {
@@ -287,11 +288,12 @@ class NormalizerTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::normalize
+     * @dataProvider provideTestNormalizeData
+     *
      * @param false|string $same
      * @param string       $string
      * @param null|int     $form
-     * @dataProvider provideTestNormalizeData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
      */
     public function testNormalize($same, $string, $form)
     {
@@ -304,13 +306,12 @@ class NormalizerTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::normalizeTo
+     * @dataProvider provideTestNormalizeData
+     *
      * @param false|string $same
      * @param string       $string
      * @param null|int     $form
-     * @dataProvider provideTestNormalizeData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
      */
     public function testNormalizeTo($same, $string, $form)
     {
@@ -323,13 +324,12 @@ class NormalizerTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::normalizeStringTo
+     * @dataProvider provideTestNormalizeData
+     *
      * @param false|string $same
      * @param string       $string
      * @param null|int     $form
-     * @dataProvider provideTestNormalizeData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalizeTo
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::isNormalized
      */
     public function testNormalizeStringTo($same, $string, $form)
     {
@@ -342,13 +342,14 @@ class NormalizerTest extends ConformanceTestCase
     }
 
     /**
+     * @covers ::normalize
+     * @dataProvider provideConformanceTestData
+     * @large
+     * @group conformance
+     *
      * @param string                  $unicodeVersion
      * @param int                     $form
      * @param NormalizationTestReader $fileIterator
-     * @large
-     * @group conformance
-     * @dataProvider provideConformanceTestData
-     * @covers \Sjorek\UnicodeNormalization\Normalizer::normalize
      */
     public function testNormalizeConformance($unicodeVersion, $form, NormalizationTestReader $fileIterator)
     {

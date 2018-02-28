@@ -18,7 +18,7 @@ use Sjorek\UnicodeNormalization\Tests\NormalizationTestCase;
 use Sjorek\UnicodeNormalization\Validation\StringValidator;
 
 /**
- * Testcase for Sjorek\UnicodeNormalization\Validation\StringValidator.
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\StringValidator.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
@@ -102,6 +102,7 @@ class StringValidatorTest extends NormalizationTestCase
     }
 
     /**
+     * @covers ::filter
      * @dataProvider provideTestFilterData
      *
      * @param bool        $expected
@@ -176,6 +177,7 @@ class StringValidatorTest extends NormalizationTestCase
     }
 
     /**
+     * @covers ::isValid
      * @dataProvider provideTestIsValidData
      *
      * @param bool        $expected
