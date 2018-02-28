@@ -19,6 +19,10 @@ use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
+ * NormalizationUtility tests
+ *
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\NormalizationUtility
+ *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class NormalizationUtilityTest extends AbstractTestCase
@@ -76,8 +80,8 @@ class NormalizationUtilityTest extends AbstractTestCase
     }
 
     /**
+     * @covers ::parseForm()
      * @dataProvider provideTestParseFormData
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::parseForm()
      *
      * @param int   $expected
      * @param mixed $form
@@ -88,11 +92,10 @@ class NormalizationUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
-     * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
-     * @expectedExceptionCode       1398603947
-     * @covers \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::parseForm()
+     * @covers ::parseForm()
+     * @expectedException        \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
+     * @expectedExceptionMessage Invalid unicode normalization form value: nonsense
+     * @expectedExceptionCode    1398603947
      */
     public function testParseFormThrowsInvalidNormalizationFormException()
     {
@@ -104,7 +107,7 @@ class NormalizationUtilityTest extends AbstractTestCase
     // ///////////////////////////////////////////////////
 
     /**
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::isNfdMacCompatible()
+     * @covers ::isNfdMacCompatible()
      */
     public function testIsNfdMacCompatible()
     {
@@ -129,7 +132,7 @@ class NormalizationUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::isStrictImplementation();
+     * @covers ::isStrictImplementation();
      */
     public function testIsStrictImplementation()
     {
@@ -146,7 +149,7 @@ class NormalizationUtilityTest extends AbstractTestCase
     // ///////////////////////////////////////////////////
 
     /**
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::detectUnicodeVersion()
+     * @covers ::detectUnicodeVersion()
      */
     public function testDetectUnicodeVersion()
     {

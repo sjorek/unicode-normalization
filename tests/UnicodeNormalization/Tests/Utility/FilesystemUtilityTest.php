@@ -13,36 +13,18 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
-use org\bovigo\vfs;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamWrapper;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
-
-if (!class_exists(__NAMESPACE__ . '\\Filesystem', false)) {
-    /**
-     * tweaked filesystem implementation for testing with vfsStream.
-     */
-    class Filesystem extends \Sjorek\UnicodeNormalization\Filesystem\Filesystem
-    {
-        /**
-         * Checks if the given path is absolute.
-         *
-         * @param string $path
-         *
-         * @return bool
-         */
-        public function isAbsolutePath($path)
-        {
-            if ('vfs://root' === substr($path, 0, 10)) {
-                $path = substr($path, 10) ?: '/';
-            }
-
-            return parent::isAbsolutePath($path);
-        }
-    }
-}
+use Sjorek\UnicodeNormalization\Tests\Helper\VfsFilesystem;
 
 /**
+ * FilesystemUtility tests
+ *
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\FilesystemUtility
+ *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
 class FilesystemUtilityTest extends AbstractTestCase
@@ -52,7 +34,7 @@ class FilesystemUtilityTest extends AbstractTestCase
     // /////////////////////////////////////////////////
 
     /**
-     * @var Filesystem
+     * @var VfsFilesystem
      */
     protected $fs;
 
@@ -68,8 +50,8 @@ class FilesystemUtilityTest extends AbstractTestCase
      */
     protected function setUp()
     {
-        $this->fs = new Filesystem();
-        $this->vfs = vfs\vfsStream::setup(
+        $this->fs = new VfsFilesystem();
+        $this->vfs = vfsStream::setup(
             'root',
             null,
             [
@@ -87,10 +69,11 @@ class FilesystemUtilityTest extends AbstractTestCase
      */
     protected function tearDown()
     {
-        vfs\vfsStreamWrapper::unregister();
+        vfsStreamWrapper::unregister();
     }
 
     /**
+     * @covers ::detectCapabilitiesForPath
      * @testWith                       [""]
      *                                 ["relative\/path"]
      *                                 ["vfs:\/\/root\/path-does-not-exist"]
@@ -140,6 +123,7 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
+     * @covers ::detectCapabilitiesForPath
      * @dataProvider provideTestDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
      *
      * @param mixed $locale
@@ -183,6 +167,7 @@ class FilesystemUtilityTest extends AbstractTestCase
         'C.UTF-8', 'C.UTF8', ];
 
     /**
+     * @covers ::detectCapabilitiesForPath
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^The detection folder already exists: /
      * @expectedExceptionCode          1519131257
@@ -202,13 +187,14 @@ class FilesystemUtilityTest extends AbstractTestCase
     }
 
     /**
+     * @covers ::detectCapabilitiesForPath
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^Failed to create "vfs:\/\/root\/[^"]+"/
      */
     public function testDetectCapabilitiesForPathWithWriteProtection()
     {
-        vfs\vfsStreamWrapper::unregister();
-        $vfs = vfs\vfsStream::setup('root', 0555);
+        vfsStreamWrapper::unregister();
+        $vfs = vfsStream::setup('root', 0555);
 
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);
         $charset = $this->assertSetCharset('UTF-8');

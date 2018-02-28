@@ -18,6 +18,8 @@ use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
+ * Normalizer tests
+ *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Normalizer
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>

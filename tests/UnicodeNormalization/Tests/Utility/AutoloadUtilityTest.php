@@ -24,6 +24,8 @@ use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
 use Sjorek\UnicodeNormalization\Validation\StringValidator;
 
 /**
+ * AutoloadUtility tests
+ *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\AutoloadUtility
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>

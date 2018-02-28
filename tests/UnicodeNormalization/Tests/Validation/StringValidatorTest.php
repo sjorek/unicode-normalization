@@ -18,7 +18,9 @@ use Sjorek\UnicodeNormalization\Tests\NormalizationTestCase;
 use Sjorek\UnicodeNormalization\Validation\StringValidator;
 
 /**
- * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\StringValidator.
+ * StringValidator tests
+ *
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\StringValidator
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */

@@ -18,6 +18,8 @@ use Sjorek\UnicodeNormalization\StreamFilter;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
+ * StreamFilter tests
+ *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\StreamFilter
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
