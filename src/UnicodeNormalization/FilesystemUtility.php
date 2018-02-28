@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 /**
- * Class to handle unicode specific functionality.
+ * Class to detect unicode filesystem capabilities.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */

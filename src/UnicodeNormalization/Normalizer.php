@@ -17,7 +17,10 @@ if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
     /**
      * Normalizer implementation (for IDE only).
      *
-     * @see Implementation\Normalizer
+     * @see Implementation\NormalizerImpl
+     * @see Implementation\BaseNormalizer
+     * @see Implementation\StrictNormalizer
+     * @see Implementation\MacNormalizer
      *
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
