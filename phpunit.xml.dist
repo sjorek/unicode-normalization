@@ -32,6 +32,11 @@
         </whitelist>
     </filter>
 
+    <logging>
+        <log type="coverage-html" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-text" showUncoveredFiles="true"/>
+    </logging>
+
     <php>
         <ini name="memory_limit" value="16M"/>
     </php>
