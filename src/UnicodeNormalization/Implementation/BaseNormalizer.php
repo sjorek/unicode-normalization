@@ -68,7 +68,7 @@ class BaseNormalizer implements NormalizerInterface
     /**
      * Constructor.
      *
-     * @param null|int|string $form [optional] Set normalization form, optional
+     * @param null|bool|int|string $form [optional] Set normalization form, default: NFC
      *
      * @see NormalizationUtility::parseForm()
      */

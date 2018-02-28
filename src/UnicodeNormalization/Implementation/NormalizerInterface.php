@@ -27,7 +27,7 @@ interface NormalizerInterface
      * Ignore any decomposition/composition.
      *
      * Ignoring Implementation decomposition/composition, means nothing is automatically normalized.
-     * Manny Linux- and BSD-filesystems do not normalize paths and filenames, but treat them as binary data.
+     * Many Linux- and BSD-filesystems do not normalize paths and filenames, but treat them as binary data.
      * Apple™'s APFS filesystem treats paths and filenames as binary data.
      *
      * @var int
