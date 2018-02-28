@@ -13,52 +13,31 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
-use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
+use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
+use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
 
 /**
- * Base test case class for all unit-tests.
+ * Test case class for unicode normalization conformance unit-tests.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class AbstractNormalizationTestCase extends AbstractTestCase
+class ConformanceTestCase extends NormalizationTestCase
 {
-    /**
-     * @var array
-     */
-    protected static $unicodeVersion = null;
-
-    /**
-     * @var \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface
-     */
-    protected $subject;
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see \PHPUnit\Framework\TestCase::setUp()
-     */
-    protected function setUp()
-    {
-        self::$unicodeVersion = Normalizer::getUnicodeVersion();
-        $this->subject = new Normalizer();
-    }
-
     /**
      * @return array
      */
     public function provideConformanceTestData()
     {
         $data = [];
-        foreach (ConfigurationUtility::getFixtureUnicodeVersions() as $version) {
+        foreach (ConfigurationHandler::getFixtureUnicodeVersions() as $version) {
             foreach (['NFC', 'NFD', 'NFKC', 'NFKD', 'NFD_MAC'] as $form) {
                 $caption = sprintf('unicode version %s with normalization form %s', $version, $form);
                 $data[$caption] = [
                     $version,
                     NormalizationUtility::parseForm($form),
-                    NormalizationTestUtility::createReader($version),
+                    NormalizationTestHandler::createReader($version),
                 ];
             }
         }
@@ -164,37 +143,6 @@ class AbstractNormalizationTestCase extends AbstractTestCase
             //    yield sprintf($message, '5 (NFKD)') => [$this->subject->normalize($codes[4], $form), $codes[4]];
             }
             yield sprintf($message, '6 (NFD_MAC)') => [$codes[5], $codes[5]];
-        }
-    }
-
-    // ////////////////////////////////////////////////////////////////
-    // utility methods
-    // ////////////////////////////////////////////////////////////////
-
-    /**
-     * @param string $unicodeVersion
-     */
-    protected function markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion)
-    {
-        if (version_compare($unicodeVersion, static::$unicodeVersion, '>')) {
-            $this->markTestSkipped(
-                sprintf(
-                    'Skipped test as unicode version %s is higher than the supported unicode conformance level %s.',
-                    $unicodeVersion,
-                    static::$unicodeVersion
-                )
-            );
-        }
-    }
-
-    protected function markTestSkippedIfNfdMacIsNotSupported($form)
-    {
-        $form = NormalizationUtility::parseForm($form);
-        if (Normalizer::NFD_MAC === $form && !in_array($form, Normalizer::getNormalizationForms(), true)) {
-            $this->markTestSkipped(
-                'Skipped test as "iconv" extension is either not available '
-                . 'or not able to handle "utf-8-mac" charset.'
-            );
         }
     }
 }

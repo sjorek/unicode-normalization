@@ -11,9 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Conformance;
+namespace Sjorek\UnicodeNormalization\Tests\Helper\Conformance;
 
-use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
+use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
 
 /**
  * An iterator to read "NormalizationTest.X.Y.Z.txt" fixture files.
@@ -40,14 +40,14 @@ class NormalizationTestReader implements \IteratorAggregate
      */
     public function __construct($version)
     {
-        $filePath = NormalizationTestUtility::createFilePath($version);
+        $filePath = NormalizationTestHandler::createFilePath($version);
         if (!file_exists($filePath)) {
             throw new \InvalidArgumentException(sprintf('The source file does not exist: %s', $filePath));
         }
         if (!is_readable($filePath)) {
             throw new \InvalidArgumentException(sprintf('The source file is not readable: %s', $filePath));
         }
-        $this->filePath = NormalizationTestUtility::applyGzip($filePath);
+        $this->filePath = NormalizationTestHandler::applyGzip($filePath);
     }
 
     /**

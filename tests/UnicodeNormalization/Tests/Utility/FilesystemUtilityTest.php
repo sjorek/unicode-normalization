@@ -11,10 +11,10 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Filesystem;
+namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
 use org\bovigo\vfs;
-use Sjorek\UnicodeNormalization\FilesystemUtility;
+use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 

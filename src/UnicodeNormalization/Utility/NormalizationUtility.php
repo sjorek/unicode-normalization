@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization;
+namespace Sjorek\UnicodeNormalization\Utility;
 
 use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
@@ -109,41 +109,6 @@ class NormalizationUtility
     }
 
     /**
-     * Registration method to be called by (an) bootstrap script like "src/UnicodeNormalization/bootstrap.php".
-     *
-     * @return bool
-     */
-    public static function register()
-    {
-        $normalizerClass = __NAMESPACE__ . '\\Normalizer';
-        $implementationClass = __NAMESPACE__ . '\\Implementation\\NormalizerImpl';
-        $baseClass = __NAMESPACE__ . '\\Implementation\\BaseNormalizer';
-
-        // Use the autoloader here !
-        if (!class_exists('Normalizer', true)) {
-            return
-                class_alias(__NAMESPACE__ . '\\Implementation\\MissingNormalizer', 'Normalizer', true) &&
-                class_exists($normalizerClass, true);
-        }
-        // Do not use the autoloader here !
-        if (class_exists($normalizerClass, false) || class_exists($implementationClass, false)) {
-            return false;
-        }
-        if (!self::isStrictImplementation()) {
-            $baseClass = __NAMESPACE__ . '\\Implementation\\StrictNormalizer';
-        }
-        // Use the autoloader here !
-        if (!class_alias($baseClass, $implementationClass, true)) {
-            return false;
-        }
-        if (self::isNfdMacCompatible()) {
-            $implementationClass = __NAMESPACE__ . '\\Implementation\\MacNormalizer';
-        }
-        // Use the autoloader here !
-        return class_alias($implementationClass, $normalizerClass, true);
-    }
-
-    /**
      * Return true if the \Normalizer implementation is strict.
      * Strict implementations process every character in a string to determine if a string is normalized.
      *
@@ -168,7 +133,7 @@ class NormalizationUtility
      *
      * @return bool
      *
-     * @see Normalizer::NFD_MAC
+     * @see \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface::NFD_MAC
      */
     public static function isNfdMacCompatible()
     {
@@ -191,10 +156,6 @@ class NormalizationUtility
      */
     public static function detectUnicodeVersion()
     {
-        if (!extension_loaded('intl')) {
-            // TODO replace hard-coded version with a real detection
-            return '7.0.0';
-        }
         if (class_exists('IntlChar', true) && method_exists('IntlChar', 'getUnicodeVersion')) {
             return implode('.', array_slice(\IntlChar::getUnicodeVersion(), 0, 3));
         }
@@ -229,6 +190,10 @@ class NormalizationUtility
             if (isset($icuToUnicodeVersionMap[$icuVersion])) {
                 return $icuToUnicodeVersionMap[$icuVersion];
             }
+        }
+        if (!extension_loaded('intl') && class_exists('Normalizer', true)) {
+            // TODO replace hard-coded version with a real detection
+            return '7.0.0';
         }
 
         throw new \RuntimeException('Could not determine unicode version.', 1519488534);

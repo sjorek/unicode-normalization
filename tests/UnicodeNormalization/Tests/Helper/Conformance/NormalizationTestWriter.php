@@ -11,9 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Conformance;
+namespace Sjorek\UnicodeNormalization\Tests\Helper\Conformance;
 
-use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
+use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
 
 /**
  * A file object to write "UnicodeNormalizationTest.X.Y.Z.txt" fixture files.
@@ -34,7 +34,7 @@ class NormalizationTestWriter extends \SplFileObject
      */
     public function __construct($version)
     {
-        $filePath = NormalizationTestUtility::createFilePath($version);
+        $filePath = NormalizationTestHandler::createFilePath($version);
         if (!file_exists($filePath) && !is_writable(dirname($filePath))) {
             throw new \InvalidArgumentException(
                 sprintf('The target folder is not writable: %s', dirname($filePath))
@@ -46,7 +46,7 @@ class NormalizationTestWriter extends \SplFileObject
             );
         }
         $this->filePath = $filePath;
-        parent::__construct(NormalizationTestUtility::applyGzip($filePath), 'w', false);
+        parent::__construct(NormalizationTestHandler::applyGzip($filePath), 'w', false);
     }
 
     /**

@@ -11,10 +11,10 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Conformance;
+namespace Sjorek\UnicodeNormalization\Tests\Helper\Conformance;
 
-use Sjorek\UnicodeNormalization\NormalizationUtility;
-use Sjorek\UnicodeNormalization\Tests\Utility\NormalizationTestUtility;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
 
 /**
  * An iterator to update "UnicodeNormalizationTest.X.Y.Z.txt" files from www.unicode.org.
@@ -51,7 +51,7 @@ class NormalizationTestUpdater implements \IteratorAggregate
                 'The extension "iconv" is either missing or does not support the "utf-8-mac" charset.'
             );
         }
-        $source = NormalizationTestUtility::createDownloadUrl($version);
+        $source = NormalizationTestHandler::createDownloadUrl($version);
         $scheme = parse_url($source, PHP_URL_SCHEME);
         if (false === $scheme) {
             throw new \InvalidArgumentException(sprintf('Invalid url "%s" given.', $source));

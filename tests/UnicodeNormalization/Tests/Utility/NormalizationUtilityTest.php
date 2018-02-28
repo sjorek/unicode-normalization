@@ -11,14 +11,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests;
+namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
-use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
-use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
-use Sjorek\UnicodeNormalization\NormalizationUtility;
-use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
+use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -136,32 +134,11 @@ class NormalizationUtilityTest extends AbstractTestCase
     public function testIsStrictImplementation()
     {
         $isStrict = NormalizationUtility::isStrictImplementation();
-        if (ConfigurationUtility::isPolyfillImplementation()) {
+        if (ConfigurationHandler::isPolyfillImplementation()) {
             $this->assertFalse($isStrict);
         } else {
             $this->assertTrue($isStrict);
         }
-    }
-
-    // ///////////////////////////////////////////////////
-    // Tests concerning implementation registry
-    // ///////////////////////////////////////////////////
-
-    /**
-     * @covers \Sjorek\UnicodeNormalization\NormalizationUtility::register()
-     */
-    public function testRegister()
-    {
-        $this->assertFalse(NormalizationUtility::register());
-        $this->assertSame(
-            NormalizationUtility::isNfdMacCompatible(),
-            is_a(Normalizer::class, MacNormalizer::class, true)
-        );
-        $this->assertSame(
-            NormalizationUtility::isStrictImplementation(),
-            // strict implementations should not inherit the strict-enforcing facade
-            !is_a(Normalizer::class, StrictNormalizer::class, true)
-        );
     }
 
     // ///////////////////////////////////////////////////
@@ -185,7 +162,7 @@ class NormalizationUtilityTest extends AbstractTestCase
         $unicodeVersion = NormalizationUtility::detectUnicodeVersion();
         $this->assertSame(1, preg_match('/^[1-9][0-9]*\.[0-9]+\.[0-9]+$/', $unicodeVersion));
         $this->assertTrue(version_compare('0.0.0', $unicodeVersion, '<'));
-        if (ConfigurationUtility::isPolyfillImplementation()) {
+        if (ConfigurationHandler::isPolyfillImplementation()) {
             $this->assertSame('7.0.0', $unicodeVersion);
         }
     }

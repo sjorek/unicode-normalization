@@ -44,44 +44,46 @@ class UrlEncodedStringValidator
      *
      * @param string $uri     The uri to filter
      * @param int    $form    [optional] normalization form to check against, overriding the default
-     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     * @param string $charset [optional] charset to convert from, default is `mb_detect_encoding()` or ISO-8859-1
      *
-     * @return string
+     * @return false|string
      *
      * @see \Patchwork\Utf8\Bootup::filterRequestUri()
      *
-     * @todo Feature #57695: Keep this method in sync patchwork's implementation
-     * @todo Feature #57695: Figure out why patchwork's implementation assumes Windows-CP1252 as fallback
+     * @todo Keep this method in sync patchwork's implementation
+     * @todo Figure out why patchwork's implementation used Windows-CP1252 as fallback
      */
-    public function sanitize($uri, $form = null, $charset = null)
+    public function filter($input, $form = null, $charset = null)
     {
         // is url empty or is the url-decoded url already valid utf8 ?
-        if ('' === $uri || !preg_match('/[\x80-\xFF]/', urldecode($uri))) {
-            return $uri;
+        if ('' === $input || !preg_match('/[\x80-\xFF]/', urldecode($input))) {
+            return $input;
         }
 
         // encode all unencoded single-byte characters from 128 to 255
-        $uri = preg_replace_callback(
+        $input = preg_replace_callback(
             '/[\x80-\xFF]+/',
             function ($match) {
                 return urlencode($match[0]);
             },
-            $uri
+            $input
         );
+        if (null === $input) {
+            return false;
+        }
 
-        $stringValidator = $this->stringValidator;
-        // encode all unencoded multibyte-byte characters from 128 and above
-        // for combined characters in NFD we need to prepend the preceding character
-        $uri = preg_replace_callback(
+        $validator = $this->stringValidator;
+        // encode all multibyte-byte characters from 128 and above
+        $input = preg_replace_callback(
             '/(^|.)(?:%[89A-F][0-9A-F])+/i',
             // url-decode -> utf8-encode -> url-encode
-            function ($match) use ($stringValidator, $form, $charset) {
-                return urlencode($stringValidator->sanitize(urldecode($match[0]), $form, $charset));
+            function ($match) use ($validator, $form, $charset) {
+                return urlencode($validator->filter(urldecode($match[0]), $form, $charset));
             },
-            $uri
+            $input
         );
 
-        return $uri;
+        return $input === null ? false : $input;
     }
 
     /**
@@ -89,12 +91,12 @@ class UrlEncodedStringValidator
      *
      * @param string $uri     The uri to to test
      * @param int    $form    [optional] normalization form to check against, overriding the default
-     * @param string $charset [optional] charset to try to convert from, default is ISO-8859-1
+     * @param string $charset [optional] charset to convert from, default is `mb_detect_encoding()` or ISO-8859-1
      *
      * @return bool TRUE if the string is a well-formed and normalized UTF-8 string
      */
     public function isValid($uri, $form = null, $charset = null)
     {
-        return '' === $uri || $uri === $this->sanitize($uri, $form, $charset);
+        return '' === $uri || $uri === $this->filter($uri, $form, $charset);
     }
 }

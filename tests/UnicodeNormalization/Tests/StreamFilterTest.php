@@ -15,12 +15,12 @@ namespace Sjorek\UnicodeNormalization\Tests;
 
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\StreamFilter;
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StreamFilterTest extends AbstractNormalizationTestCase
+class StreamFilterTest extends ConformanceTestCase
 {
     // ////////////////////////////////////////////////////////////////
     // StreamFilter::getCodePointSize() method tests

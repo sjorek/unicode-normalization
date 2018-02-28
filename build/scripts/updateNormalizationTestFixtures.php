@@ -47,8 +47,8 @@ EOT;
             ],
             [
                 $argv[0],
-                Utility\NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST,
-                implode(' ', Utility\ConfigurationUtility::getKnownUnicodeVersions()),
+                Helper\NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST,
+                implode(' ', Helper\ConfigurationHandler::getKnownUnicodeVersions()),
             ],
             implode(PHP_EOL, explode("\n", $usage)) . PHP_EOL
         );
@@ -61,12 +61,12 @@ EOT;
     }
 
     if (in_array('-c', $argv, true) || in_array('--check', $argv, true)) {
-        $current = Utility\NormalizationTestUtility::UPDATE_CHECK_VERSION_LATEST;
+        $current = Helper\NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST;
         if ($verbose) {
             echo sprintf('Current unicode version: %s' . PHP_EOL, $current);
             echo 'Detecting latest unicode version ...' . PHP_EOL;
         }
-        $latest = Utility\NormalizationTestUtility::detectLatestVersion();
+        $latest = Helper\NormalizationTestHandler::detectLatestVersion();
         if (version_compare($current, $latest, '=')) {
             if ($verbose) {
                 echo 'The current unicode version is up-to-date.' . PHP_EOL;
@@ -79,7 +79,7 @@ EOT;
         exit(1);
     }
 
-    $versions = array_slice($argv, 1) ?: Utility\ConfigurationUtility::getKnownUnicodeVersions();
+    $versions = array_slice($argv, 1) ?: Helper\ConfigurationHandler::getKnownUnicodeVersions();
 
     foreach ($versions as $version) {
         echo sprintf(
@@ -87,13 +87,13 @@ EOT;
             $version
         );
 
-        $updater = Utility\NormalizationTestUtility::createUpdater($version);
+        $updater = Helper\NormalizationTestHandler::createUpdater($version);
         echo sprintf(
             'Fetching tests from: %s' . PHP_EOL,
             $updater->getSource()
         );
 
-        $writer = Utility\NormalizationTestUtility::createWriter($version, $updater->getSource());
+        $writer = Helper\NormalizationTestHandler::createWriter($version, $updater->getSource());
         echo sprintf(
             'Writing tests to: %s' . PHP_EOL,
             $writer->getFilePath()

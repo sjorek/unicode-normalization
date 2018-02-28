@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Utility;
+namespace Sjorek\UnicodeNormalization\Tests\Helper;
 
 /**
  * This implementation has been inspired by composer's XdebugHandler.

@@ -176,7 +176,7 @@ interface NormalizerInterface
      *
      * @param int|string $form
      *
-     * @see \Sjorek\UnicodeNormalization\NormalizationUtility::parseForm()
+     * @see \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm()
      *
      * @throws \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      */

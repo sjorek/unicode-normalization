@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Implementation;
 
 use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
-use Sjorek\UnicodeNormalization\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
  * Class for normalizing unicode.

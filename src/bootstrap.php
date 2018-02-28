@@ -12,6 +12,6 @@ declare(strict_types=1);
  */
 
 namespace Sjorek\UnicodeNormalization {
-    NormalizationUtility::register();
+    Utility\AutoloadUtility::register();
     StreamFilter::register();
 }

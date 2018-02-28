@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests;
 
 use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
-use Sjorek\UnicodeNormalization\Tests\Utility\ConfigurationUtility;
+use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 
 /**
  * Testcase for Sjorek\UnicodeNormalization\Normalizer.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class NormalizerTest extends AbstractNormalizationTestCase
+class NormalizerTest extends ConformanceTestCase
 {
     /**
      * @group native
@@ -32,7 +32,7 @@ class NormalizerTest extends AbstractNormalizationTestCase
     public function testImplementationIsNative()
     {
         $this->assertTrue(extension_loaded('intl'));
-        $this->assertFalse(ConfigurationUtility::isPolyfillImplementation());
+        $this->assertFalse(ConfigurationHandler::isPolyfillImplementation());
     }
 
     /**
@@ -43,8 +43,8 @@ class NormalizerTest extends AbstractNormalizationTestCase
     public function testImplementationIsSymfony()
     {
         $this->assertFalse(extension_loaded('intl'));
-        $this->assertTrue(ConfigurationUtility::isPolyfillImplementation());
-        $this->assertTrue(is_a('Normalizer', ConfigurationUtility::SYMFONY_IMPLEMENTATION, true));
+        $this->assertTrue(ConfigurationHandler::isPolyfillImplementation());
+        $this->assertTrue(is_a('Normalizer', ConfigurationHandler::SYMFONY_IMPLEMENTATION, true));
     }
 
     /**
@@ -55,8 +55,8 @@ class NormalizerTest extends AbstractNormalizationTestCase
     public function testImplementationIsPatchwork()
     {
         $this->assertFalse(extension_loaded('intl'));
-        $this->assertTrue(ConfigurationUtility::isPolyfillImplementation());
-        $this->assertTrue(is_a('Normalizer', ConfigurationUtility::PATCHWORK_IMPLEMENTATION, true));
+        $this->assertTrue(ConfigurationHandler::isPolyfillImplementation());
+        $this->assertTrue(is_a('Normalizer', ConfigurationHandler::PATCHWORK_IMPLEMENTATION, true));
     }
 
     /**

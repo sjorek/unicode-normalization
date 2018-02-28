@@ -11,18 +11,18 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Utility;
+namespace Sjorek\UnicodeNormalization\Tests\Helper;
 
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestReader;
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestUpdater;
-use Sjorek\UnicodeNormalization\Tests\Conformance\NormalizationTestWriter;
+use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
+use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestUpdater;
+use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestWriter;
 
 /**
  * Utility functions dealing with "NormalizationTest.X.Y.Z.txt" fixture files.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class NormalizationTestUtility
+class NormalizationTestHandler
 {
     /**
      * @var string

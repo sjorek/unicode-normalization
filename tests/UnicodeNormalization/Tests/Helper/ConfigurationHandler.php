@@ -11,12 +11,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Utility;
+namespace Sjorek\UnicodeNormalization\Tests\Helper;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class ConfigurationUtility
+class ConfigurationHandler
 {
     /**
      * @var string[]
