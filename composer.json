@@ -74,12 +74,13 @@
     "scripts": {
         "run:build": [
             "@run:clean",
-            "@run:security-check",
             "@run:cs-lint",
-            "@run:coverage"
+            "@run:security-check",
+            "@run:report-coverage-html"
         ],
         "run:clean": [
             "[ -d coverage ] && rm -r coverage || true",
+            "[ -f coverage.xml ] && rm coverage.xml || true",
             "@run:remove-implementation-packages"
         ],
         "run:test": [
@@ -128,10 +129,10 @@
         "run:test-coverage-all": [
             "phpunit -v --colors=always --exclude-group=implementation --coverage-text"
         ],
-        "run:coverage-html": [
+        "run:report-coverage-html": [
             "phpunit -v --colors=always --exclude-group=implementation,large --coverage-html coverage"
         ],
-        "run:coverage-clover": [
+        "run:report-coverage-clover": [
             "phpunit -v --colors=always --exclude-group=implementation,large --coverage-clover coverage.xml"
         ],
         "run:cs-lint": [
@@ -155,17 +156,17 @@
         "run:require-native-implementation": [
             "@run:remove-implementation-packages",
             "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-implementation:@dev",
-            "phpunit -v --colors=always --group=native"
+            "phpunit --colors=always --group=native"
         ],
         "run:require-symfony-implementation": [
             "@run:remove-implementation-packages",
             "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-implementation:@dev",
-            "phpunit -v --colors=always --group=symfony"
+            "phpunit --colors=always --group=symfony"
         ],
         "run:require-patchwork-implementation": [
             "@run:remove-implementation-packages",
             "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-implementation:@dev",
-            "phpunit -v --colors=always --group=patchwork"
+            "phpunit --colors=always --group=patchwork"
         ],
         "run:remove-implementation-packages": [
             "@composer remove --optimize-autoloader --no-interaction sjorek/unicode-normalization-native-implementation sjorek/unicode-normalization-symfony-implementation sjorek/unicode-normalization-patchwork-implementation"
