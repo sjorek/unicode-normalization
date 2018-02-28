@@ -39,6 +39,7 @@
     },
     "require" : {
         "php": ">=7.0",
+        "sjorek/unicode-normalization-native-implementation": "@dev",
         "symfony/filesystem": "^3.4"
     },
     "require-dev" : {
@@ -84,72 +85,72 @@
         ],
         "run:test": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation,large",
+            "phpunit -v --colors=always --exclude-group=implementation,large",
             "@run:remove-implementation-packages"
         ],
         "run:test-polyfills": [
             "@run:require-symfony-implementation",
-            "phpunit -v --exclude-group=implementation,large",
+            "phpunit -v --colors=always --exclude-group=implementation,large",
             "@run:require-patchwork-implementation",
-            "phpunit -v --exclude-group=implementation,large",
+            "phpunit -v --colors=always --exclude-group=implementation,large",
             "@run:remove-implementation-packages"
         ],
         "run:test-all": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation",
+            "phpunit -v --colors=always --exclude-group=implementation",
             "@run:remove-implementation-packages"
         ],
         "run:test-all-ployfills": [
             "@run:require-symfony-implementation",
-            "phpunit -v --exclude-group=implementation",
+            "phpunit -v --colors=always --exclude-group=implementation",
             "@run:require-patchwork-implementation",
-            "phpunit -v --exclude-group=implementation",
+            "phpunit -v --colors=always --exclude-group=implementation",
             "@run:remove-implementation-packages"
         ],
         "run:test-large": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation --group=large",
+            "phpunit -v --colors=always --exclude-group=implementation --group=large",
             "@run:remove-implementation-packages"
         ],
         "run:test-large-polyfills": [
             "@run:require-symfony-implementation",
-            "phpunit -v --exclude-group=implementation --group=large",
+            "phpunit -v --colors=always --exclude-group=implementation --group=large",
             "@run:require-patchwork-implementation",
-            "phpunit -v --exclude-group=implementation --group=large",
+            "phpunit -v --colors=always --exclude-group=implementation --group=large",
             "@run:remove-implementation-packages"
         ],
         "run:test-conformance": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation --group=conformance",
+            "phpunit -v --colors=always --exclude-group=implementation --group=conformance",
             "@run:remove-implementation-packages"
         ],
         "run:test-conformance-polyfills": [
             "@run:require-symfony-implementation",
-            "phpunit -v --exclude-group=implementation --group=conformance",
+            "phpunit -v --colors=always --exclude-group=implementation --group=conformance",
             "@run:require-patchwork-implementation",
-            "phpunit -v --exclude-group=implementation --group=conformance",
+            "phpunit -v --colors=always --exclude-group=implementation --group=conformance",
             "@run:remove-implementation-packages"
         ],
         "run:test-coverage": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation,large --coverage-text",
+            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-text",
             "@run:remove-implementation-packages"
         ],
         "run:test-coverage-all": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation --coverage-text",
+            "phpunit -v --colors=always --exclude-group=implementation --coverage-text",
             "@run:remove-implementation-packages"
         ],
         "run:coverage": [
             "@run:require-native-implementation",
-            "phpunit -v --exclude-group=implementation,large --coverage-html coverage",
+            "phpunit -v --colors=always --exclude-group=implementation,large --coverage-html coverage",
             "@run:remove-implementation-packages"
         ],
         "run:cs-lint": [
-            "php-cs-fixer fix --diff --stop-on-violation --verbose --dry-run"
+            "php-cs-fixer fix --ansi --diff --stop-on-violation --verbose --dry-run"
         ],
         "run:cs-fix": [
-            "php-cs-fixer fix -vv || true"
+            "php-cs-fixer fix -vv --ansi || true"
         ],
         "run:security-check": [
             "security-checker security:check --ansi"
@@ -166,17 +167,17 @@
         "run:require-native-implementation": [
             "@run:remove-implementation-packages",
             "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-implementation:@dev",
-            "phpunit -v --group=native"
+            "phpunit -v --colors=always --group=native"
         ],
         "run:require-symfony-implementation": [
             "@run:remove-implementation-packages",
             "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-implementation:@dev",
-            "phpunit -v --group=symfony"
+            "phpunit -v --colors=always --group=symfony"
         ],
         "run:require-patchwork-implementation": [
             "@run:remove-implementation-packages",
             "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-implementation:@dev",
-            "phpunit -v --group=patchwork"
+            "phpunit -v --colors=always --group=patchwork"
         ],
         "run:remove-implementation-packages": [
             "@composer remove --optimize-autoloader --no-interaction sjorek/unicode-normalization-native-implementation sjorek/unicode-normalization-symfony-implementation sjorek/unicode-normalization-patchwork-implementation"
