@@ -36,9 +36,17 @@ class MacNormalizerTest extends NormalizerTest
     }
 
     /**
+     * @return string
+     */
+    protected static function getUnicodeVersion()
+    {
+        return MacNormalizer::getUnicodeVersion();
+    }
+
+    /**
      * @return bool
      */
-    protected function getNormalizationForms()
+    protected static function getNormalizationForms()
     {
         return MacNormalizer::getNormalizationForms();
     }

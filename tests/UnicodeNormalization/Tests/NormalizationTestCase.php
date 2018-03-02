@@ -15,6 +15,7 @@ namespace Sjorek\UnicodeNormalization\Tests;
 
 use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
  * Base test case class for all unit-tests.
@@ -47,7 +48,7 @@ class NormalizationTestCase extends AbstractTestCase
                 __NAMESPACE__ . '\\Normalizer',
                 true
             );
-            self::$unicodeVersion = Normalizer::getUnicodeVersion();
+            self::$unicodeVersion = static::getUnicodeVersion();
         }
     }
 
@@ -87,7 +88,7 @@ class NormalizationTestCase extends AbstractTestCase
     protected function markTestSkippedIfNfdMacIsNotSupported($form)
     {
         $form = NormalizationUtility::parseForm($form);
-        if (Normalizer::NFD_MAC === $form && !in_array($form, Normalizer::getNormalizationForms(), true)) {
+        if (NormalizerInterface::NFD_MAC === $form && !in_array($form, static::getNormalizationForms(), true)) {
             $this->markTestSkipped(
                 'Skipped test as "iconv" extension is either not available '
                 . 'or not able to handle "utf-8-mac" charset.'
@@ -98,15 +99,23 @@ class NormalizationTestCase extends AbstractTestCase
     /**
      * @return bool
      */
-    protected function isStrictImplementation()
+    protected static function isStrictImplementation()
     {
         return true;
     }
 
     /**
+     * @return string
+     */
+    protected static function getUnicodeVersion()
+    {
+        return Normalizer::getUnicodeVersion();
+    }
+
+    /**
      * @return bool
      */
-    protected function getNormalizationForms()
+    protected static function getNormalizationForms()
     {
         return Normalizer::getNormalizationForms();
     }

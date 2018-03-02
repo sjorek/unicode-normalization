@@ -39,15 +39,23 @@ class BaseNormalizerTest extends NormalizerTest
     /**
      * @return bool
      */
-    protected function isStrictImplementation()
+    protected static function isStrictImplementation()
     {
         return NormalizationUtility::isStrictImplementation();
     }
 
     /**
+     * @return string
+     */
+    protected static function getUnicodeVersion()
+    {
+        return BaseNormalizer::getUnicodeVersion();
+    }
+
+    /**
      * @return bool
      */
-    protected function getNormalizationForms()
+    protected static function getNormalizationForms()
     {
         return BaseNormalizer::getNormalizationForms();
     }

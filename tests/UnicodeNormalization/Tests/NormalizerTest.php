@@ -31,8 +31,8 @@ class NormalizerTest extends ConformanceTestCase
     {
         static::setUpNormalizationTestCase();
 
-        $forms = $this->getNormalizationForms();
-        $strict = $this->isStrictImplementation();
+        $forms = static::getNormalizationForms();
+        $strict = static::isStrictImplementation();
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -181,7 +181,7 @@ class NormalizerTest extends ConformanceTestCase
     {
         static::setUpNormalizationTestCase();
 
-        $forms = $this->getNormalizationForms();
+        $forms = static::getNormalizationForms();
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');

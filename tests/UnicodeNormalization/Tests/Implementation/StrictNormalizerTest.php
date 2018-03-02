@@ -36,9 +36,17 @@ class StrictNormalizerTest extends NormalizerTest
     }
 
     /**
+     * @return string
+     */
+    protected static function getUnicodeVersion()
+    {
+        return StrictNormalizer::getUnicodeVersion();
+    }
+
+    /**
      * @return bool
      */
-    protected function getNormalizationForms()
+    protected static function getNormalizationForms()
     {
         return StrictNormalizer::getNormalizationForms();
     }
