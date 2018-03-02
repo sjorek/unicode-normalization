@@ -1,5 +1,5 @@
 {
-    "name": "sjorek/unicode-normalization-patchwork-implementation",
+    "name": "sjorek/unicode-normalization-patchwork-runtime",
     "version": "0.0.0",
     "description" : "This package provides patchwork's polyfill implementations for the 'sjorek/unicode-normalization' package - please do not install this package directly.",
     "homepage" : "https://sjorek.github.io/unicode-normalization/",
@@ -19,7 +19,11 @@
         "ext-intl" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
         "ext-mbstring" : "For best performance - but please consider 'sjorek/unicode-normalization-native-implementation' package instead."
     },
+    "conflict": {
+        "sjorek/unicode-normalization-native-runtime": "*",
+        "sjorek/unicode-normalization-symfony-runtime": "*"
+    },
     "provide": {
-        "sjorek/unicode-normalization-implementation": "self.version"
+        "sjorek/unicode-normalization-runtime": "self.version"
     }
 }

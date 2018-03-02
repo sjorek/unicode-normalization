@@ -1,5 +1,5 @@
 {
-    "name": "sjorek/unicode-normalization-native-implementation",
+    "name": "sjorek/unicode-normalization-native-runtime",
     "version": "0.0.0",
     "description" : "This package provides native implementations for the 'sjorek/unicode-normalization' package - please do not install this package directly.",
     "homepage" : "https://sjorek.github.io/unicode-normalization/",
@@ -15,7 +15,11 @@
         "ext-intl": "*",
         "ext-mbstring": "*"
     },
+    "conflict": {
+        "sjorek/unicode-normalization-symfony-runtime": "*",
+        "sjorek/unicode-normalization-patchwork-runtime": "*"
+    },
     "provide": {
-        "sjorek/unicode-normalization-implementation": "self.version"
+        "sjorek/unicode-normalization-runtime": "self.version"
     }
 }

@@ -27,7 +27,7 @@ class RuntimeTest extends TestCase
 {
     /**
      * @group native
-     * @group implementation
+     * @group runtime
      * @coversNothing
      */
     public function testImplementationIsNative()
@@ -38,7 +38,7 @@ class RuntimeTest extends TestCase
 
     /**
      * @group symfony
-     * @group implementation
+     * @group runtime
      * @coversNothing
      */
     public function testImplementationIsSymfony()
@@ -50,7 +50,7 @@ class RuntimeTest extends TestCase
 
     /**
      * @group patchwork
-     * @group implementation
+     * @group runtime
      * @coversNothing
      */
     public function testImplementationIsPatchwork()
