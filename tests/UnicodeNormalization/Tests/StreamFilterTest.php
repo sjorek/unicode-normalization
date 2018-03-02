@@ -21,7 +21,7 @@ use Sjorek\UnicodeNormalization\StreamFilter;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
- * StreamFilter tests
+ * StreamFilter tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\StreamFilter
  *
@@ -40,7 +40,8 @@ class StreamFilterTest extends ConformanceTestCase
     protected $stream;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
@@ -50,7 +51,8 @@ class StreamFilterTest extends ConformanceTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \PHPUnit\Framework\TestCase::tearDown()
      */
     protected function tearDown()
@@ -186,6 +188,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::processStringFragment
+     *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
@@ -213,7 +216,7 @@ class StreamFilterTest extends ConformanceTestCase
             'processStringFragment',
             $fragment,
             $size,
-            /** @see NormalizationTestCase::setUpNormalizationTestCase() */
+            /* @see NormalizationTestCase::setUpNormalizationTestCase() */
             new Normalizer($form)
         );
         if (false === $expected) {
@@ -239,7 +242,6 @@ class StreamFilterTest extends ConformanceTestCase
         $filters = stream_get_filters();
         $this->assertContains(StreamFilter::DEFAULT_NAMESPACE, $filters);
         $this->assertContains(sprintf('%s.*', StreamFilter::DEFAULT_NAMESPACE), $filters);
-
     }
 
     /**
@@ -271,6 +273,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::onCreate
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getForm
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
@@ -294,6 +297,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::onCreate
+     *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @testWith    [1, "with normalization form value"]
@@ -314,6 +318,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::onCreate
+     *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      */
@@ -329,6 +334,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::onCreate
+     *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      */
@@ -368,6 +374,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::filter
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
@@ -432,6 +439,7 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::filter
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
@@ -537,7 +545,6 @@ class StreamFilterTest extends ConformanceTestCase
             $testIterator = $this->getConformanceTestIterator($version, $form, $lineNumber, $comment, $codes);
             $position = 0;
             foreach ($testIterator as $message => $data) {
-
                 if (0 === $position) {
                     $expectStream = $this->createStream();
                     $actualStream = $this->createStream();
@@ -550,7 +557,7 @@ class StreamFilterTest extends ConformanceTestCase
                 fwrite($expectStream, sprintf('%s: %s %s', $message, $expected, $delimiter));
                 fwrite($actualStream, sprintf('%s: %s %s', $message, $actual, $delimiter));
 
-                if($position < $chunkSize) {
+                if ($position < $chunkSize) {
                     $position += 1;
                     continue;
                 }
@@ -590,6 +597,8 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * Keep 1MB (= 1024 * 1024 = 1048576) in memory before creating a temporary file.
+     *
+     * @param int $memory
      *
      * @return resource
      */

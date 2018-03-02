@@ -22,7 +22,7 @@ use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix6
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
 
 /**
- * AutoloadUtility tests
+ * AutoloadUtility tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\AutoloadUtility
  *
@@ -36,6 +36,7 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::register()
+     *
      * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
      * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::registerNormalizerImplementation
      * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::registerStringValidatorImplementation
@@ -58,6 +59,7 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::registerNormalizerImplementation()
+     *
      * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isStrictImplementation
@@ -91,6 +93,7 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::registerStringValidatorImplementation()
+     *
      * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
      * @runInSeparateProcess
      * @preserveGlobalState disabled

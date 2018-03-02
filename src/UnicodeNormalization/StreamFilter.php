@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization;
 
+use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
-use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
 
 /**
  * A stream-filter implementation for normalizing unicode, currently only utf8.

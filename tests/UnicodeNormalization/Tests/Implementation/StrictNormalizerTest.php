@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
-use Sjorek\UnicodeNormalization\Tests\NormalizerTest;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
+use Sjorek\UnicodeNormalization\Tests\NormalizerTest;
 
 /**
- * Normalizer tests
+ * Normalizer tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer
  *
@@ -25,9 +25,9 @@ use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
  */
 class StrictNormalizerTest extends NormalizerTest
 {
-
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
@@ -36,7 +36,7 @@ class StrictNormalizerTest extends NormalizerTest
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     protected function getNormalizationForms()
     {

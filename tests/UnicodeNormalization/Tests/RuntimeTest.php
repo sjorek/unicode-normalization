@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use PHPUnit\Framework\TestCase;
+use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 
 /**
- * Runtime tests
+ * Runtime tests.
  *
  * @coversNothing
  *

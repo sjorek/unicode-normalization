@@ -16,7 +16,7 @@ namespace Sjorek\UnicodeNormalization\Tests;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
- * Normalizer tests
+ * Normalizer tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Normalizer
  *
@@ -149,6 +149,7 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::isNormalized
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
@@ -266,6 +267,7 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::normalize
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
@@ -293,6 +295,7 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::normalizeTo
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
@@ -321,6 +324,7 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::normalizeStringTo
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms

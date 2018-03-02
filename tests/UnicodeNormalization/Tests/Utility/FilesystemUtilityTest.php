@@ -17,11 +17,11 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
-use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 use Sjorek\UnicodeNormalization\Tests\Helper\VfsFilesystem;
+use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 
 /**
- * FilesystemUtility tests
+ * FilesystemUtility tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\FilesystemUtility
  *
@@ -74,6 +74,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @testWith                       [""]
@@ -126,6 +127,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
@@ -173,6 +175,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
@@ -195,6 +198,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
@@ -218,6 +222,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir

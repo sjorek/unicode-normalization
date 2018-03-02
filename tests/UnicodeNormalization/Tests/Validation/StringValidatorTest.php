@@ -16,7 +16,7 @@ namespace Sjorek\UnicodeNormalization\Tests\Validation;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
- * StringValidator tests
+ * StringValidator tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\StringValidator
  *
@@ -82,6 +82,7 @@ class StringValidatorTest extends StringValidatorTestCase
 
     /**
      * @covers ::filter
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
@@ -163,6 +164,7 @@ class StringValidatorTest extends StringValidatorTestCase
 
     /**
      * @covers ::isValid
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized

@@ -17,7 +17,7 @@ use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTest;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
 
 /**
- * StringValidator tests
+ * StringValidator tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl
  *
@@ -31,7 +31,8 @@ class StringValidatorImplTest extends StringValidatorTest
     protected $subject;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTestCase::setUp()
      */
     protected function setUp()

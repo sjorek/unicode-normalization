@@ -28,6 +28,7 @@ class StringValidatorTestCase extends NormalizationTestCase
 
     /**
      * This method is called before the first test of this test class is run.
+     *
      * @beforeClass
      */
     public static function setUpStringValidatorTestCase()
@@ -44,7 +45,8 @@ class StringValidatorTestCase extends NormalizationTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Sjorek\UnicodeNormalization\Tests\NormalizationTestCase::setUp()
      */
     protected function setUp()

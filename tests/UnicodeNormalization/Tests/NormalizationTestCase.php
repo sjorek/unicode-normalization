@@ -35,6 +35,7 @@ class NormalizationTestCase extends AbstractTestCase
 
     /**
      * This method is called before the first test of this test class is run.
+     *
      * @beforeClass
      */
     public static function setUpNormalizationTestCase()
@@ -51,7 +52,8 @@ class NormalizationTestCase extends AbstractTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
@@ -94,7 +96,7 @@ class NormalizationTestCase extends AbstractTestCase
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     protected function isStrictImplementation()
     {
@@ -102,7 +104,7 @@ class NormalizationTestCase extends AbstractTestCase
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     protected function getNormalizationForms()
     {

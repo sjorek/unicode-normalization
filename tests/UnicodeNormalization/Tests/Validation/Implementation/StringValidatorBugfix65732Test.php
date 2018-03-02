@@ -18,7 +18,7 @@ use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTest;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732;
 
 /**
- * StringValidator tests
+ * StringValidator tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732
  *
@@ -32,7 +32,8 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
     protected $subject;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTest::setUp()
      */
     protected function setUp()
@@ -68,6 +69,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
 
     /**
      * @covers ::filter
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
@@ -122,6 +124,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
 
     /**
      * @covers ::isValid
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized

@@ -38,7 +38,7 @@ class PhpExtensionHandler
 
     /**
      * @param array|string $extension
-     * @param string[] ...$extensions
+     * @param string[]     ...$extensions
      */
     public static function runWithout($extension = [], ...$extensions)
     {
@@ -48,7 +48,7 @@ class PhpExtensionHandler
 
     /**
      * @param array|string $extension
-     * @param string[] ...$extensions
+     * @param string[]     ...$extensions
      */
     public static function renderWithout($extension = [], ...$extensions)
     {
@@ -65,7 +65,7 @@ class PhpExtensionHandler
     protected function __construct(array $extensions)
     {
         $this->extensions = array_filter($extensions);
-        $this->loaded = array_filter($this->extensions, function($ext) { return extension_loaded($ext); });
+        $this->loaded = array_filter($this->extensions, function ($ext) { return extension_loaded($ext); });
         $this->envScanDir = getenv('PHP_INI_SCAN_DIR');
         sort($this->extensions);
         sort($this->loaded);
@@ -195,9 +195,10 @@ class PhpExtensionHandler
         $found = 0;
         $disabled = [];
         $content = $this->renderIni($iniPaths, $found, $disabled);
-        if(0 < $found && empty(array_diff($this->loaded, $disabled))) {
+        if (0 < $found && empty(array_diff($this->loaded, $disabled))) {
             return @file_put_contents($this->tmpIni, $content);
         }
+
         return false;
     }
 
@@ -208,7 +209,7 @@ class PhpExtensionHandler
      *
      * @return string
      */
-    private function renderIni(array $iniPaths, int & $found = 0, array & $disabled = [])
+    private function renderIni(array $iniPaths, int &$found = 0, array &$disabled = [])
     {
         // $iniPaths has at least one item and it may be empty
         if (empty($iniPaths[0])) {
@@ -223,7 +224,7 @@ class PhpExtensionHandler
             if (empty($data = file_get_contents($file) ?: '') ||
                 empty($this->extensions) ||
                 !($count = preg_match_all($pattern, $data, $matches, PREG_PATTERN_ORDER))
-            ){
+            ) {
                 $content .= $data . PHP_EOL;
                 continue;
             }

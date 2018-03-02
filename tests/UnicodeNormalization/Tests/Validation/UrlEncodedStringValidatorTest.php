@@ -17,7 +17,7 @@ use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator;
 
 /**
- * UrlEncodedStringValidator tests
+ * UrlEncodedStringValidator tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator
  *
@@ -31,7 +31,8 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
     protected $subject;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
@@ -111,6 +112,7 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
 
     /**
      * @covers ::filter
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
@@ -197,6 +199,7 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
 
     /**
      * @covers ::isValid
+     *
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized

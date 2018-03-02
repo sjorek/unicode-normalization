@@ -19,7 +19,7 @@ use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
- * NormalizationUtility tests
+ * NormalizationUtility tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Utility\NormalizationUtility
  *
