@@ -38,7 +38,7 @@
     </logging>
 
     <php>
-        <ini name="memory_limit" value="16M"/>
+        <ini name="memory_limit" value="32M"/>
     </php>
 
 </phpunit>
