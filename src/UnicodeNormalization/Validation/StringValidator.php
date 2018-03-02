@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Validation;
 
+// @codeCoverageIgnoreStart
 if (!class_exists(__NAMESPACE__ . '\\StringValidator', false)) {
     /**
      * StringValidator implementation (for IDE only).
@@ -26,3 +27,4 @@ if (!class_exists(__NAMESPACE__ . '\\StringValidator', false)) {
     {
     }
 }
+// @codeCoverageIgnoreEnd

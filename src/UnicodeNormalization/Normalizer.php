@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization;
 
+// @codeCoverageIgnoreStart
 if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
     /**
      * Normalizer implementation (for IDE only).
@@ -28,3 +29,4 @@ if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
     {
     }
 }
+// @codeCoverageIgnoreEnd
