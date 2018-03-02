@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Normalizer;
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
@@ -59,7 +59,7 @@ class ConformanceTestCase extends NormalizationTestCase
         // NFD_MAC is sometimes lossy and can't be converted back to other forms
         $validForMac = 0 === preg_match('/EFBFBD/i', bin2hex($codes[5]));
 
-        if (Normalizer::NFC === $form) {
+        if (NormalizerInterface::NFC === $form) {
             $message = sprintf(
                 'Normalize to NFC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -76,7 +76,7 @@ class ConformanceTestCase extends NormalizationTestCase
             }
         }
 
-        if (Normalizer::NFD === $form) {
+        if (NormalizerInterface::NFD === $form) {
             $message = sprintf(
                 'Normalize to NFD for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -93,7 +93,7 @@ class ConformanceTestCase extends NormalizationTestCase
             }
         }
 
-        if (Normalizer::NFKC === $form) {
+        if (NormalizerInterface::NFKC === $form) {
             $message = sprintf(
                 'Normalize to NFKC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -110,7 +110,7 @@ class ConformanceTestCase extends NormalizationTestCase
             }
         }
 
-        if (Normalizer::NFKD === $form) {
+        if (NormalizerInterface::NFKD === $form) {
             $message = sprintf(
                 'Normalize to NFKD for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment
@@ -127,7 +127,7 @@ class ConformanceTestCase extends NormalizationTestCase
             }
         }
 
-        if (Normalizer::NFD_MAC === $form) {
+        if (NormalizerInterface::NFD_MAC === $form) {
             $message = sprintf(
                 'Normalize to NFD_MAC for version %s line %s codepoint %%s: %s',
                 $unicodeVersion, $lineNumber, $comment

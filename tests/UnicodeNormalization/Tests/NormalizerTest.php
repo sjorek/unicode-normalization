@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Normalizer;
-use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
@@ -27,47 +25,14 @@ use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader
 class NormalizerTest extends ConformanceTestCase
 {
     /**
-     * @group native
-     * @group implementation
-     * @coversNothing
-     */
-    public function testImplementationIsNative()
-    {
-        $this->assertTrue(extension_loaded('intl'));
-        $this->assertFalse(ConfigurationHandler::isPolyfillImplementation());
-    }
-
-    /**
-     * @group symfony
-     * @group implementation
-     * @coversNothing
-     */
-    public function testImplementationIsSymfony()
-    {
-        $this->assertFalse(extension_loaded('intl'));
-        $this->assertTrue(ConfigurationHandler::isPolyfillImplementation());
-        $this->assertTrue(is_a('Normalizer', ConfigurationHandler::SYMFONY_IMPLEMENTATION, true));
-    }
-
-    /**
-     * @group patchwork
-     * @group implementation
-     * @coversNothing
-     */
-    public function testImplementationIsPatchwork()
-    {
-        $this->assertFalse(extension_loaded('intl'));
-        $this->assertTrue(ConfigurationHandler::isPolyfillImplementation());
-        $this->assertTrue(is_a('Normalizer', ConfigurationHandler::PATCHWORK_IMPLEMENTATION, true));
-    }
-
-    /**
      * @return array
      */
     public function provideTestIsNormalizedData()
     {
-        $forms = Normalizer::getNormalizationForms();
-        $strict = true;
+        static::setUpNormalizationTestCase();
+
+        $forms = $this->getNormalizationForms();
+        $strict = $this->isStrictImplementation();
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -184,6 +149,14 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::detectUnicodeVersion
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestIsNormalizedData
      *
      * @param bool     $assert
@@ -205,7 +178,9 @@ class NormalizerTest extends ConformanceTestCase
      */
     public function provideTestNormalizeData()
     {
-        $forms = Normalizer::getNormalizationForms();
+        static::setUpNormalizationTestCase();
+
+        $forms = $this->getNormalizationForms();
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -291,6 +266,15 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
      * @param false|string $same
@@ -309,6 +293,16 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
      * @param false|string $same
@@ -327,6 +321,17 @@ class NormalizerTest extends ConformanceTestCase
 
     /**
      * @covers ::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
      * @param false|string $same
@@ -344,7 +349,7 @@ class NormalizerTest extends ConformanceTestCase
     }
 
     /**
-     * @covers ::normalize
+     * @coversNothing
      * @dataProvider provideConformanceTestData
      * @large
      * @group conformance

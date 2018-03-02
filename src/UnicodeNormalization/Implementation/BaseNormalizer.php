@@ -156,7 +156,7 @@ class BaseNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param int $form
+     * @param null|int $form
      *
      * @throws InvalidNormalizationForm
      *

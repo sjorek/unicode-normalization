@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Validation;
 
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
-use Sjorek\UnicodeNormalization\Tests\NormalizationTestCase;
-use Sjorek\UnicodeNormalization\Validation\StringValidator;
 
 /**
  * StringValidator tests
@@ -24,29 +22,16 @@ use Sjorek\UnicodeNormalization\Validation\StringValidator;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StringValidatorTest extends NormalizationTestCase
+class StringValidatorTest extends StringValidatorTestCase
 {
-    /**
-     * @var StringValidator
-     */
-    protected $subject;
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see \PHPUnit\Framework\TestCase::setUp()
-     */
-    protected function setUp()
-    {
-        $this->subject = new StringValidator();
-    }
-
     // ///////////////////////////////////////
     // Tests concerning filtered utf-8 strings
     // ///////////////////////////////////////
 
     public function provideTestFilterData()
     {
+        static::setUpStringValidatorTestCase();
+
         // é
         $iso_8859_1 = hex2bin('e9');
         // é
@@ -55,8 +40,6 @@ class StringValidatorTest extends NormalizationTestCase
         $utf8_nfd = hex2bin('65cc81');
         // é
         $utf8_nfd_without_leading_combinator = substr($utf8_nfd, 1);
-        // Test https://bugs.php.net/65732
-        $bugs_65732 = "\n\r" . $utf8_nfc . "\n\r";
         // A number guaranteed to be random as specified by RFC 1149.5
         $number = '4';
 
@@ -72,9 +55,6 @@ class StringValidatorTest extends NormalizationTestCase
             'UTF8-NFC string is same as UTF8-NFC string without normalization' => [
                 $utf8_nfc, $utf8_nfc, $f_NONE,
             ],
-            'test bug https://bugs.php.net/65732 without normalization' => [
-                $bugs_65732, $bugs_65732, $f_NONE,
-            ],
             'number stays a number without normalization' => [
                 $number, $number, $f_NONE,
             ],
@@ -85,9 +65,6 @@ class StringValidatorTest extends NormalizationTestCase
             ],
             'UTF8-NFC string is same as UTF8-NFC string for NFC normalization' => [
                 $utf8_nfc, $utf8_nfc, $f_NFC,
-            ],
-            'test bug https://bugs.php.net/65732 for NFC normalization' => [
-                $bugs_65732, $bugs_65732, $f_NFC,
             ],
             'number stays a number for NFC normalization' => [
                 $number, $number, $f_NFC,
@@ -105,6 +82,18 @@ class StringValidatorTest extends NormalizationTestCase
 
     /**
      * @covers ::filter
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter
      * @dataProvider provideTestFilterData
      *
      * @param bool        $expected
@@ -112,7 +101,7 @@ class StringValidatorTest extends NormalizationTestCase
      * @param int         $form
      * @param null|string $charset
      */
-    public function testFilterUtf8String($expected, $string, $form, $charset = null)
+    public function testFilter($expected, $string, $form, $charset = null)
     {
         $this->markTestSkippedIfNfdMacIsNotSupported($form);
         $actual = $this->subject->filter($string, $form, $charset);
@@ -128,6 +117,8 @@ class StringValidatorTest extends NormalizationTestCase
 
     public function provideTestIsValidData()
     {
+        static::setUpStringValidatorTestCase();
+
         // é
         $iso_8859_1 = hex2bin('e9');
         // é
@@ -136,8 +127,6 @@ class StringValidatorTest extends NormalizationTestCase
         $utf8_nfd = hex2bin('65cc81');
         // é
         $utf8_nfd_without_leading_combinator = substr($utf8_nfd, 1);
-        // Test https://bugs.php.net/65732
-        $bugs_65732 = "\n\r" . $utf8_nfc . "\n\r";
         // A number guaranteed to be random as specified by RFC 1149.5
         $number = '4';
 
@@ -151,9 +140,6 @@ class StringValidatorTest extends NormalizationTestCase
             'UTF8-NFC string is well-formed UTF8 string without normalization' => [
                 true, $utf8_nfc, $f_NONE,
             ],
-            'test bug https://bugs.php.net/65732 without normalization' => [
-                true, $bugs_65732, $f_NONE,
-            ],
             'number is well-formed UTF8 without normalization' => [
                 true, $number, $f_NONE,
             ],
@@ -162,9 +148,6 @@ class StringValidatorTest extends NormalizationTestCase
             ],
             'UTF8-NFC string is well-formed UTF8 for NFC normalization' => [
                 true, $utf8_nfc, $f_NFC,
-            ],
-            'test bug https://bugs.php.net/65732 for NFC normalization' => [
-                true, $bugs_65732, $f_NFC,
             ],
             'number is well-formed UTF8 for NFC normalization' => [
                 true, $number, $f_NFC,
@@ -180,6 +163,19 @@ class StringValidatorTest extends NormalizationTestCase
 
     /**
      * @covers ::isValid
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732::filter
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter
      * @dataProvider provideTestIsValidData
      *
      * @param bool        $expected

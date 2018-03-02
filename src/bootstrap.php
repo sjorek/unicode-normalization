@@ -12,6 +12,8 @@ declare(strict_types=1);
  */
 
 namespace Sjorek\UnicodeNormalization {
-    Utility\AutoloadUtility::register();
-    StreamFilter::register();
+    if (!class_exists(__NAMESPACE__ . '\\Tests\\Helper\\AutoloadHandler', true)) {
+        Utility\AutoloadUtility::register();
+        StreamFilter::register();
+    }
 }

@@ -34,7 +34,7 @@ class StringValidatorBugfix65732 extends StringValidatorImpl
 
         $input = array_map(
             function ($string) use ($form, $charset) {
-                $this->filter($string, $form, $charset);
+                return '' === $string ? $string : $this->filter($string, $form, $charset);
             },
             explode("\r", $input)
         );

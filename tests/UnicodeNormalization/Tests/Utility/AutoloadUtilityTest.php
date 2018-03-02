@@ -15,13 +15,11 @@ namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
 use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
-use Sjorek\UnicodeNormalization\Normalizer;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
-use Sjorek\UnicodeNormalization\Validation\StringValidator;
 
 /**
  * AutoloadUtility tests
@@ -38,49 +36,83 @@ class AutoloadUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::register()
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::registerNormalizerImplementation
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::registerStringValidatorImplementation
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @see AutoloadUtility::register()
      */
     public function testRegister()
     {
-        // should already be registered by autoloader
-        $this->assertFalse(AutoloadUtility::register());
+        $this->assertTrue(
+            AutoloadUtility::register(),
+            'initial registration succeeds'
+        );
+        $this->assertFalse(
+            AutoloadUtility::register(),
+            'subsequent registration fails'
+        );
     }
 
     /**
-     * @covers ::registerNormalizer()
+     * @covers ::registerNormalizerImplementation()
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isStrictImplementation
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
-     * @see AutoloadUtility::registerNormalizer()
+     * @see AutoloadUtility::registerNormalizerImplementation()
      */
-    public function testRegisterNormalizer()
+    public function testRegisterNormalizerImplementation()
     {
         // should already be registered by autoloader
-        $this->assertFalse(AutoloadUtility::registerNormalizer());
+        $this->assertTrue(
+            AutoloadUtility::registerNormalizerImplementation(),
+            'initial registration succeeds'
+        );
+        $this->assertFalse(
+            AutoloadUtility::registerNormalizerImplementation(),
+            'subsequent registration fails'
+        );
+        $className = \Sjorek\UnicodeNormalization\Normalizer::class;
         $this->assertSame(
             NormalizationUtility::isNfdMacCompatible(),
-            is_a(Normalizer::class, MacNormalizer::class, true)
+            is_a($className, MacNormalizer::class, true)
         );
         $this->assertSame(
             NormalizationUtility::isStrictImplementation(),
             // strict implementations should not inherit the strict-enforcing facade
-            !is_a(Normalizer::class, StrictNormalizer::class, true)
+            !is_a($className, StrictNormalizer::class, true)
         );
     }
 
     /**
-     * @covers ::registerStringValidator()
+     * @covers ::registerStringValidatorImplementation()
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
-     * @see AutoloadUtility::registerStringValidator()
+     * @see AutoloadUtility::registerStringValidatorImplementation()
      */
-    public function testRegisterStringValidator()
+    public function testRegisterStringValidatorImplementation()
     {
         // should already be registered by autoloader
-        $this->assertFalse(AutoloadUtility::register());
-        $this->assertTrue(is_a(StringValidator::class, StringValidatorImpl::class, true));
+        $this->assertTrue(
+            AutoloadUtility::registerStringValidatorImplementation(),
+            'initial registration succeeds');
+        $this->assertFalse(
+            AutoloadUtility::registerStringValidatorImplementation(),
+            'subsequent registration fails'
+        );
+        $className = \Sjorek\UnicodeNormalization\Validation\StringValidator::class;
+        $this->assertTrue(is_a($className, StringValidatorImpl::class, true));
         $this->assertSame(
             version_compare(PHP_VERSION, '7.0.11', '<'),
             // with buggy php the implementation should inherit the bugfix facade
-            is_a(StringValidator::class, StringValidatorBugfix65732::class, true)
+            is_a($className, StringValidatorBugfix65732::class, true)
         );
     }
 }

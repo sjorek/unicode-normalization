@@ -25,18 +25,32 @@ class PhpExtensionHandler
     const ENV_ORIGINAL = 'PHP_EXTENSION_HANDLER_INIS';
     const RESTART_ID = 'internal';
 
+    const INI_HEADER =
+        '; extension(s): %u (%s)' . PHP_EOL .
+        '; loaded      : %u (%s)' . PHP_EOL .
+        '; found       : %u (%s)' . PHP_EOL . PHP_EOL
+    ;
+
     private $extensions;
     private $loaded;
     private $envScanDir;
     private $tmpIni;
 
-    public static function runWithout($extension, ...$extensions)
+    /**
+     * @param array|string $extension
+     * @param string[] ...$extensions
+     */
+    public static function runWithout($extension = [], ...$extensions)
     {
         $handler = new static(array_merge(is_array($extension) ? $extension : [$extension], $extensions));
-        $handler->check();
+        $handler->run();
     }
 
-    public static function renderWithout($extension, ...$extensions)
+    /**
+     * @param array|string $extension
+     * @param string[] ...$extensions
+     */
+    public static function renderWithout($extension = [], ...$extensions)
     {
         $handler = new static(array_merge(is_array($extension) ? $extension : [$extension], $extensions));
 
@@ -51,8 +65,10 @@ class PhpExtensionHandler
     protected function __construct(array $extensions)
     {
         $this->extensions = array_filter($extensions);
-        $this->loaded = in_array(true, array_map('extension_loaded', $this->extensions), true);
+        $this->loaded = array_filter($this->extensions, function($ext) { return extension_loaded($ext); });
         $this->envScanDir = getenv('PHP_INI_SCAN_DIR');
+        sort($this->extensions);
+        sort($this->loaded);
     }
 
     /**
@@ -68,7 +84,7 @@ class PhpExtensionHandler
      * restarted process is created only once and PHP_INI_SCAN_DIR can be
      * restored to its original value.
      */
-    protected function check()
+    protected function run()
     {
         $args = explode('|', (string) (getenv(self::ENV_ALLOW)), 2);
 
@@ -136,7 +152,7 @@ class PhpExtensionHandler
             return false;
         }
 
-        return !empty($this->extensions) && empty($allow) && $this->loaded;
+        return !empty($this->extensions) && empty($allow) && !empty($this->loaded);
     }
 
     /**
@@ -176,8 +192,13 @@ class PhpExtensionHandler
         if (!$this->tmpIni = tempnam(sys_get_temp_dir(), '')) {
             return false;
         }
-
-        return @file_put_contents($this->tmpIni, $this->renderIni($iniPaths));
+        $found = 0;
+        $disabled = [];
+        $content = $this->renderIni($iniPaths, $found, $disabled);
+        if(0 < $found && empty(array_diff($this->loaded, $disabled))) {
+            return @file_put_contents($this->tmpIni, $content);
+        }
+        return false;
     }
 
     /**
@@ -187,7 +208,7 @@ class PhpExtensionHandler
      *
      * @return string
      */
-    private function renderIni(array $iniPaths)
+    private function renderIni(array $iniPaths, int & $found = 0, array & $disabled = [])
     {
         // $iniPaths has at least one item and it may be empty
         if (empty($iniPaths[0])) {
@@ -195,14 +216,22 @@ class PhpExtensionHandler
         }
 
         $content = '';
-        $regex = implode('|', array_map('preg_quote', $this->extensions));
-        $regex = '/^\s*(zend_)?extension\s*=.*(' . $regex . ').*$/mi';
-
+        $pattern = implode('|', array_map('preg_quote', $this->extensions));
+        $pattern = '/^\s*(?:zend_)?extension\s*=.*(' . $pattern . ').*$/mi';
         foreach ($iniPaths as $file) {
-            if (false !== ($data = file_get_contents($file))) {
-                $content .= preg_replace($regex, ';$0', $data) . PHP_EOL;
+            $matches = null;
+            if (empty($data = file_get_contents($file) ?: '') ||
+                empty($this->extensions) ||
+                !($count = preg_match_all($pattern, $data, $matches, PREG_PATTERN_ORDER))
+            ){
+                $content .= $data . PHP_EOL;
+                continue;
             }
+            $content .= (preg_replace($pattern, ';$0', $data) ?: '') . PHP_EOL;
+            $disabled = array_merge($disabled, $matches[1]);
+            $found += $count;
         }
+        sort($disabled);
 
         $content .= 'allow_url_fopen=' . ini_get('allow_url_fopen') . PHP_EOL;
         $content .= 'disable_functions="' . ini_get('disable_functions') . '"' . PHP_EOL;
@@ -213,7 +242,15 @@ class PhpExtensionHandler
             $content .= 'opcache.enable_cli=0' . PHP_EOL;
         }
 
-        return $content;
+        return
+            sprintf(
+                static::INI_HEADER,
+                count($this->extensions), implode(', ', $this->extensions) ?: '-',
+                count($this->loaded), implode(', ', $this->loaded) ?: '-',
+                $found, implode(', ', $disabled) ?: '-'
+            )
+            . $content
+        ;
     }
 
     /**
@@ -237,7 +274,7 @@ class PhpExtensionHandler
      *
      * @return bool
      */
-    private function setEnvironment($additional, array $iniPaths)
+    protected function setEnvironment($additional, array $iniPaths)
     {
         // Set scan dir to an empty value if additional ini files were used
         if ($additional && !putenv('PHP_INI_SCAN_DIR=')) {

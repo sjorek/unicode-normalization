@@ -29,10 +29,6 @@ use Sjorek\UnicodeNormalization\Tests\Helper\VfsFilesystem;
  */
 class FilesystemUtilityTest extends AbstractTestCase
 {
-    // /////////////////////////////////////////////////
-    // Tests concerning unicode filesystem capabilities
-    // /////////////////////////////////////////////////
-
     /**
      * @var VfsFilesystem
      */
@@ -72,8 +68,14 @@ class FilesystemUtilityTest extends AbstractTestCase
         vfsStreamWrapper::unregister();
     }
 
+    // /////////////////////////////////////////////////
+    // Tests concerning unicode filesystem capabilities
+    // /////////////////////////////////////////////////
+
     /**
      * @covers ::detectCapabilitiesForPath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @testWith                       [""]
      *                                 ["relative\/path"]
      *                                 ["vfs:\/\/root\/path-does-not-exist"]
@@ -124,6 +126,9 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
      * @dataProvider provideTestDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
      *
      * @param mixed $locale
@@ -168,6 +173,8 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^The detection folder already exists: /
      * @expectedExceptionCode          1519131257
@@ -188,6 +195,10 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
+     * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^Failed to create "vfs:\/\/root\/[^"]+"/
      */
@@ -205,6 +216,15 @@ class FilesystemUtilityTest extends AbstractTestCase
         ini_set('default_charset', $charset);
     }
 
+    /**
+     * @covers ::detectCapabilitiesForPath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::remove
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::touch
+     * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
+     */
     public function testDetectCapabilitiesForPath()
     {
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);

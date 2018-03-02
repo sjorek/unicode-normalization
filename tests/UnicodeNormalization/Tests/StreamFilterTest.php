@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit\Framework\Error\Warning;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\StreamFilter;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
@@ -26,6 +29,35 @@ use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader
  */
 class StreamFilterTest extends ConformanceTestCase
 {
+    /**
+     * @var StreamFilter
+     */
+    protected $subject;
+
+    /**
+     * @var StreamFilter
+     */
+    protected $stream;
+
+    /**
+     * {@inheritDoc}
+     * @see \PHPUnit\Framework\TestCase::setUp()
+     */
+    protected function setUp()
+    {
+        $this->subject = new StreamFilter();
+        $this->stream = $this->createStream();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \PHPUnit\Framework\TestCase::tearDown()
+     */
+    protected function tearDown()
+    {
+        fclose($this->stream);
+    }
+
     // ////////////////////////////////////////////////////////////////
     // StreamFilter::getCodePointSize() method tests
     // ////////////////////////////////////////////////////////////////
@@ -154,6 +186,18 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::processStringFragment
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::setForm
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
      * @dataProvider provideTestProcessStringFragmentData
      *
      * @param array|false $expected
@@ -164,9 +208,14 @@ class StreamFilterTest extends ConformanceTestCase
     public function testProcessStringFragment($expected, $form, $fragment, $size)
     {
         $this->markTestSkippedIfNfdMacIsNotSupported($form);
-        $filter = new StreamFilter();
-        $this->setProtectedProperty($filter, 'form', $form);
-        $actual = $this->callProtectedMethod($filter, 'processStringFragment', $fragment, $size, $this->subject);
+        $actual = $this->callProtectedMethod(
+            $this->subject,
+            'processStringFragment',
+            $fragment,
+            $size,
+            /** @see NormalizationTestCase::setUpNormalizationTestCase() */
+            new Normalizer($form)
+        );
         if (false === $expected) {
             $this->assertFalse($actual);
         } else {
@@ -180,16 +229,39 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::register
+     * @runInSeparateProcess
      */
-    public function testRegister()
+    public function testRegisterDefaultNamespace()
     {
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $filters = stream_get_filters();
-        $this->assertContains($ns, $filters, 'namespace is registered by autoloader');
-        $this->assertContains(sprintf('%s.*', $ns), $filters, 'namespace.* is registered by autoloader');
+        $this->assertTrue(StreamFilter::register(), 'first stream-filter registration succeeds');
+        $this->assertFalse(StreamFilter::register(), 'subsequent stream-filter registration fails');
 
-        // $this->assertTrue(StreamFilter::register('dummy'), 'first stream-filter registration succeeds');
+        $filters = stream_get_filters();
+        $this->assertContains(StreamFilter::DEFAULT_NAMESPACE, $filters);
+        $this->assertContains(sprintf('%s.*', StreamFilter::DEFAULT_NAMESPACE), $filters);
+
+    }
+
+    /**
+     * @covers ::register
+     * @runInSeparateProcess
+     */
+    public function testRegisterCustomNamespace()
+    {
+        $this->assertTrue(StreamFilter::register('dummy'), 'first stream-filter registration succeeds');
         $this->assertFalse(StreamFilter::register('dummy'), 'subsequent stream-filter registration fails');
+
+        $filters = stream_get_filters();
+        $this->assertContains('dummy', $filters);
+        $this->assertContains('dummy.*', $filters);
+    }
+
+    /**
+     * @covers ::register
+     * @runInSeparateProcess
+     */
+    public function testRegisterInvalidNamespace()
+    {
         $this->assertFalse(StreamFilter::register('dummy2.*'), 'invalid namespace registration fails');
     }
 
@@ -199,48 +271,75 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::onCreate
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getForm
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
+     * @testWith    [null, "without normalization form value"]
+     *              [1, "with normalization form value"]
+     *              ["none", "with normalization form expression"]
+     *
+     * @param mixed $form
+     * @param mixed $message
+     */
+    public function testOnCreateWithFormAsParameter($form, $message)
+    {
+        StreamFilter::register();
+        $this->assertInternalType(
+            'resource',
+            stream_filter_append($this->stream, StreamFilter::DEFAULT_NAMESPACE, STREAM_FILTER_ALL, $form),
+            sprintf('create stream-filter %s as parameter succeeds', $message)
+        );
+    }
+
+    /**
+     * @covers ::onCreate
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @testWith    [1, "with normalization form value"]
      *              ["none", "with normalization form expression"]
      *
      * @param mixed $form
      * @param mixed $message
      */
-    public function testOnCreate($form, $message)
+    public function testOnCreateWithFormAsNamespace($form, $message)
     {
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $stream = $this->createStream();
-
-        $filter = stream_filter_append($stream, $ns, STREAM_FILTER_READ, $form);
-        $this->assertFalse(false === $filter, sprintf('create stream-filter %s for parameter succeeds', $message));
-
-        $filter = stream_filter_append($stream, sprintf('%s.%s', $ns, $form));
-        $this->assertFalse(false === $filter, sprintf('create stream-filter %s for namespace succeeds', $message));
+        StreamFilter::register();
+        $this->assertInternalType(
+            'resource',
+            stream_filter_append($this->stream, sprintf('%s.%s', StreamFilter::DEFAULT_NAMESPACE, $form)),
+            sprintf('create stream-filter %s as namespace succeeds', $message)
+        );
     }
 
     /**
      * @covers ::onCreate
-     * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
-     * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
-     * @expectedExceptionCode       1398603947
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      */
-    public function testOnCreateWithInvalidParameterThrowsException()
+    public function testOnCreateWithInvalidParameterTriggersWarningAndFails()
     {
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $stream = $this->createStream();
-        stream_filter_append($stream, $ns, STREAM_FILTER_READ, 'nonsense');
+        StreamFilter::register();
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage('Invalid unicode normalization form value: nonsense');
+        $this->assertFalse(
+            stream_filter_append($this->stream, StreamFilter::DEFAULT_NAMESPACE, STREAM_FILTER_READ, 'nonsense')
+        );
     }
 
     /**
      * @covers ::onCreate
-     * @expectedException           \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
-     * @expectedExceptionMessage    Invalid unicode normalization form value: nonsense
-     * @expectedExceptionCode       1398603947
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      */
-    public function testOnCreateWithInvalidNamespaceThrowsException()
+    public function testOnCreateWithInvalidNamespaceTriggersWarningAndFails()
     {
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $stream = $this->createStream();
-        stream_filter_append($stream, sprintf('%s.nonsense', $ns));
+        StreamFilter::register();
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage('Invalid unicode normalization form value: nonsense');
+        $this->assertFalse(
+            stream_filter_append($this->stream, sprintf('%s.nonsense', StreamFilter::DEFAULT_NAMESPACE))
+        );
     }
 
     // ////////////////////////////////////////////////////////////////
@@ -269,6 +368,19 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::filter
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestFilterWithParameterData
      *
      * @param string $expected
@@ -278,14 +390,12 @@ class StreamFilterTest extends ConformanceTestCase
     public function testFilterWithParameter($expected, $form, $fragment)
     {
         $this->markTestSkippedIfNfdMacIsNotSupported($form);
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $stream = $this->createStream();
-        $filter = stream_filter_append($stream, $ns, STREAM_FILTER_READ, $form);
-        $this->assertFalse(false === $filter, 'append stream-filter with parameter succeeds');
-        fwrite($stream, $fragment);
-        rewind($stream);
-        $this->assertSame($expected, stream_get_contents($stream));
-        fclose($stream);
+        StreamFilter::register();
+        $filter = stream_filter_append($this->stream, StreamFilter::DEFAULT_NAMESPACE, STREAM_FILTER_READ, $form);
+        $this->assertInternalType('resource', $filter, 'append stream-filter with parameter succeeds');
+        fwrite($this->stream, $fragment);
+        rewind($this->stream);
+        $this->assertSame($expected, stream_get_contents($this->stream));
     }
 
     public function provideTestFilterWithNamespaceData()
@@ -322,6 +432,19 @@ class StreamFilterTest extends ConformanceTestCase
 
     /**
      * @covers ::filter
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
+     * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestFilterWithNamespaceData
      *
      * @param string $expected
@@ -331,14 +454,64 @@ class StreamFilterTest extends ConformanceTestCase
     public function testFilterWithNamespace($expected, $form, $fragment)
     {
         $this->markTestSkippedIfNfdMacIsNotSupported($form);
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $stream = $this->createStream();
-        $filter = stream_filter_append($stream, sprintf('%s.%s', $ns, $form), STREAM_FILTER_READ);
-        $this->assertFalse(false === $filter, 'append stream-filter with namespace succeeds');
-        fwrite($stream, $fragment);
-        rewind($stream);
-        $this->assertSame($expected, stream_get_contents($stream));
-        fclose($stream);
+        StreamFilter::register();
+        $namespace = sprintf('%s.%s', StreamFilter::DEFAULT_NAMESPACE, $form);
+        $filter = stream_filter_append($this->stream, $namespace, STREAM_FILTER_READ);
+        $this->assertInternalType('resource', $filter, 'append stream-filter with namespace succeeds');
+        fwrite($this->stream, $fragment);
+        rewind($this->stream);
+        $this->assertSame($expected, stream_get_contents($this->stream));
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function testFilterReadStream()
+    {
+        // déjà 훈쇼™⒜你
+        $nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
+        $nfd = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
+
+        StreamFilter::register();
+        vfsStreamWrapper::register();
+        $root = vfsStream::setup('root', null, ['file' => $nfc]);
+        $this->assertSame(
+            $nfd,
+            file_get_contents(
+                sprintf(
+                    'php://filter/read=%s.%s/resource=%s',
+                    StreamFilter::DEFAULT_NAMESPACE,
+                    'nfd',
+                    $root->getChild('file')->url()
+                )
+            )
+        );
+        vfsStreamWrapper::unregister();
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function testFilterWriteStream()
+    {
+        // déjà 훈쇼™⒜你
+        $nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
+        $nfd = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
+
+        StreamFilter::register();
+        vfsStreamWrapper::register();
+        $root = vfsStream::setup('root', null, ['file' => '']);
+        file_put_contents(
+            sprintf(
+                'php://filter/write=%s.%s/resource=%s',
+                StreamFilter::DEFAULT_NAMESPACE,
+                'nfd',
+                $root->getChild('file')->url()
+            ),
+            $nfc
+        );
+        $this->assertSame($nfd, file_get_contents($root->getChild('file')->url()));
+        vfsStreamWrapper::unregister();
     }
 
     /**
@@ -347,34 +520,29 @@ class StreamFilterTest extends ConformanceTestCase
      * @group conformance
      * @dataProvider provideConformanceTestData
      *
-     * @param string                  $unicodeVersion
+     * @param string                  $version
      * @param int                     $form
      * @param NormalizationTestReader $fileIterator
      */
-    public function testFilterConformance($unicodeVersion, $form, NormalizationTestReader $fileIterator)
+    public function testFilterConformance($version, $form, NormalizationTestReader $fileIterator)
     {
-        $this->markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion);
+        $this->markTestSkippedIfUnicodeConformanceLevelIsInsufficient($version);
         $this->markTestSkippedIfNfdMacIsNotSupported($form);
-
-        $ns = StreamFilter::DEFAULT_NAMESPACE;
-        $delimiter = ' @' . chr(10) . '@ ';
+        StreamFilter::register();
+        $namespace = StreamFilter::DEFAULT_NAMESPACE;
+        $delimiter = ' @' . PHP_EOL . '@ ';
         $chunkSize = 100;
         foreach ($fileIterator as $lineNumber => $data) {
             list($comment, $codes) = $data;
-            $testIterator = $this->getConformanceTestIterator(
-                $unicodeVersion,
-                $form,
-                $lineNumber,
-                $comment,
-                $codes
-            );
-            $chunkPosition = 0;
+            $testIterator = $this->getConformanceTestIterator($version, $form, $lineNumber, $comment, $codes);
+            $position = 0;
             foreach ($testIterator as $message => $data) {
-                if (0 === $chunkPosition) {
+
+                if (0 === $position) {
                     $expectStream = $this->createStream();
                     $actualStream = $this->createStream();
-                    $filter = stream_filter_append($actualStream, $ns, STREAM_FILTER_READ, $form);
-                    $this->assertFalse(false === $filter, 'append stream-filter with namespace succeeds');
+                    $filter = stream_filter_append($actualStream, $namespace, STREAM_FILTER_READ, $form);
+                    $this->assertInternalType('resource', $filter, 'append stream-filter with namespace succeeds');
                 }
 
                 list($expected, $actual) = $data;
@@ -382,25 +550,26 @@ class StreamFilterTest extends ConformanceTestCase
                 fwrite($expectStream, sprintf('%s: %s %s', $message, $expected, $delimiter));
                 fwrite($actualStream, sprintf('%s: %s %s', $message, $actual, $delimiter));
 
-                if ($chunkPosition < $chunkSize) {
-                    $chunkPosition += 1;
-                } else {
-                    $chunkPosition = 0;
-
-                    rewind($expectStream);
-                    $expected = stream_get_contents($expectStream);
-                    fclose($expectStream);
-
-                    rewind($actualStream);
-                    $actual = stream_get_contents($actualStream);
-                    fclose($actualStream);
-
-                    $this->assertSame(explode($delimiter, $expected), explode($delimiter, $actual));
-                    $this->assertSame($expected, $actual);
+                if($position < $chunkSize) {
+                    $position += 1;
+                    continue;
                 }
+
+                $position = 0;
+
+                rewind($expectStream);
+                $expected = stream_get_contents($expectStream);
+                fclose($expectStream);
+
+                rewind($actualStream);
+                $actual = stream_get_contents($actualStream);
+                fclose($actualStream);
+
+                $this->assertSame(explode($delimiter, $expected), explode($delimiter, $actual));
+                $this->assertSame($expected, $actual);
             }
 
-            if ($chunkPosition > 0) {
+            if (0 < $position) {
                 rewind($expectStream);
                 $expected = stream_get_contents($expectStream);
                 fclose($expectStream);
@@ -420,10 +589,12 @@ class StreamFilterTest extends ConformanceTestCase
     // ////////////////////////////////////////////////////////////////
 
     /**
+     * Keep 1MB (= 1024 * 1024 = 1048576) in memory before creating a temporary file.
+     *
      * @return resource
      */
-    protected function createStream()
+    protected function createStream($memory = 1048576)
     {
-        return fopen('php://memory', 'r+');
+        return fopen(sprintf('php://temp/maxmemory:%u', $memory), 'r+');
     }
 }

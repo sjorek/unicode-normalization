@@ -15,6 +15,7 @@ namespace Sjorek\UnicodeNormalization;
 
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
+use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
 
 /**
  * A stream-filter implementation for normalizing unicode, currently only utf8.
@@ -99,9 +100,9 @@ class StreamFilter extends \php_user_filter
     protected static $normalizer = null;
 
     /**
-     * @var int
+     * @var null|int
      */
-    protected $form;
+    protected $form = null;
 
     /**
      * @param string              $namespace
@@ -136,24 +137,28 @@ class StreamFilter extends \php_user_filter
      */
     public function onCreate()
     {
-        if (static::$namespace === $this->filtername) {
-            if (isset($this->params)) {
-                $this->form = NormalizationUtility::parseForm($this->params);
-            } else {
-                $this->form = self::$normalizer->getForm();
-            }
-
-            return true;
-        }
-        if (false !== strpos($this->filtername, '.')) {
-            list($form, $namespace) = explode('.', strrev($this->filtername), 2);
-            $namespace = strrev($namespace);
-            $form = strrev($form);
-            if (static::$namespace === $namespace) {
-                $this->form = NormalizationUtility::parseForm($form);
+        try {
+            if (static::$namespace === $this->filtername) {
+                if (isset($this->params)) {
+                    $this->form = NormalizationUtility::parseForm($this->params);
+                } else {
+                    $this->form = self::$normalizer->getForm();
+                }
 
                 return true;
             }
+            if (false !== strpos($this->filtername, '.')) {
+                list($form, $namespace) = explode('.', strrev($this->filtername), 2);
+                $namespace = strrev($namespace);
+                $form = strrev($form);
+                if (static::$namespace === $namespace) {
+                    $this->form = NormalizationUtility::parseForm($form);
+
+                    return true;
+                }
+            }
+        } catch (InvalidNormalizationForm $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
         }
 
         // Some other normalize filter was asked for,

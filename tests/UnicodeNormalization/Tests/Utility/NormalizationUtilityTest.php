@@ -132,7 +132,7 @@ class NormalizationUtilityTest extends AbstractTestCase
     }
 
     /**
-     * @covers ::isStrictImplementation();
+     * @covers ::isStrictImplementation()
      */
     public function testIsStrictImplementation()
     {

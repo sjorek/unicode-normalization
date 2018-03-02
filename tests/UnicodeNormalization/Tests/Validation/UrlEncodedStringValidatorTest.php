@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Validation;
 
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
-use Sjorek\UnicodeNormalization\Tests\NormalizationTestCase;
-use Sjorek\UnicodeNormalization\Validation\StringValidator;
 use Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator;
 
 /**
@@ -25,7 +23,7 @@ use Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class UrlEncodedStringValidatorTest extends NormalizationTestCase
+class UrlEncodedStringValidatorTest extends StringValidatorTestCase
 {
     /**
      * @var UrlEncodedStringValidator
@@ -33,8 +31,7 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
     protected $subject;
 
     /**
-     * {@inheritdoc}
-     *
+     * {@inheritDoc}
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
@@ -48,6 +45,8 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
 
     public function provideTestFilterData()
     {
+        static::setUpStringValidatorTestCase();
+
         // é
         $iso_8859_1 = hex2bin('e9');
         // é
@@ -112,6 +111,18 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
 
     /**
      * @covers ::filter
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter
+     * @uses \Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator::__construct
      * @dataProvider provideTestFilterData
      *
      * @param bool        $expected
@@ -130,6 +141,8 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
 
     public function provideTestIsValidData()
     {
+        static::setUpStringValidatorTestCase();
+
         // é
         $iso_8859_1 = hex2bin('e9');
         // é
@@ -184,6 +197,19 @@ class UrlEncodedStringValidatorTest extends NormalizationTestCase
 
     /**
      * @covers ::isValid
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter
+     * @uses \Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator::filter
      * @dataProvider provideTestIsValidData
      *
      * @param bool        $expected

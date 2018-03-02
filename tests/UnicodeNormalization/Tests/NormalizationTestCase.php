@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Normalizer;
+use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
@@ -34,13 +34,28 @@ class NormalizationTestCase extends AbstractTestCase
     protected $subject;
 
     /**
-     * {@inheritdoc}
-     *
+     * This method is called before the first test of this test class is run.
+     * @beforeClass
+     */
+    public static function setUpNormalizationTestCase()
+    {
+        if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
+            AutoloadUtility::registerNormalizerImplementation();
+            class_alias(
+                str_replace('\\Tests', '', __NAMESPACE__) . '\\Normalizer',
+                __NAMESPACE__ . '\\Normalizer',
+                true
+            );
+            self::$unicodeVersion = Normalizer::getUnicodeVersion();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
     {
-        self::$unicodeVersion = Normalizer::getUnicodeVersion();
         $this->subject = new Normalizer();
     }
 
@@ -64,6 +79,9 @@ class NormalizationTestCase extends AbstractTestCase
         }
     }
 
+    /**
+     * @param mixed $form
+     */
     protected function markTestSkippedIfNfdMacIsNotSupported($form)
     {
         $form = NormalizationUtility::parseForm($form);
@@ -73,5 +91,21 @@ class NormalizationTestCase extends AbstractTestCase
                 . 'or not able to handle "utf-8-mac" charset.'
             );
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function isStrictImplementation()
+    {
+        return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getNormalizationForms()
+    {
+        return Normalizer::getNormalizationForms();
     }
 }
