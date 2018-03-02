@@ -233,6 +233,7 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::register
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testRegisterDefaultNamespace()
     {
@@ -247,6 +248,7 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::register
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testRegisterCustomNamespace()
     {
@@ -261,6 +263,7 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::register
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testRegisterInvalidNamespace()
     {
