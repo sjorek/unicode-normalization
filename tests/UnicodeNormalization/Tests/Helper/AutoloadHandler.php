@@ -18,7 +18,7 @@ namespace Sjorek\UnicodeNormalization\Tests\Helper;
  */
 class AutoloadHandler
 {
-    public static function register()
+    public static function run()
     {
         if (defined('PHP_EXTENSION_HANDLER_RUN_WITHOUT')) {
             PhpExtensionHandler::runWithout(explode(',', PHP_EXTENSION_HANDLER_RUN_WITHOUT));

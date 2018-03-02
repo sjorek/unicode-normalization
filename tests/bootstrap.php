@@ -12,5 +12,5 @@ declare(strict_types=1);
  */
 
 namespace Sjorek\UnicodeNormalization\Tests\Helper {
-    AutoloadHandler::register();
+    AutoloadHandler::run();
 }
