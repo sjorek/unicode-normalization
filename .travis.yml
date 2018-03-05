@@ -21,7 +21,9 @@ cache:
     - $HOME/vendor
 
 install:
-- phpenv config-rm xdebug.ini || true
+- if [[ ! $COVERAGE = true ]]; then
+    phpenv config-rm xdebug.ini || true;
+  fi
 - travis_retry composer self-update
 - composer diagnose || true
 - if [[ $NIGHTLY = true ]]; then
