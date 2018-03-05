@@ -35,7 +35,7 @@ script:
     composer validate;
     composer run:cs-lint;
   fi
-- composer run:require-native-implementation
+- composer run:require-native-runtime
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v run:test-all;
   elif [[ ! $COVERAGE = true ]]; then
@@ -44,7 +44,7 @@ script:
 - if [[ $COVERAGE = true ]]; then
     composer -v run:test-coverage;
   fi
-- composer run:remove-implementation-packages
+- composer run:remove-runtime-packages
 - if [[ $CHECK_SECURITY = true ]]; then
     composer run:security-check-bugfix-for-travis;
   fi
