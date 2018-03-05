@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Validation;
+namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
 /**
- * StringValidator implementation (for IDE and to prevent too early auto-loading).
+ * MacNormalizer implementation (for IDE and to prevent too early auto-loading).
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StringValidator extends \Sjorek\UnicodeNormalization\Validation\StringValidator
+class MacNormalizer extends \Sjorek\UnicodeNormalization\Implementation\MacNormalizer
 {
 }

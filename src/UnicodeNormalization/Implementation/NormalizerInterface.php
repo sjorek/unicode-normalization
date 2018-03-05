@@ -197,7 +197,7 @@ interface NormalizerInterface
      *
      * @throws \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      *
-     * @return string the normalized string or FALSE if an error occurred
+     * @return string the normalized string or NULL if an error occurred
      *
      * @see http://php.net/manual/en/normalizer.normalize.php
      */

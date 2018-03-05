@@ -203,7 +203,7 @@ class StreamFilter extends \php_user_filter
 
         $payloadSize = 1;
         foreach ([1, 2, 3, 4] as $offset) {
-            if (abs($offset) > $fragmentSize) {
+            if ($offset > $fragmentSize) {
                 return false;
             }
 
@@ -223,7 +223,7 @@ class StreamFilter extends \php_user_filter
             }
 
             $result = $normalizer->normalizeStringTo($fragment, $this->form);
-            if (false === $result || null === $result) {
+            if (null === $result) {
                 return false;
             }
 

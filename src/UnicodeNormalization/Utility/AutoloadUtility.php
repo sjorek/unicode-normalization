@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Utility;
 
-use Sjorek\UnicodeNormalization\Validation\StringValidator;
-
 /**
  * Class to handle autoload functionality, especially for the composer bootstrap.
  *
@@ -26,6 +24,9 @@ class AutoloadUtility
      * Registration method to be called by (an) bootstrap script like "src/UnicodeNormalization/bootstrap.php".
      *
      * @return bool
+     *
+     * @see AutoloadUtility::registerNormalizerImplementation()
+     * @see AutoloadUtility::registerStringValidatorImplementation()
      */
     public static function register()
     {

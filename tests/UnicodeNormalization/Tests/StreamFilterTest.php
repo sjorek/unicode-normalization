@@ -80,6 +80,7 @@ class StreamFilterTest extends ConformanceTestCase
             'quad byte payload 1' => [0, $string[7]],
             'quad byte payload 2' => [0, $string[8]],
             'quad byte payload 3' => [0, $string[9]],
+            'invalid payload' => [-1, chr(0b11111111)],
         ];
     }
 
@@ -129,6 +130,9 @@ class StreamFilterTest extends ConformanceTestCase
             ],
             'return false on on invalid initial byte' => [
                 false, NormalizerInterface::NONE, substr('ä', 1) . 'a', 1,
+            ],
+            'return false on invalid byte' => [
+                false, NormalizerInterface::NONE, $string . chr(0b11111111), 11,
             ],
             'pass through' => [
                 ['äa', 2], NormalizerInterface::NONE, 'äa', 2,
@@ -201,6 +205,7 @@ class StreamFilterTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::setForm
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @dataProvider provideTestProcessStringFragmentData
      *
      * @param array|false $expected
@@ -386,6 +391,7 @@ class StreamFilterTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
@@ -451,6 +457,7 @@ class StreamFilterTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment

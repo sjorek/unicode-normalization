@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization;
 
+use Sjorek\UnicodeNormalization\Implementation\InvalidNormalizer;
+
 // @codeCoverageIgnoreStart
 if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
     /**
      * Normalizer implementation (for IDE only).
      *
-     * @see Implementation\NormalizerImpl
+     * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::registerNormalizerImplementation()
      * @see Implementation\BaseNormalizer
      * @see Implementation\StrictNormalizer
      * @see Implementation\MacNormalizer
      *
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
-    class Normalizer extends Implementation\NormalizerImpl
+    class Normalizer extends InvalidNormalizer
     {
     }
 }

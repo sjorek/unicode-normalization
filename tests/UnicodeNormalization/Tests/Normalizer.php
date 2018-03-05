@@ -13,15 +13,11 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Implementation\BaseNormalizer;
-
-if (false === true) {
-    /**
-     * Normalizer implementation (for IDE only).
-     *
-     * @author Stephan Jorek <stephan.jorek@gmail.com>
-     */
-    class Normalizer extends BaseNormalizer
-    {
-    }
+/**
+ * Normalizer implementation (for IDE and to prevent too early auto-loading).
+ *
+ * @author Stephan Jorek <stephan.jorek@gmail.com>
+ */
+class Normalizer extends \Sjorek\UnicodeNormalization\Normalizer
+{
 }

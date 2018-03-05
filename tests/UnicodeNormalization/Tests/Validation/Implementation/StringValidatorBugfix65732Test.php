@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Validation\Implementation;
 
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
-use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTest;
+use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTestCase;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732;
 
 /**
@@ -24,7 +24,7 @@ use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix6
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StringValidatorBugfix65732Test extends StringValidatorTest
+class StringValidatorBugfix65732Test extends StringValidatorTestCase
 {
     /**
      * @var StringValidatorBugfix65732
@@ -34,7 +34,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
     /**
      * {@inheritdoc}
      *
-     * @see \Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTest::setUp()
+     * @see \Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTestCase::setUp()
      */
     protected function setUp()
     {
@@ -47,7 +47,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
 
     public function provideTestFilterBug65732Data()
     {
-        static::setUpStringValidatorTestCase();
+        static::setUpValidationTestCase();
 
         // é
         $utf8_nfc = hex2bin('c3a9');
@@ -78,6 +78,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
@@ -102,7 +103,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
 
     public function provideTestIsValidBug65732Data()
     {
-        static::setUpStringValidatorTestCase();
+        static::setUpValidationTestCase();
 
         // é
         $utf8_nfc = hex2bin('c3a9');
@@ -133,6 +134,7 @@ class StringValidatorBugfix65732Test extends StringValidatorTest
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732::filter
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct

@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Validation;
 
 /**
- * StringValidator implementation (for IDE and to prevent too early auto-loading).
+ * StringValidator tests.
+ *
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Validation\StringValidator
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StringValidator extends \Sjorek\UnicodeNormalization\Validation\StringValidator
+class StringValidatorTest_ extends StringValidatorTestCase
 {
 }

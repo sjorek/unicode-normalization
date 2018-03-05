@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
+use Sjorek\UnicodeNormalization\Implementation\InvalidNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
@@ -88,6 +89,24 @@ class AutoloadUtilityTest extends AbstractTestCase
             NormalizationUtility::isStrictImplementation(),
             // strict implementations should not inherit the strict-enforcing facade
             !is_a($className, StrictNormalizer::class, true)
+        );
+    }
+
+    /**
+     * @coversNothing
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testRegisterNormalizerImplementationSkipped()
+    {
+        $this->assertTrue(
+            is_a(\Sjorek\UnicodeNormalization\Normalizer::class, InvalidNormalizer::class, true)
+        );
+        $this->assertTrue(
+            is_a(\Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::class, InvalidNormalizer::class, true)
+        );
+        $this->assertTrue(
+            is_a(\Sjorek\UnicodeNormalization\Implementation\MacNormalizer::class, InvalidNormalizer::class, true)
         );
     }
 

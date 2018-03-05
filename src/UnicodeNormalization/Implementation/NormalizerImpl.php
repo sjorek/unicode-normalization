@@ -18,13 +18,14 @@ if (!class_exists(__NAMESPACE__ . '\\NormalizerImpl', false)) {
     /**
      * Normalizer implementation (for IDE only).
      *
+     * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::registerNormalizerImplementation()
      * @see BaseNormalizer
      * @see StrictNormalizer
      * @see MacNormalizer
      *
      * @author Stephan Jorek <stephan.jorek@gmail.com>
      */
-    class NormalizerImpl extends BaseNormalizer
+    class NormalizerImpl extends InvalidNormalizer
     {
     }
 }

@@ -23,7 +23,7 @@ use Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class UrlEncodedStringValidatorTest extends StringValidatorTestCase
+class UrlEncodedStringValidatorTest extends ValidationTestCase
 {
     /**
      * @var UrlEncodedStringValidator
@@ -40,13 +40,24 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
         $this->subject = new UrlEncodedStringValidator();
     }
 
+    /**
+     * @covers ::__construct
+     *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
+     */
+    public function testConstruct()
+    {
+        $this->assertAttributeInstanceOf(StringValidator::class, 'stringValidator', $this->subject);
+    }
+
     // ////////////////////////////////////
     // Tests concerning filtered utf-8 urls
     // ////////////////////////////////////
 
     public function provideTestFilterData()
     {
-        static::setUpStringValidatorTestCase();
+        static::setUpValidationTestCase();
 
         // é
         $iso_8859_1 = hex2bin('e9');
@@ -63,6 +74,12 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
         $leading_combinator = StringValidator::LEADING_COMBINATOR;
 
         return [
+            'empty uri returns early' => [
+                '', '', $f_NONE,
+            ],
+            'ascii uri returns early' => [
+                'abc', 'abc', $f_NONE,
+            ],
             'url-encoded ISO-8859-1 uri is same as UTF8-NFC uri without normalization' => [
                 urlencode($utf8_nfc), urlencode($iso_8859_1), $f_NONE,
             ],
@@ -121,6 +138,7 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter
@@ -143,7 +161,7 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
 
     public function provideTestIsValidData()
     {
-        static::setUpStringValidatorTestCase();
+        static::setUpValidationTestCase();
 
         // é
         $iso_8859_1 = hex2bin('e9');
@@ -208,6 +226,7 @@ class UrlEncodedStringValidatorTest extends StringValidatorTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter

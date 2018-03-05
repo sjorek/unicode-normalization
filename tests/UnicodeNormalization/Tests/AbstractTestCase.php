@@ -27,10 +27,9 @@ class AbstractTestCase extends TestCase
     // ////////////////////////////////////////////////////////////////
 
     /**
-     * @param mixed  $object
+     * @param mixed  $objectOrClass
      * @param string $methodName
      * @param array  $arguments
-     * @param mixed  $objectOrClass
      *
      * @return mixed
      */

@@ -43,7 +43,7 @@ class BaseNormalizer implements NormalizerInterface
     /**
      * Array of supported normalization forms.
      *
-     * @var array
+     * @var int[]
      */
     const NORMALIZATION_FORMS = [
         self::NONE,
@@ -56,7 +56,7 @@ class BaseNormalizer implements NormalizerInterface
     /**
      * NONE or one of the five unicode normalization forms NFC, NFD, NFKC, NFKD or NFD_MAC.
      *
-     * Must be set to one of the integer constants from above. Defaults to NFC.
+     * Must be set to one of the normalization form constants. Defaults to NFC.
      *
      * @var int
      *
@@ -110,8 +110,10 @@ class BaseNormalizer implements NormalizerInterface
     public function normalize($input, $form = null)
     {
         $form = $this->getFormArgument($form);
+        $result = \Normalizer::normalize($input, $form);
 
-        return \Normalizer::normalize($input, $form);
+        // Depending on the underlying implementation the result may also be false!
+        return (false !== $result) ? $result : null;
     }
 
     /**
@@ -172,7 +174,7 @@ class BaseNormalizer implements NormalizerInterface
             return $form;
         }
         throw new InvalidNormalizationForm(
-            sprintf('Unsupported unicode-normalization form: %s.', $form), 1398603947
+            sprintf('Unsupported unicode-normalization form: %s.', $form), 1398603948
         );
     }
 

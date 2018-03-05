@@ -108,7 +108,10 @@ class StringValidatorImpl
         if (null === $charset && 'UTF-8' === ($charset = mb_detect_encoding($input))) {
             $charset = 'ISO-8859-1';
         }
+        if (false !== $charset) {
+            return mb_convert_encoding($input, 'UTF-8', $charset);
+        }
 
-        return mb_convert_encoding($input, 'UTF-8', $charset);
+        return false;
     }
 }

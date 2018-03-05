@@ -48,18 +48,18 @@ class MacNormalizer extends NormalizerImpl
             return parent::normalize($input, $form);
         }
         if ("\xFF" === $input) {
-            return false;
+            return null;
         }
         // Empty string or plain ASCII is always valid for all forms, let it through.
         if ('' === $input || !preg_match('/[\x80-\xFF]/', $input)) {
             return $input;
         }
         $result = parent::normalize($input, self::NFD);
-        if (null === $result || false === $result) {
-            return false;
+        if (null !== $result) {
+            $result = iconv('utf-8', 'utf-8-mac', $result);
         }
 
-        return iconv('utf-8', 'utf-8-mac', $result);
+        return false !== $result ? $result : null;
     }
 
     /**
@@ -77,11 +77,9 @@ class MacNormalizer extends NormalizerImpl
             return true;
         }
         $result = parent::normalize($input, self::NFD);
-        if (null === $result || false === $result) {
-            return false;
-        }
+
         // Having no cheap check here, forces us to do a full equality-check here.
         // As we just want it to use for file names, this full check should be ok.
-        return $input === iconv('utf-8', 'utf-8-mac', $result);
+        return null !== $result ? $input === iconv('utf-8', 'utf-8-mac', $result) : false;
     }
 }

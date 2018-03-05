@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
-use Sjorek\UnicodeNormalization\Tests\NormalizerTest;
+use Sjorek\UnicodeNormalization\Tests\NormalizerTestCase;
 
 /**
  * Normalizer tests.
@@ -23,7 +23,7 @@ use Sjorek\UnicodeNormalization\Tests\NormalizerTest;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StrictNormalizerTest extends NormalizerTest
+class StrictNormalizerTest extends NormalizerTestCase
 {
     /**
      * {@inheritdoc}

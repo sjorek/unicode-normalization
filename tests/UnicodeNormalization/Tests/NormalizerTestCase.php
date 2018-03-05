@@ -16,13 +16,11 @@ namespace Sjorek\UnicodeNormalization\Tests;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
- * Normalizer tests.
- *
- * @coversDefaultClass \Sjorek\UnicodeNormalization\Normalizer
+ * Normalizer test-case.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class NormalizerTest extends ConformanceTestCase
+class NormalizerTestCase extends ConformanceTestCase
 {
     /**
      * @return array
@@ -59,8 +57,8 @@ class NormalizerTest extends ConformanceTestCase
             $data['NFC string is loosely not normalized for default'] = [false, $s_nfc, null];
         }
 
-        $data['Reserved byte FF is not normalized for default'] = [false, "\xFF", null];
         $data['Empty string is not normalized for NONE'] = [false, '', $f_NONE];
+        $data['Reserved byte 0xFF is not normalized for default'] = [false, "\xFF", null];
 
         if (in_array($f_NFC, $forms, true)) {
             if ($strict) {
@@ -142,6 +140,8 @@ class NormalizerTest extends ConformanceTestCase
             $data['NFKC string is not normalized for NFD_MAC'] = [false, $s_nfkc, $f_MAC];
 
             $data['Empty string is normalized for NFD_MAC'] = [true, '', $f_MAC];
+            $data['ASCII string is always normalized for default'] = [true, 'abc', $f_MAC];
+            $data['Reserved byte 0xFF is not normalized for NFD_MAC'] = [false, "\xFF", $f_MAC];
         }
 
         return $data;
@@ -156,6 +156,8 @@ class NormalizerTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::detectUnicodeVersion
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestIsNormalizedData
@@ -206,7 +208,13 @@ class NormalizerTest extends ConformanceTestCase
         $data['Combined string plus NFD_MAC is same for NONE'] = [$c_plus_m, $c_plus_m, $f_NONE];
 
         $data['Empty string is same for default'] = ['', '', null];
-        $data['Reseverd byte FF is false for default'] = [false, "\xFF", null];
+        $data['Reserved byte 0xFF is not normalize-able for default'] = [null, "\xFF", null];
+
+        if (in_array($f_MAC, $forms, true)) {
+            $data['Empty string is same for NFD_MAC'] = ['', '', $f_MAC];
+            $data['ASCI string is same for NFD_MAC'] = ['abc', 'abc', $f_MAC];
+            $data['Reserved byte 0xFF is not normalize-able for NFD_MAC'] = [null, "\xFF", $f_MAC];
+        }
 
         // if NFC and NFD are supported
         if (empty(array_diff([$f_NFC, $f_NFD], $forms))) {
@@ -279,15 +287,15 @@ class NormalizerTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
-     * @param false|string $same
+     * @param false|string $expect
      * @param string       $string
      * @param null|int     $form
      */
-    public function testNormalize($same, $string, $form)
+    public function testNormalize($expect, $string, $form)
     {
         $this->markTestSkippedIfNfdMacIsNotSupported($form);
-        if (false !== $same) {
-            $this->assertSame($same, $this->subject->normalize($string, $form));
+        if (false !== $expect) {
+            $this->assertSame($expect, $this->subject->normalize($string, $form));
         } else {
             $this->assertFalse($this->subject->normalize($string, $form));
         }

@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Validation\Implementation;
 
-use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTest;
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTestCase;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
 
 /**
@@ -23,7 +24,7 @@ use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StringValidatorImplTest extends StringValidatorTest
+class StringValidatorImplTest extends StringValidatorTestCase
 {
     /**
      * @var StringValidatorImpl
@@ -38,5 +39,32 @@ class StringValidatorImplTest extends StringValidatorTest
     protected function setUp()
     {
         $this->subject = new StringValidatorImpl();
+    }
+
+    /**
+     * @covers ::__construct
+     *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     */
+    public function testConstruct()
+    {
+        $this->assertAttributeInstanceOf(NormalizerInterface::class, 'normalizer', $this->subject);
+    }
+
+    /**
+     * @covers ::convertStringToUtf8
+     *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
+     */
+    public function testConvertStringToUtf8()
+    {
+        // é
+        $iso_8859_1 = hex2bin('e9');
+        // é
+        $utf8 = hex2bin('c3a9');
+        $this->assertSame($utf8, $this->callProtectedMethod($this->subject, 'convertStringToUtf8', $iso_8859_1));
+        $invalid = chr(0b11111111);
+        $this->assertFalse($this->callProtectedMethod($this->subject, 'convertStringToUtf8', $invalid));
     }
 }

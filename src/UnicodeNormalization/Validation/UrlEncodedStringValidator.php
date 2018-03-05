@@ -69,20 +69,18 @@ class UrlEncodedStringValidator
             },
             $input
         );
-        if (null === $input) {
-            return false;
+        if (null !== $input) {
+            $validator = $this->stringValidator;
+            // encode all multibyte-byte characters from 128 and above
+            $input = preg_replace_callback(
+                '/(^|.)(?:%[89A-F][0-9A-F])+/i',
+                // url-decode -> utf8-encode -> url-encode
+                function ($match) use ($validator, $form, $charset) {
+                    return urlencode($validator->filter(urldecode($match[0]), $form, $charset));
+                },
+                $input
+            );
         }
-
-        $validator = $this->stringValidator;
-        // encode all multibyte-byte characters from 128 and above
-        $input = preg_replace_callback(
-            '/(^|.)(?:%[89A-F][0-9A-F])+/i',
-            // url-decode -> utf8-encode -> url-encode
-            function ($match) use ($validator, $form, $charset) {
-                return urlencode($validator->filter(urldecode($match[0]), $form, $charset));
-            },
-            $input
-        );
 
         return null === $input ? false : $input;
     }

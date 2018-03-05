@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
+use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
  * Base test case class for all unit-tests.
@@ -24,11 +24,6 @@ use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
  */
 class NormalizationTestCase extends AbstractTestCase
 {
-    /**
-     * @var array
-     */
-    protected static $unicodeVersion = null;
-
     /**
      * @var \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface
      */
@@ -43,12 +38,6 @@ class NormalizationTestCase extends AbstractTestCase
     {
         if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
             AutoloadUtility::registerNormalizerImplementation();
-            class_alias(
-                str_replace('\\Tests', '', __NAMESPACE__) . '\\Normalizer',
-                __NAMESPACE__ . '\\Normalizer',
-                true
-            );
-            self::$unicodeVersion = static::getUnicodeVersion();
         }
     }
 
@@ -71,12 +60,12 @@ class NormalizationTestCase extends AbstractTestCase
      */
     protected function markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion)
     {
-        if (version_compare($unicodeVersion, static::$unicodeVersion, '>')) {
+        if (version_compare($unicodeVersion, static::getUnicodeVersion(), '>')) {
             $this->markTestSkipped(
                 sprintf(
                     'Skipped test as unicode version %s is higher than the supported unicode conformance level %s.',
                     $unicodeVersion,
-                    static::$unicodeVersion
+                    static::getUnicodeVersion()
                 )
             );
         }

@@ -40,10 +40,7 @@ class StrictNormalizer extends BaseNormalizer
         // Having no cheap check here, forces us to do a full equality-check here.
         // As we just want it to use for file names, this full check should be ok.
         $result = $this->normalize($input, $form);
-        if (null === $result || false === $result) {
-            return false;
-        }
 
-        return $result === $input;
+        return null !== $result ? $result === $input : false;
     }
 }
