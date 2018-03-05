@@ -36,14 +36,13 @@ script:
     composer run:cs-lint;
   fi
 - composer run:require-native-implementation
-- if [[ $COVERAGE = true ]] && [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
-    composer -v run:test-coverage-all;
-  elif [[ $COVERAGE = true ]]; then
-    composer -v run:test-coverage;
-  elif [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
+- if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v run:test-all;
-  else
+  elif [[ ! $COVERAGE = true ]]; then
     composer -v run:test;
+  fi
+- if [[ $COVERAGE = true ]]; then
+    composer -v run:test-coverage;
   fi
 - composer run:remove-implementation-packages
 - if [[ $CHECK_SECURITY = true ]]; then
