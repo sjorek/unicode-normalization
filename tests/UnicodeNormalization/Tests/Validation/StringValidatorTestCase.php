@@ -106,6 +106,7 @@ class StringValidatorTestCase extends ValidationTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
@@ -194,6 +195,7 @@ class StringValidatorTestCase extends ValidationTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732::filter
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct

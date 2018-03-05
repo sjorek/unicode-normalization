@@ -159,6 +159,7 @@ class NormalizerTestCase extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::detectUnicodeVersion
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestIsNormalizedData
      *
@@ -284,6 +285,7 @@ class NormalizerTestCase extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
@@ -313,6 +315,7 @@ class NormalizerTestCase extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
@@ -343,6 +346,7 @@ class NormalizerTestCase extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *

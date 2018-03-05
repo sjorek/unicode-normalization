@@ -77,7 +77,12 @@ class NormalizationTestCase extends AbstractTestCase
     protected function markTestSkippedIfNfdMacIsNotSupported($form)
     {
         $form = NormalizationUtility::parseForm($form);
-        if (NormalizerInterface::NFD_MAC === $form && !in_array($form, static::getNormalizationForms(), true)) {
+        if (NormalizerInterface::NFD_MAC === $form &&
+            (
+                !in_array($form, static::getNormalizationForms(), true) ||
+                !NormalizationUtility::isNfdMacCompatible()
+            )
+        ) {
             $this->markTestSkipped(
                 'Skipped test as "iconv" extension is either not available '
                 . 'or not able to handle "utf-8-mac" charset.'

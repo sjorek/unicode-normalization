@@ -194,7 +194,6 @@ class StreamFilterTest extends ConformanceTestCase
      * @covers ::processStringFragment
      *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
@@ -206,6 +205,8 @@ class StreamFilterTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestProcessStringFragmentData
      *
      * @param array|false $expected
@@ -396,6 +397,7 @@ class StreamFilterTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestFilterWithParameterData
      *
@@ -462,6 +464,7 @@ class StreamFilterTest extends ConformanceTestCase
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestFilterWithNamespaceData
      *
