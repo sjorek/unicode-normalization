@@ -9,7 +9,7 @@ env:
     - COVERAGE=false
     - LINT=false
     - NIGHTLY=false
-    - UPDATE_CHECK_VERSION_TIMESTAMP_FILE=$HOME/.unicode-normalization/version-check-timestamp
+    - UPDATE_CHECK_VERSION_TIMESTAMP_FILE=$TRAVIS_BUILD_DIR/.unicode-normalization/version-check-timestamp
 
 matrix:
   include:
@@ -25,9 +25,9 @@ matrix:
 cache:
   directories:
     - $HOME/.composer/cache/files
-    - $HOME/.php-cs-fixer
-    - $HOME/.unicode-normalization
-    - $HOME/vendor
+    - $TRAVIS_BUILD_DIR/.php-cs-fixer
+    - $TRAVIS_BUILD_DIR/.unicode-normalization
+    - $TRAVIS_BUILD_DIR/vendor
 
 install:
 - env
