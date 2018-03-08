@@ -26,6 +26,10 @@ class Filesystem implements FilesystemInterface
     protected $fs;
 
     /**
+     * Constructor.
+     *
+     * @codeCoverageIgnore
+     *
      * @param \Symfony\Component\Filesystem\Filesystem $fs
      */
     public function __construct(\Symfony\Component\Filesystem\Filesystem $fs = null)
@@ -39,6 +43,8 @@ class Filesystem implements FilesystemInterface
     /**
      * Returns whether the file path is an absolute path.
      *
+     * @codeCoverageIgnore
+     *
      * @param string $file A file path
      *
      * @return bool
@@ -50,6 +56,8 @@ class Filesystem implements FilesystemInterface
 
     /**
      * Creates a directory recursively.
+     *
+     * @codeCoverageIgnore
      *
      * @param string $dir The directory path
      *
@@ -63,6 +71,8 @@ class Filesystem implements FilesystemInterface
     /**
      * Create an empty file.
      *
+     * @codeCoverageIgnore
+     *
      * @param string $file A filename
      *
      * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When touch fails
@@ -74,6 +84,8 @@ class Filesystem implements FilesystemInterface
 
     /**
      * Removes file.
+     *
+     * @codeCoverageIgnore
      *
      * @param string $file A filename to remove
      *
