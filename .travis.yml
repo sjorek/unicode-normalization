@@ -7,7 +7,7 @@ matrix:
   include:
     - php: 7.0
     - php: 7.1
-      env: LINT=true COVERAGE=true CHECK_SECURITY=true CHECK_UNICODE_UPDATE=true
+      env: LINT=true COVERAGE=true CHECK_SECURITY=true
     - php: 7.2
     - php: nightly
       env: NIGHTLY=true
@@ -18,10 +18,14 @@ cache:
   directories:
     - $HOME/.composer/cache/files
     - $HOME/.php-cs-fixer
-    - $HOME/.unicode-version-check-timestamp
+    - $HOME/.unicode-normalization
     - $HOME/vendor
 
 install:
+- if [ -f .unicode-normalization/version-check-timestamp ]; then
+    echo "Unicode Version Check Timestamp:";
+    cat .unicode-normalization/version-check-timestamp;
+  fi 
 - if [[ ! $COVERAGE = true ]]; then
     phpenv config-rm xdebug.ini || true;
   fi
@@ -31,14 +35,14 @@ install:
     composer remove --dev friendsofphp/php-cs-fixer;
   fi
 - travis_retry composer install --optimize-autoloader --no-interaction
+- composer run:require-native-runtime
 - composer check-platform-reqs
+- composer validate
 
 script:
 - if [[ $LINT = true ]]; then
-    composer validate;
     composer run:cs-lint;
   fi
-- composer run:require-native-runtime
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v run:test-all;
   elif [[ ! $COVERAGE = true ]]; then
@@ -47,12 +51,8 @@ script:
 - if [[ $COVERAGE = true ]]; then
     composer -v run:test-coverage;
   fi
-- composer run:remove-runtime-packages
 - if [[ $CHECK_SECURITY = true ]]; then
     composer run:security-check-bugfix-for-travis;
-  fi
-- if [[ $CHECK_UNICODE_UPDATE = true ]]; then
-    composer run:normalization-test-fixtures-update-check;
   fi
 
 sudo: false
