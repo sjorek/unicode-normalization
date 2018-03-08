@@ -155,17 +155,17 @@
         ],
         "run:require-native-runtime": [
             "@run:remove-runtime-packages",
-            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-runtime:@dev",
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-native-runtime:0.0.0",
             "phpunit --colors=always --group=native"
         ],
         "run:require-symfony-runtime": [
             "@run:remove-runtime-packages",
-            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-runtime:@dev",
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-symfony-runtime:0.0.0",
             "phpunit --colors=always --group=symfony"
         ],
         "run:require-patchwork-runtime": [
             "@run:remove-runtime-packages",
-            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-runtime:@dev",
+            "@composer require --optimize-autoloader --no-interaction --no-progress sjorek/unicode-normalization-patchwork-runtime:0.0.0",
             "phpunit --colors=always --group=patchwork"
         ],
         "run:remove-runtime-packages": [
