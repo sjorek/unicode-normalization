@@ -136,10 +136,10 @@
             "phpunit -v --colors=always --exclude-group=runtime,large --coverage-clover coverage.xml"
         ],
         "run:cs-lint": [
-            "php-cs-fixer fix --ansi --diff --stop-on-violation --verbose --dry-run"
+            "php-cs-fixer fix --ansi --diff --stop-on-violation --verbose --dry-run --cache-file=.unicode-normalization/php_cs.cache.json"
         ],
         "run:cs-fix": [
-            "php-cs-fixer fix -vv --ansi || true"
+            "php-cs-fixer fix -vv --ansi --cache-file=.unicode-normalization/php_cs.cache.json"
         ],
         "run:security-check": [
             "security-checker security:check --ansi"

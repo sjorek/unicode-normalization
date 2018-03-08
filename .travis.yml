@@ -25,9 +25,7 @@ matrix:
 cache:
   directories:
     - $HOME/.composer/cache/files
-    - $TRAVIS_BUILD_DIR/.php-cs-fixer
     - $TRAVIS_BUILD_DIR/.unicode-normalization
-    - $TRAVIS_BUILD_DIR/vendor
 
 install:
 - env
