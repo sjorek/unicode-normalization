@@ -18,6 +18,7 @@ cache:
   directories:
     - $HOME/.composer/cache/files
     - $HOME/.php-cs-fixer
+    - $HOME/.unicode-version-check-timestamp
     - $HOME/vendor
 
 install:
