@@ -186,7 +186,9 @@ EOT;
      */
     public static function detectLatestVersion($force = false)
     {
-        $timestampFile = self::UPDATE_CHECK_VERSION_TIMESTAMP_FILE;
+        if (false === ($timestampFile = getenv('UPDATE_CHECK_VERSION_TIMESTAMP_FILE'))) {
+            $timestampFile = self::UPDATE_CHECK_VERSION_TIMESTAMP_FILE;
+        }
         if (true === $force || !file_exists($timestampFile)) {
             if ('.' !== ($dir = dirname($timestampFile))) {
                 $fs = new Filesystem();

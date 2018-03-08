@@ -3,6 +3,14 @@ language: php
 git:
   depth: 50
 
+env:
+  global:
+    - CHECK_SECURITY=false
+    - COVERAGE=false
+    - LINT=false
+    - NIGHTLY=false
+    - UPDATE_CHECK_VERSION_TIMESTAMP_FILE=$HOME/.unicode-normalization/version-check-timestamp
+
 matrix:
   include:
     - php: 7.0
@@ -22,9 +30,12 @@ cache:
     - $HOME/vendor
 
 install:
-- if [ -f .unicode-normalization/version-check-timestamp ]; then
-    echo "Unicode Version Check Timestamp:";
-    cat .unicode-normalization/version-check-timestamp;
+- env
+- if [ -f $UPDATE_CHECK_VERSION_TIMESTAMP_FILE ]; then
+    echo "Unicode Version Check Timestamp => found";
+    cat $UPDATE_CHECK_VERSION_TIMESTAMP_FILE;
+  else
+    echo "Unicode Version Check Timestamp => missing";
   fi 
 - if [[ ! $COVERAGE = true ]]; then
     phpenv config-rm xdebug.ini || true;
