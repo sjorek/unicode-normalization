@@ -47,6 +47,7 @@ install:
 - composer run:require-native-runtime
 - composer check-platform-reqs
 - composer validate
+- composer config --list
 
 script:
 - if [[ $LINT = true ]]; then
