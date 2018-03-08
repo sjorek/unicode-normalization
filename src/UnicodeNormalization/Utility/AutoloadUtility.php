@@ -54,23 +54,31 @@ class AutoloadUtility
 
         // Use the autoloader here!
         if (!class_exists('Normalizer', true)) {
+            // @codeCoverageIgnoreStart
             return
                 class_alias($namespace . 'Implementation\\MissingNormalizer', 'Normalizer', true) &&
                 class_exists($normalizerClass, true);
+            // @codeCoverageIgnoreEnd
         }
         // Do not use the autoloader here!
         if (class_exists($normalizerClass, false) || class_exists($implementationClass, false)) {
             return false;
         }
         if (!NormalizationUtility::isStrictImplementation()) {
+            // @codeCoverageIgnoreStart
             $baseClass = $namespace . 'Implementation\\StrictNormalizer';
+            // @codeCoverageIgnoreEnd
         }
         // Use the autoloader here!
         if (!class_alias($baseClass, $implementationClass, true)) {
+            // @codeCoverageIgnoreStart
             return false;
+            // @codeCoverageIgnoreEnd
         }
         if (NormalizationUtility::isNfdMacCompatible()) {
+            // @codeCoverageIgnoreStart
             $implementationClass = $namespace . 'Implementation\\MacNormalizer';
+            // @codeCoverageIgnoreEnd
         }
         // Use the autoloader here!
         return class_alias($implementationClass, $normalizerClass, true);
@@ -101,6 +109,8 @@ class AutoloadUtility
 
     /**
      * Return the root namespace of the 'sjorek/unicode-normalization' package.
+     *
+     * @codeCoverageIgnore
      *
      * @return string
      */

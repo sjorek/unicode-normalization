@@ -23,6 +23,9 @@ class AutoloadHandler
         if (defined('PHP_EXTENSION_HANDLER_RUN_WITHOUT')) {
             PhpExtensionHandler::runWithout(explode(',', PHP_EXTENSION_HANDLER_RUN_WITHOUT));
         }
+        if (false !== getenv('PHP_EXTENSION_HANDLER_RUN_WITHOUT')) {
+            PhpExtensionHandler::runWithout(explode(',', getenv('PHP_EXTENSION_HANDLER_RUN_WITHOUT')));
+        }
         if (false !== strpos($_SERVER['argv'][0], 'phpunit') && ConfigurationHandler::isPolyfillAvailable()) {
             PhpExtensionHandler::runWithout('intl');
         }

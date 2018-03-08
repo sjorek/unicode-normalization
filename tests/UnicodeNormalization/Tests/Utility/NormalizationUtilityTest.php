@@ -16,6 +16,8 @@ namespace Sjorek\UnicodeNormalization\Tests\Utility;
 use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
+use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
+use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
@@ -153,20 +155,75 @@ class NormalizationUtilityTest extends AbstractTestCase
      */
     public function testDetectUnicodeVersion()
     {
-        // Use the autoloader here !
-        if (is_a('Normalizer', MissingNormalizer::class, true)) {
-            $this->expectException(\RuntimeException::class);
-            $this->expectExceptionCode(1519488534);
-            $this->expectExceptionMessage('Could not determine unicode version.');
-            NormalizationUtility::detectUnicodeVersion();
-
-            return;
-        }
         $unicodeVersion = NormalizationUtility::detectUnicodeVersion();
         $this->assertSame(1, preg_match('/^[1-9][0-9]*\.[0-9]+\.[0-9]+$/', $unicodeVersion));
         $this->assertTrue(version_compare('0.0.0', $unicodeVersion, '<'));
         if (ConfigurationHandler::isPolyfillImplementation()) {
             $this->assertSame('7.0.0', $unicodeVersion);
+        }
+        $localVersion = NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST;
+        $latestVersion = NormalizationTestHandler::detectLatestVersion();
+        $this->assertTrue(version_compare($unicodeVersion, $localVersion, '<='));
+        $this->assertTrue(version_compare($unicodeVersion, $latestVersion, '<='));
+        $this->assertTrue(version_compare($localVersion, $latestVersion, '='));
+    }
+
+    /**
+     * @covers ::detectUnicodeVersion()
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testDetectUnicodeVersionByIntlCharGetUnicodeVersionMethod()
+    {
+        if (!class_exists('IntlChar', true) || !method_exists('IntlChar', 'getUnicodeVersion')) {
+            $this->markTestSkipped('Skipped test as "IntlChar::getUnicodeVersion" method is not available.');
+        }
+        $this->testDetectUnicodeVersion();
+    }
+
+    /**
+     * @covers ::detectUnicodeVersion()
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testDetectUnicodeVersionByIntlIcuVersionConstant()
+    {
+        if (!defined('INTL_ICU_VERSION')) {
+            $this->markTestSkipped('Skipped test as "INTL_ICU_VERSION" is not defined.');
+        }
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture1.php';
+        $this->testDetectUnicodeVersion();
+    }
+
+    /**
+     * @covers ::detectUnicodeVersion()
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testDetectUnicodeVersionByParsingIntlExtensionInfo()
+    {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('Skipped test as "intl"-extension is not loaded.');
+        }
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture1.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture2.php';
+        $this->testDetectUnicodeVersion();
+    }
+
+    /**
+     * @covers ::detectUnicodeVersion()
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testDetectUnicodeVersionThrowsRuntimeExceptionIfImplementationisMissing()
+    {
+        $this->assertTrue(AutoloadUtility::registerNormalizerImplementation());
+        // Use the autoloader here !
+        if (class_exists('Normalizer', true) && is_a('Normalizer', MissingNormalizer::class, true)) {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionCode(1519488534);
+            $this->expectExceptionMessage('Could not determine unicode version.');
+            NormalizationUtility::detectUnicodeVersion();
         }
     }
 }

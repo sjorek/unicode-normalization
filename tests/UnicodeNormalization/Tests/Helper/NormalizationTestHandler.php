@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Helper;
 
+use Sjorek\UnicodeNormalization\Filesystem\Filesystem;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestUpdater;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestWriter;
@@ -62,11 +63,21 @@ EOT;
         . '/umisU';
 
     /**
-     * @see \Sjorek\UnicodeNormalization\NormalizationUtility::MAP_ICU_TO_UNICODE_VERSION
-     *
      * @var string
      */
     const UPDATE_CHECK_VERSION_LATEST = '10.0.0';
+
+    /**
+     * @var string
+     */
+    const UPDATE_CHECK_VERSION_TIMESTAMP_FILE = '.unicode-normalization/version-check-timestamp';
+
+    /**
+     * Check once per week: 60s * 60min * 24h * 7d.
+     *
+     * @var int
+     */
+    const UPDATE_CHECK_VERSION_INTERVAL = 604800;
 
     /**
      * @param string $version
@@ -147,18 +158,66 @@ EOT;
      *
      * @return string
      */
-    public static function detectLatestVersion()
+    public static function detectLatestVersionOnline()
     {
         $content = file_get_contents(self::UPDATE_CHECK_URL);
         if (false === $content) {
-            throw new \RuntimeException(sprintf('Could not fetch version check url: %s', self::UPDATE_CHECK_URL));
+            throw new \RuntimeException(
+                sprintf('Could not fetch version check url: %s', self::UPDATE_CHECK_URL)
+            );
         }
 
         $matches = null;
         if (!preg_match(self::UPDATE_CHECK_VERSION_PATTERN, $content, $matches)) {
-            throw new \RuntimeException(sprintf('Could not determine version from url: %s', self::UPDATE_CHECK_URL));
+            throw new \RuntimeException(
+                sprintf('Could not determine version from url: %s', self::UPDATE_CHECK_URL)
+            );
         }
 
         return $matches['version'];
+    }
+
+    /**
+     * @param bool $force
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public static function detectLatestVersion($force = false)
+    {
+        $timestampFile = self::UPDATE_CHECK_VERSION_TIMESTAMP_FILE;
+        if (true === $force || !file_exists($timestampFile)) {
+            if ('.' !== ($dir = dirname($timestampFile))) {
+                $fs = new Filesystem();
+                $fs->mkdir($dir);
+            }
+            $version = self::detectLatestVersionOnline();
+            $content = sprintf('|%s|%u|%s' . PHP_EOL, $version, time(), date(DATE_RFC2822));
+            if (false === file_put_contents($timestampFile, $content)) {
+                throw new \RuntimeException(
+                    sprintf('Could write version check timestamp-file: %s', $timestampFile)
+                );
+            }
+
+            return $version;
+        }
+        $content = file_get_contents($timestampFile);
+        if (false === $content) {
+            throw new \RuntimeException(
+                sprintf('Could read version check timestamp-file: %s', $timestampFile)
+            );
+        }
+        $major = $minor = $patch = $timestamp = null;
+        if (4 !== sscanf($content, '|%u.%u.%u|%u|', $major, $minor, $patch, $timestamp)) {
+            throw new \RuntimeException(
+                sprintf('Invalid format of timestamp-file content: %s', $timestampFile)
+            );
+        }
+        if (($timestamp + self::UPDATE_CHECK_VERSION_INTERVAL) < time()) {
+            return self::detectLatestVersion(true);
+        }
+
+        return sprintf('%u.%u.%u', $major, $minor, $patch);
     }
 }

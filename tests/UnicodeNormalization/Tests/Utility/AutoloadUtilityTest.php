@@ -71,7 +71,6 @@ class AutoloadUtilityTest extends AbstractTestCase
      */
     public function testRegisterNormalizerImplementation()
     {
-        // should already be registered by autoloader
         $this->assertTrue(
             AutoloadUtility::registerNormalizerImplementation(),
             'initial registration succeeds'
@@ -121,7 +120,6 @@ class AutoloadUtilityTest extends AbstractTestCase
      */
     public function testRegisterStringValidatorImplementation()
     {
-        // should already be registered by autoloader
         $this->assertTrue(
             AutoloadUtility::registerStringValidatorImplementation(),
             'initial registration succeeds');
@@ -135,6 +133,28 @@ class AutoloadUtilityTest extends AbstractTestCase
             version_compare(PHP_VERSION, '7.0.11', '<'),
             // with buggy php the implementation should inherit the bugfix facade
             is_a($className, StringValidatorBugfix65732::class, true)
+        );
+    }
+
+    /**
+     * @covers ::registerStringValidatorImplementation()
+     *
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     *
+     * @see AutoloadUtility::registerStringValidatorImplementation()
+     */
+    public function testRegisterStringValidatorImplementationBugfix65732()
+    {
+        require_once __DIR__ . '/../Fixtures/AutoloadUtilityTestFixture.php';
+        $this->assertTrue(AutoloadUtility::registerStringValidatorImplementation());
+        $this->assertTrue(
+            is_a(
+                \Sjorek\UnicodeNormalization\Validation\StringValidator::class,
+                StringValidatorBugfix65732::class,
+                true
+            )
         );
     }
 }

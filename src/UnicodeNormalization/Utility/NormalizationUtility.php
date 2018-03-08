@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Utility;
 
 use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
+use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 
 /**
@@ -148,6 +149,21 @@ class NormalizationUtility
     }
 
     /**
+     * @var array
+     *
+     * @see http://source.icu-project.org/repos/icu/trunk/icu4j/main/classes/core/src/com/ibm/icu/util/VersionInfo.java
+     */
+    const MAP_ICU_TO_UNICODE_VERSION = [
+        '49' => '6.1.0',
+        '50' => '6.2.0',
+        '52' => '6.3.0',
+        '54' => '7.0.0',
+        '56' => '8.0.0',
+        '58' => '9.0.0',
+        '60' => '10.0.0',
+    ];
+
+    /**
      * Get the supported unicode version level as version triple ("X.Y.Z").
      *
      * @throws \RuntimeException
@@ -176,22 +192,17 @@ class NormalizationUtility
             }
         }
         if (null !== $icuVersion) {
-            $icuVersion = array_shift(explode('.', $icuVersion));
-            // taken from http://source.icu-project.org/repos/icu/trunk/icu4j/main/classes/core/src/com/ibm/icu/util/VersionInfo.java
-            $icuToUnicodeVersionMap = [
-                '49' => '6.1.0',
-                '50' => '6.2.0',
-                '52' => '6.3.0',
-                '54' => '7.0.0',
-                '56' => '8.0.0',
-                '58' => '9.0.0',
-                '60' => '10.0.0',
-            ];
-            if (isset($icuToUnicodeVersionMap[$icuVersion])) {
-                return $icuToUnicodeVersionMap[$icuVersion];
+            $majorVersion = $minorVersion = null;
+            if (2 !== sscanf($icuVersion, '%u.%u', $majorVersion, $minorVersion)) {
+                throw new \RuntimeException('Could not determine unicode version from ICU version.', 1519488534);
             }
+            if (!isset(self::MAP_ICU_TO_UNICODE_VERSION[$majorVersion])) {
+                throw new \RuntimeException('Could not determine unicode version from ICU version.', 1519488534);
+            }
+
+            return self::MAP_ICU_TO_UNICODE_VERSION[$majorVersion];
         }
-        if (!extension_loaded('intl') && class_exists('Normalizer', true)) {
+        if (class_exists('Normalizer', true) && !is_a('Normalizer', MissingNormalizer::class, true)) {
             // TODO replace hard-coded version with a real detection
             return '7.0.0';
         }

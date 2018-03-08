@@ -63,10 +63,13 @@ EOT;
     if (in_array('-c', $argv, true) || in_array('--check', $argv, true)) {
         $current = Helper\NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST;
         if ($verbose) {
-            echo sprintf('Current unicode version: %s' . PHP_EOL, $current);
-            echo 'Detecting latest unicode version ...' . PHP_EOL;
+            echo sprintf('Latest known unicode version     : %s' . PHP_EOL, $current);
+            echo 'Detecting latest unicode version : ';
         }
         $latest = Helper\NormalizationTestHandler::detectLatestVersion();
+        if ($verbose) {
+            echo sprintf('%s' . PHP_EOL, $latest);
+        }
         if (version_compare($current, $latest, '=')) {
             if ($verbose) {
                 echo 'The current unicode version is up-to-date.' . PHP_EOL;

@@ -17,7 +17,7 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
-use Sjorek\UnicodeNormalization\Tests\Helper\VfsFilesystem;
+use Sjorek\UnicodeNormalization\Tests\Fixtures\VfsFilesystem;
 use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 
 /**
