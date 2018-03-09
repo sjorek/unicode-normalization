@@ -9,7 +9,6 @@ env:
     - COVERAGE=false
     - LINT=false
     - NIGHTLY=false
-    - UPDATE_CHECK_VERSION_TIMESTAMP_FILE=$TRAVIS_BUILD_DIR/.unicode-normalization/version-check-timestamp
 
 matrix:
   include:
@@ -28,41 +27,34 @@ cache:
     - $TRAVIS_BUILD_DIR/.unicode-normalization
 
 install:
-- env
-- if [ -f $UPDATE_CHECK_VERSION_TIMESTAMP_FILE ]; then
-    echo "Unicode Version Check Timestamp => found";
-    cat $UPDATE_CHECK_VERSION_TIMESTAMP_FILE;
-  else
-    echo "Unicode Version Check Timestamp => missing";
-  fi 
 - if [[ ! $COVERAGE = true ]]; then
     phpenv config-rm xdebug.ini || true;
   fi
 - travis_retry composer self-update
 - composer diagnose || true
+- composer validate
+- composer config --list
 - if [[ $NIGHTLY = true ]]; then
     composer remove --dev friendsofphp/php-cs-fixer;
   fi
 - travis_retry composer install --optimize-autoloader --no-interaction
 - composer run:require-native-runtime
 - composer check-platform-reqs
-- composer validate
-- composer config --list
 
 script:
 - if [[ $LINT = true ]]; then
-    composer run:cs-lint;
+    composer -v run:cs-lint;
   fi
 - if [[ $(( $TRAVIS_BUILD_NUMBER % 10 )) = 0 ]]; then
     composer -v run:test-all;
-  elif [[ ! $COVERAGE = true ]]; then
+  elif [[ $COVERAGE = false ]]; then
     composer -v run:test;
   fi
 - if [[ $COVERAGE = true ]]; then
     composer -v run:test-coverage;
   fi
 - if [[ $CHECK_SECURITY = true ]]; then
-    composer run:security-check-bugfix-for-travis;
+    composer -v run:security-check-bugfix-for-travis;
   fi
 
 sudo: false
