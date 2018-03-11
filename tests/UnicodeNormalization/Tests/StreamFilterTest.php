@@ -197,6 +197,7 @@ class StreamFilterTest extends ConformanceTestCase
      *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
@@ -388,6 +389,7 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::filter
      *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
@@ -457,6 +459,7 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::filter
      *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized

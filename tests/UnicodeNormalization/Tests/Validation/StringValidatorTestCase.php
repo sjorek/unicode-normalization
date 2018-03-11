@@ -100,6 +100,7 @@ class StringValidatorTestCase extends ValidationTestCase
      * @covers ::filter
      *
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
@@ -192,6 +193,7 @@ class StringValidatorTestCase extends ValidationTestCase
      * @covers ::isValid
      *
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
      * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
