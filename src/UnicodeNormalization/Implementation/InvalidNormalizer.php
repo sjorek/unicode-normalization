@@ -13,165 +13,165 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Implementation;
 
-use Sjorek\UnicodeNormalization\Exception\InvalidNormalizerImplementation;
+use Sjorek\UnicodeNormalization\Exception\InvalidRuntimeFailure;
 
 /**
  * Normalizer implementation, used if the auto-loading was somehow skipped.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-abstract class InvalidNormalizer implements NormalizerInterface
+final class InvalidNormalizer implements NormalizerInterface
 {
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * @param null|bool|int|string $form [optional] Set normalization form, default: NFC
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function __construct($form = null)
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function getForm()
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function setForm($form)
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function isNormalized($input, $form = null)
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function normalize($input, $form = null)
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function normalizeStringTo($input, $form = null)
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public function normalizeTo($input, $form = null)
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public static function getUnicodeVersion()
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Throw a InvalidNormalizerImplementation as the autoloader was skipped somehow.
+     * Throw a InvalidRuntimeFailure as the autoloader was skipped somehow.
      *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
      *
-     * @throws InvalidNormalizerImplementation
+     * @throws InvalidRuntimeFailure
      *
      * @see \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::register()
      */
     public static function getNormalizationForms()
     {
-        throw self::createInvalidNormalizerImplementationException();
+        throw self::createException();
     }
 
     /**
-     * Creates an InvalidNormalizerImplementation exception, stating that the autoloader should not be skipped.
+     * Creates an InvalidRuntimeFailure exception, stating that the autoloader should not be skipped.
      *
-     * @return InvalidNormalizerImplementation
+     * @return InvalidRuntimeFailure
      */
-    protected static function createInvalidNormalizerImplementationException()
+    private static function createException()
     {
-        return new InvalidNormalizerImplementation(
+        return new InvalidRuntimeFailure(
             'This unicode normalizer implementation is invalid. Do not skip the autoloader!',
             1520071585
         );

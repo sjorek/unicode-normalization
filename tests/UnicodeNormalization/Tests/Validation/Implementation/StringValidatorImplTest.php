@@ -44,7 +44,7 @@ class StringValidatorImplTest extends StringValidatorTestCase
     /**
      * @covers ::__construct
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
      */
     public function testConstruct()
     {
@@ -54,7 +54,7 @@ class StringValidatorImplTest extends StringValidatorTestCase
     /**
      * @covers ::convertStringToUtf8
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      */
     public function testConvertStringToUtf8()

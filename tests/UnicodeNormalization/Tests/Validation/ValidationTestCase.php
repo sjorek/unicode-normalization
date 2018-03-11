@@ -29,13 +29,6 @@ class ValidationTestCase extends NormalizationTestCase
     public static function setUpValidationTestCase()
     {
         static::setUpNormalizationTestCase();
-        if (!class_exists(__NAMESPACE__ . '\\StringValidator', false)) {
-            AutoloadUtility::registerStringValidatorImplementation();
-            class_alias(
-                str_replace('\\Tests', '', __NAMESPACE__) . '\\StringValidator',
-                __NAMESPACE__ . '\\StringValidator',
-                true
-            );
-        }
+        AutoloadUtility::registerStringValidatorImplementation();
     }
 }

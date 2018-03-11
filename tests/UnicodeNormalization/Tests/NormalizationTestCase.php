@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+// DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
+// use Sjorek\UnicodeNormalization\Normalizer;
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
@@ -25,9 +27,24 @@ use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 class NormalizationTestCase extends AbstractTestCase
 {
     /**
-     * @var \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface
+     * @var bool
      */
-    protected $subject;
+    protected static $isStrictImplementation = null;
+
+    /**
+     * @var bool
+     */
+    protected static $isNfdMacCompatible = null;
+
+    /**
+     * @var string
+     */
+    protected static $unicodeVersion = null;
+
+    /**
+     * @var int[]
+     */
+    protected static $normalizationForms = null;
 
     /**
      * This method is called before the first test of this test class is run.
@@ -36,10 +53,38 @@ class NormalizationTestCase extends AbstractTestCase
      */
     public static function setUpNormalizationTestCase()
     {
-        if (!class_exists(__NAMESPACE__ . '\\Normalizer', false)) {
-            AutoloadUtility::registerNormalizerImplementation();
+        AutoloadUtility::registerNormalizerImplementation();
+        if (null === static::$isStrictImplementation) {
+            static::$isStrictImplementation = true;
+        }
+        if (null === static::$isNfdMacCompatible) {
+            static::$isNfdMacCompatible = AutoloadUtility::isNfdMacCompatible();
+        }
+        if (null === static::$unicodeVersion) {
+            static::$unicodeVersion = \Sjorek\UnicodeNormalization\Normalizer::getUnicodeVersion();
+        }
+        if (null === static::$normalizationForms) {
+            static::$normalizationForms = \Sjorek\UnicodeNormalization\Normalizer::getNormalizationForms();
         }
     }
+
+    /**
+     * This method is called after the last test of this test class is run.
+     *
+     * @afterClass
+     */
+    public static function tearDownNormalizationTestCase()
+    {
+        static::$isStrictImplementation = null;
+        static::$isNfdMacCompatible = null;
+        static::$unicodeVersion = null;
+        static::$normalizationForms = null;
+    }
+
+    /**
+     * @var \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface
+     */
+    protected $subject;
 
     /**
      * {@inheritdoc}
@@ -48,7 +93,7 @@ class NormalizationTestCase extends AbstractTestCase
      */
     protected function setUp()
     {
-        $this->subject = new Normalizer();
+        $this->subject = new \Sjorek\UnicodeNormalization\Normalizer();
     }
 
     // ////////////////////////////////////////////////////////////////
@@ -60,12 +105,12 @@ class NormalizationTestCase extends AbstractTestCase
      */
     protected function markTestSkippedIfUnicodeConformanceLevelIsInsufficient($unicodeVersion)
     {
-        if (version_compare($unicodeVersion, static::getUnicodeVersion(), '>')) {
+        if (version_compare($unicodeVersion, static::$unicodeVersion, '>')) {
             $this->markTestSkipped(
                 sprintf(
                     'Skipped test as unicode version %s is higher than the supported unicode conformance level %s.',
                     $unicodeVersion,
-                    static::getUnicodeVersion()
+                    static::$unicodeVersion
                 )
             );
         }
@@ -77,40 +122,18 @@ class NormalizationTestCase extends AbstractTestCase
     protected function markTestSkippedIfNfdMacIsNotSupported($form)
     {
         $form = NormalizationUtility::parseForm($form);
-        if (NormalizerInterface::NFD_MAC === $form &&
-            (
-                !in_array($form, static::getNormalizationForms(), true) ||
-                !NormalizationUtility::isNfdMacCompatible()
-            )
-        ) {
-            $this->markTestSkipped(
-                'Skipped test as "iconv" extension is either not available '
-                . 'or not able to handle "utf-8-mac" charset.'
-            );
+        if (NormalizationForms::NFD_MAC === $form) {
+            if (!in_array($form, static::$normalizationForms, true)) {
+                $this->markTestSkipped(
+                    'Skipped test as the Normalizer-implementation does not support NFD_MAC.'
+                );
+            }
+            if (!static::$isNfdMacCompatible) {
+                $this->markTestSkipped(
+                    'Skipped test as "iconv" extension is either not available '
+                    . 'or not able to handle "utf-8-mac" charset.'
+                );
+            }
         }
-    }
-
-    /**
-     * @return bool
-     */
-    protected static function isStrictImplementation()
-    {
-        return true;
-    }
-
-    /**
-     * @return string
-     */
-    protected static function getUnicodeVersion()
-    {
-        return Normalizer::getUnicodeVersion();
-    }
-
-    /**
-     * @return bool
-     */
-    protected static function getNormalizationForms()
-    {
-        return Normalizer::getNormalizationForms();
     }
 }

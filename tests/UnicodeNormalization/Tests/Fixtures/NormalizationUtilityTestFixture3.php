@@ -11,11 +11,16 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Exception;
+namespace Sjorek\UnicodeNormalization\Utility;
 
 /**
- * Exception for missing or invalid normalizer implementations.
+ * tweaked utility namespace
  */
-class InvalidNormalizerImplementation extends \RuntimeException
+function ob_get_clean()
 {
+    $output = \ob_get_clean();
+    if (false === strpos($output, 'ICU version')) {
+        return $output;
+    }
+    throw new \ReflectionException();
 }

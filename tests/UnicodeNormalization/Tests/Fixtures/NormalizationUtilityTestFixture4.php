@@ -11,13 +11,16 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Validation;
+namespace Sjorek\UnicodeNormalization\Utility;
 
 /**
- * StringValidator implementation (for IDE and to prevent too early auto-loading).
- *
- * @author Stephan Jorek <stephan.jorek@gmail.com>
+ * tweaked utility namespace
  */
-class StringValidator extends \Sjorek\UnicodeNormalization\Validation\StringValidator
+function ob_get_clean()
 {
+    $output = \ob_get_clean();
+    if (false === strpos($output, 'ICU version')) {
+        return $output;
+    }
+    return FAKE_INTL_ICU_VERSION;
 }

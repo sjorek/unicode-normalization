@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
 // DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
-// use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
+// use Sjorek\UnicodeNormalization\Implementation\NormalizerImpl;
 use Sjorek\UnicodeNormalization\Tests\NormalizerTestCase;
 
 /**
  * strict normalizer implementation tests.
  *
- * @coversDefaultClass \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer
+ * @coversDefaultClass \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class StrictNormalizerTest extends NormalizerTestCase
+class NormalizerImplTest_ extends NormalizerTestCase
 {
     /**
      * This method is called before the first test of this test class is run.
@@ -35,8 +35,8 @@ class StrictNormalizerTest extends NormalizerTestCase
     {
         NormalizerTestCase::tearDownNormalizationTestCase();
         NormalizerTestCase::setUpNormalizationTestCase();
-        static::$unicodeVersion = \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::getUnicodeVersion();
-        static::$normalizationForms = \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::getNormalizationForms();
+        static::$unicodeVersion = \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::getUnicodeVersion();
+        static::$normalizationForms = \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::getNormalizationForms();
     }
 
     /**
@@ -46,6 +46,6 @@ class StrictNormalizerTest extends NormalizerTestCase
      */
     protected function setUp()
     {
-        $this->subject = new \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer();
+        $this->subject = new \Sjorek\UnicodeNormalization\Implementation\NormalizerImpl();
     }
 }

@@ -11,13 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests;
+namespace Sjorek\UnicodeNormalization\Exception;
 
 /**
- * Normalizer implementation (for IDE and to prevent too early auto-loading).
- *
- * @author Stephan Jorek <stephan.jorek@gmail.com>
+ * Exception for missing normalizer runtime implementations.
  */
-class Normalizer extends \Sjorek\UnicodeNormalization\Normalizer
+class InvalidRuntimeFailure extends \RuntimeException
 {
 }

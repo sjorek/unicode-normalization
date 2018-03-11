@@ -15,7 +15,7 @@ namespace Sjorek\UnicodeNormalization\Utility;
 
 use Sjorek\UnicodeNormalization\Filesystem\Filesystem;
 use Sjorek\UnicodeNormalization\Filesystem\FilesystemInterface;
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
@@ -74,7 +74,7 @@ class FilesystemUtility
         //       . ".txt"
         //  );
         // Many zeros to align with stuff below … turns into a single 0
-        0000000000000000000000000 => 'c396c3a9c3b6c484c486c5bbc498c486c487c485c5bcc499c3b3ce98d0a9d7a9dd90e0b88be180a4e2929ce38182eab2abe4bda0f0afa084e299a5efb88ee298baefb88e2e747874',
+        000000000000000000000000 => 'c396c3a9c3b6c484c486c5bbc498c486c487c485c5bcc499c3b3ce98d0a9d7a9dd90e0b88be180a4e2929ce38182eab2abe4bda0f0afa084e299a5efb88ee298baefb88e2e747874',
 
         // not normalized $fileName from above partially in NFC, partially in NFD and with special treatments
         // honestly, this filename is completely broken, so maybe this delivers some unexpected results
@@ -84,25 +84,25 @@ class FilesystemUtility
         //                     Normalizer::normalize(mb_substr($fileName, 8, 4), Normalizer::NFD).
         //                     mb_substr($fileName, 12));
         //
-        NormalizerInterface::NONE => 'c396c3a9c3b6c484c486c5bbc498c48663cc8161cca87acc8765cca8c3b3ce98d0a9d7a9dd90e0b88be180a4e2929ce38182eab2abe4bda0f0afa084e299a5efb88ee298baefb88e2e747874',
+        NormalizationForms::NONE => 'c396c3a9c3b6c484c486c5bbc498c48663cc8161cca87acc8765cca8c3b3ce98d0a9d7a9dd90e0b88be180a4e2929ce38182eab2abe4bda0f0afa084e299a5efb88ee298baefb88e2e747874',
 
         // NFC-normalized variant of $fileName from above
         //  php > echo bin2hex(Normalizer::normalize($fileName, Normalizer::NFC));
-        NormalizerInterface::NFC => 'c396c3a9c3b6c484c486c5bbc498c486c487c485c5bcc499c3b3ce98d0a9d7a9dd90e0b88be180a4e2929ce38182eab2abe4bda0e4bda0e299a5efb88ee298baefb88e2e747874',
+        NormalizationForms::NFC => 'c396c3a9c3b6c484c486c5bbc498c486c487c485c5bcc499c3b3ce98d0a9d7a9dd90e0b88be180a4e2929ce38182eab2abe4bda0e4bda0e299a5efb88ee298baefb88e2e747874',
 
         // NFD-normalized variant of $fileName from above
         //  php > echo bin2hex(Normalizer::normalize($fileName, Normalizer::NFD));
-        NormalizerInterface::NFD => '4fcc8865cc816fcc8841cca843cc815acc8745cca843cc8163cc8161cca87acc8765cca86fcc81ce98d0a9d7a9dd90e0b88be180a4e2929ce38182e18480e185a7e186aae4bda0e4bda0e299a5efb88ee298baefb88e2e747874',
+        NormalizationForms::NFD => '4fcc8865cc816fcc8841cca843cc815acc8745cca843cc8163cc8161cca87acc8765cca86fcc81ce98d0a9d7a9dd90e0b88be180a4e2929ce38182e18480e185a7e186aae4bda0e4bda0e299a5efb88ee298baefb88e2e747874',
         // look right for difference to NFD_MAC =>                                                                                                                                 ^^^^^^
 
         // NFD_MAC-normalized variant of $fileName from above, differing from NFD in 3 bytes
         //  php > echo bin2hex(iconv('utf-8', 'utf-8-mac', $fileName));
-        NormalizerInterface::NFD_MAC => '4fcc8865cc816fcc8841cca843cc815acc8745cca843cc8163cc8161cca87acc8765cca86fcc81ce98d0a9d7a9dd90e0b88be180a4e2929ce38182e18480e185a7e186aae4bda0efbfbde299a5efb88ee298baefb88e2e747874',
+        NormalizationForms::NFD_MAC => '4fcc8865cc816fcc8841cca843cc815acc8745cca843cc8163cc8161cca87acc8765cca86fcc81ce98d0a9d7a9dd90e0b88be180a4e2929ce38182e18480e185a7e186aae4bda0efbfbde299a5efb88ee298baefb88e2e747874',
         // look right for difference to plain NFD =>                                                                                                                                   ^^^^^^
 
         // Not supported for file names
-        NormalizerInterface::NFKD => false,
-        NormalizerInterface::NFKC => false,
+        NormalizationForms::NFKD => false,
+        NormalizationForms::NFKC => false,
     ];
 
     /**
@@ -143,12 +143,12 @@ class FilesystemUtility
      * php >      'locale' => true,
      * php >      'shell' => true,
      * php >      'unicode' => [
-     * php >          NormalizerInterface::NONE => false,
-     * php >          NormalizerInterface::NFC => true,
-     * php >          NormalizerInterface::NFD => true,
-     * php >          NormalizerInterface::NFKC => true,
-     * php >          NormalizerInterface::NFKC => true,
-     * php >          NormalizerInterface::NFD_MAC => false,
+     * php >          NormalizationForms::NONE => false,
+     * php >          NormalizationForms::NFC => true,
+     * php >          NormalizationForms::NFD => true,
+     * php >          NormalizationForms::NFKC => true,
+     * php >          NormalizationForms::NFKC => true,
+     * php >          NormalizationForms::NFD_MAC => false,
      * php >      ]
      * php > ]
      * </pre>
@@ -159,24 +159,24 @@ class FilesystemUtility
      * php >      'locale' => true,
      * php >      'shell' => true,
      * php >      'unicode' => [
-     * php >          NormalizerInterface::NONE => false,
-     * php >          NormalizerInterface::NFC => [
+     * php >          NormalizationForms::NONE => false,
+     * php >          NormalizationForms::NFC => [
      * php >              'read' => false,
      * php >              'write' => true,
      * php >          ],
-     * php >          NormalizerInterface::NFD => [
+     * php >          NormalizationForms::NFD => [
      * php >              'read' => false,
      * php >              'write' => true,
      * php >          ],
-     * php >          NormalizerInterface::NFKC => [
+     * php >          NormalizationForms::NFKC => [
      * php >              'read' => false,
      * php >              'write' => false,
      * php >          ],,
-     * php >          NormalizerInterface::NFKC => [
+     * php >          NormalizationForms::NFKC => [
      * php >              'read' => false,
      * php >              'write' => false,
      * php >          ],,
-     * php >          NormalizerInterface::NFD_MAC => [
+     * php >          NormalizationForms::NFD_MAC => [
      * php >              'read' => false,
      * php >              'write' => true,
      * php >          ],
@@ -241,7 +241,7 @@ class FilesystemUtility
             return $capabilities;
         }
 
-        $fileName = hex2bin(self::FILESYSTEM_MODES[NormalizerInterface::NFC]);
+        $fileName = hex2bin(self::FILESYSTEM_MODES[NormalizationForms::NFC]);
         $quote = $isWindows ? '"' : '\'';
 
         // Since PHP 5.6.0 escapeshellarg uses the 'default_charset' on platforms lacking a 'mblen'-implementation

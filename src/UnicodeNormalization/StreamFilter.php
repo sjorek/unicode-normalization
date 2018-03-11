@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization;
 
-use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
+use Sjorek\UnicodeNormalization\Exception\InvalidFormFailure;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
@@ -132,8 +132,6 @@ class StreamFilter extends \php_user_filter
      * {@inheritdoc}
      *
      * @see \php_user_filter::onCreate()
-     *
-     * @throws \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
      */
     public function onCreate()
     {
@@ -157,7 +155,7 @@ class StreamFilter extends \php_user_filter
                     return true;
                 }
             }
-        } catch (InvalidNormalizationForm $e) {
+        } catch (InvalidFormFailure $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
         }
 

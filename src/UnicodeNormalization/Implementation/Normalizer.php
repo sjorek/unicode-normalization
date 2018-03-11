@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Implementation;
 
-use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
+use Sjorek\UnicodeNormalization\Exception\InvalidFormFailure;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
@@ -38,21 +38,8 @@ use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
-class BaseNormalizer implements NormalizerInterface
+class Normalizer implements NormalizerInterface
 {
-    /**
-     * Array of supported normalization forms.
-     *
-     * @var int[]
-     */
-    const NORMALIZATION_FORMS = [
-        self::NONE,
-        self::NFD,
-        self::NFKD,
-        self::NFC,
-        self::NFKC,
-    ];
-
     /**
      * NONE or one of the five unicode normalization forms NFC, NFD, NFKC, NFKD or NFD_MAC.
      *
@@ -103,64 +90,9 @@ class BaseNormalizer implements NormalizerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @see NormalizerInterface::normalize()
-     */
-    public function normalize($input, $form = null)
-    {
-        $form = $this->getFormArgument($form);
-        $result = \Normalizer::normalize($input, $form);
-
-        // Depending on the underlying implementation the result may also be false!
-        return (false !== $result) ? $result : null;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see NormalizerInterface::isNormalized()
-     */
-    public function isNormalized($input, $form = null)
-    {
-        $form = $this->getFormArgument($form);
-
-        return \Normalizer::isNormalized($input, $form);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see NormalizerInterface::normalizeTo()
-     */
-    public function normalizeTo($input, $form = null)
-    {
-        if ($this->isNormalized($input, $form)) {
-            return $input;
-        }
-
-        return $this->normalize($input, $form);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see NormalizerInterface::normalizeStringTo()
-     */
-    public function normalizeStringTo($input, $form = null)
-    {
-        $form = $this->getFormArgument($form);
-        if (self::NONE < $form) {
-            return $this->normalizeTo($input, $form);
-        }
-
-        return $input;
-    }
-
-    /**
      * @param null|int $form
      *
-     * @throws InvalidNormalizationForm
+     * @throws InvalidFormFailure
      *
      * @return int
      */
@@ -173,9 +105,89 @@ class BaseNormalizer implements NormalizerInterface
         if (in_array($form, static::NORMALIZATION_FORMS, true)) {
             return $form;
         }
-        throw new InvalidNormalizationForm(
+        throw new InvalidFormFailure(
             sprintf('Unsupported unicode-normalization form: %s.', $form), 1398603948
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see NormalizerInterface::normalize()
+     */
+    public function normalize($input, $form = null)
+    {
+        return static::callNormalize($input, $this->getFormArgument($form));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see NormalizerInterface::isNormalized()
+     */
+    public function isNormalized($input, $form = null)
+    {
+        return static::callIsNormalized($input, $this->getFormArgument($form));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see NormalizerInterface::normalizeTo()
+     */
+    public function normalizeTo($input, $form = null)
+    {
+        $form = $this->getFormArgument($form);
+        if (static::callIsNormalized($input, $form)) {
+            return $input;
+        }
+
+        return static::callNormalize($input, $form);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see NormalizerInterface::normalizeStringTo()
+     */
+    public function normalizeStringTo($input, $form = null)
+    {
+        $form = $this->getFormArgument($form);
+        if (self::NONE < $form && !static::callIsNormalized($input, $form)) {
+            return static::callNormalize($input, $form);
+        }
+
+        return $input;
+    }
+
+    /**
+     * Normalizes the input provided and returns the normalized string.
+     *
+     * @param string $input The input string to normalize
+     * @param int    $form  [optional] One of the normalization forms
+     *
+     * @return string the normalized string or false if an error occurred
+     *
+     * @see http://php.net/manual/en/normalizer.normalize.php
+     */
+    protected static function callNormalize($input, $form)
+    {
+        return \Normalizer::normalize($input, $form);
+    }
+
+    /**
+     * Checks if the provided string is already in the specified normalization form.
+     *
+     * @param string $input The input string to normalize
+     * @param int    $form  [optional] One of the normalization forms
+     *
+     * @return bool true if normalized, false otherwise or if there an error
+     *
+     * @see http://php.net/manual/en/normalizer.isnormalized.php
+     */
+    protected static function callIsNormalized($input, $form)
+    {
+        return \Normalizer::isNormalized($input, $form);
     }
 
     protected static $unicodeVersion = null;
@@ -187,11 +199,11 @@ class BaseNormalizer implements NormalizerInterface
      */
     public static function getUnicodeVersion()
     {
-        if (null === self::$unicodeVersion) {
-            return self::$unicodeVersion = NormalizationUtility::detectUnicodeVersion();
+        if (null === static::$unicodeVersion) {
+            return static::$unicodeVersion = NormalizationUtility::detectUnicodeVersion();
         }
 
-        return self::$unicodeVersion;
+        return static::$unicodeVersion;
     }
 
     /**

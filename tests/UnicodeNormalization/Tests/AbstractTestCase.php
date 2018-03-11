@@ -85,17 +85,17 @@ class AbstractTestCase extends TestCase
      *
      * @see \debug_backtrace()
      */
-    protected function trace($options = DEBUG_BACKTRACE_IGNORE_ARGS, $limit = 0)
+    protected static function trace($options = DEBUG_BACKTRACE_IGNORE_ARGS, $limit = 0)
     {
         $trace = debug_backtrace($options, $limit);
         array_shift($trace);
-        $this->debug($trace);
+        static::debug($trace);
     }
 
     /**
      * @param mixed $payload
      */
-    protected function debug($payload)
+    protected static function debug($payload)
     {
         $result = file_put_contents(
             'phpunit-debug.log',

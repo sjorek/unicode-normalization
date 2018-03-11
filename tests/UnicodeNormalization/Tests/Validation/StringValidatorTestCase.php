@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Validation;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+// DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
+// use Sjorek\UnicodeNormalization\Validation\StringValidator;
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 
 /**
  * @author Stephan Jorek <stephan.jorek@gmail.com>
@@ -21,7 +23,7 @@ use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 class StringValidatorTestCase extends ValidationTestCase
 {
     /**
-     * @var StringValidator
+     * @var \Sjorek\UnicodeNormalization\Validation\StringValidator
      */
     protected $subject;
 
@@ -32,7 +34,7 @@ class StringValidatorTestCase extends ValidationTestCase
      */
     protected function setUp()
     {
-        $this->subject = new StringValidator();
+        $this->subject = new \Sjorek\UnicodeNormalization\Validation\StringValidator();
     }
 
     // ///////////////////////////////////////
@@ -54,10 +56,10 @@ class StringValidatorTestCase extends ValidationTestCase
         // A number guaranteed to be random as specified by RFC 1149.5
         $number = '4';
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
 
-        $leading_combinator = StringValidator::LEADING_COMBINATOR;
+        $leading_combinator = \Sjorek\UnicodeNormalization\Validation\StringValidator::LEADING_COMBINATOR;
 
         return [
             'ISO-8859-1 string is same as UTF8-NFC string without normalization' => [
@@ -97,16 +99,19 @@ class StringValidatorTestCase extends ValidationTestCase
     /**
      * @covers ::filter
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
@@ -152,8 +157,8 @@ class StringValidatorTestCase extends ValidationTestCase
         // A number guaranteed to be random as specified by RFC 1149.5
         $number = '4';
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
 
         return [
             'ISO-8859-1 string is not well-formed UTF8 without normalization' => [
@@ -186,16 +191,19 @@ class StringValidatorTestCase extends ValidationTestCase
     /**
      * @covers ::isValid
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732::filter
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct

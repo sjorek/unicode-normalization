@@ -16,6 +16,6 @@ namespace Sjorek\UnicodeNormalization\Exception;
 /**
  * Exception for invalid or unknown normalization form values.
  */
-class InvalidNormalizationForm extends \InvalidArgumentException
+class InvalidFormFailure extends \InvalidArgumentException
 {
 }

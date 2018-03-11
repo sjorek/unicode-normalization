@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Implementation;
 
+// DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
+// use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Tests\NormalizerTestCase;
 
 /**
- * Normalizer tests.
+ * mac normalizer implementation tests.
  *
  * @coversDefaultClass \Sjorek\UnicodeNormalization\Implementation\MacNormalizer
  *
@@ -25,28 +27,25 @@ use Sjorek\UnicodeNormalization\Tests\NormalizerTestCase;
 class MacNormalizerTest extends NormalizerTestCase
 {
     /**
+     * This method is called before the first test of this test class is run.
+     *
+     * @beforeClass
+     */
+    public static function setUpNormalizationTestCase()
+    {
+        NormalizerTestCase::tearDownNormalizationTestCase();
+        NormalizerTestCase::setUpNormalizationTestCase();
+        static::$unicodeVersion = \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::getUnicodeVersion();
+        static::$normalizationForms = \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::getNormalizationForms();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @see \PHPUnit\Framework\TestCase::setUp()
      */
     protected function setUp()
     {
-        $this->subject = new MacNormalizer();
-    }
-
-    /**
-     * @return string
-     */
-    protected static function getUnicodeVersion()
-    {
-        return MacNormalizer::getUnicodeVersion();
-    }
-
-    /**
-     * @return bool
-     */
-    protected static function getNormalizationForms()
-    {
-        return MacNormalizer::getNormalizationForms();
+        $this->subject = new \Sjorek\UnicodeNormalization\Implementation\MacNormalizer();
     }
 }

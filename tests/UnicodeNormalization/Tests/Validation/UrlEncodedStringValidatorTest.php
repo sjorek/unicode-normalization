@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Validation;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+// DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
+// use Sjorek\UnicodeNormalization\Validation\StringValidator;
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Sjorek\UnicodeNormalization\Validation\UrlEncodedStringValidator;
 
 /**
@@ -43,12 +45,14 @@ class UrlEncodedStringValidatorTest extends ValidationTestCase
     /**
      * @covers ::__construct
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      */
     public function testConstruct()
     {
-        $this->assertAttributeInstanceOf(StringValidator::class, 'stringValidator', $this->subject);
+        $this->assertAttributeInstanceOf(
+            \Sjorek\UnicodeNormalization\Validation\StringValidator::class, 'stringValidator', $this->subject
+        );
     }
 
     // ////////////////////////////////////
@@ -68,10 +72,10 @@ class UrlEncodedStringValidatorTest extends ValidationTestCase
         // é
         $utf8_nfd_without_leading_combinator = substr($utf8_nfd, 1);
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
 
-        $leading_combinator = StringValidator::LEADING_COMBINATOR;
+        $leading_combinator = \Sjorek\UnicodeNormalization\Validation\StringValidator::LEADING_COMBINATOR;
 
         return [
             'empty uri returns early' => [
@@ -130,14 +134,18 @@ class UrlEncodedStringValidatorTest extends ValidationTestCase
     /**
      * @covers ::filter
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
@@ -172,8 +180,8 @@ class UrlEncodedStringValidatorTest extends ValidationTestCase
         // é
         $utf8_nfd_without_leading_combinator = substr($utf8_nfd, 1);
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
 
         return [
             'url-encoded ISO-8859-1 uri is not a valid UTF8-NFC uri without normalization' => [
@@ -218,14 +226,18 @@ class UrlEncodedStringValidatorTest extends ValidationTestCase
     /**
      * @covers ::isValid
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8

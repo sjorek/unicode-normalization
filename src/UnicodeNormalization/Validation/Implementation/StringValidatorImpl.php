@@ -69,7 +69,7 @@ class StringValidatorImpl
     {
         if (1 === preg_match('/[\x80-\xFF]/', $input) || 1 !== preg_match('//u', $input)) {
             $normalized = $this->normalizer->normalizeStringTo($input, $form);
-            if (isset($normalized[0]) && preg_match('//u', $normalized)) {
+            if (false !== $normalized && isset($normalized[0]) && preg_match('//u', $normalized)) {
                 $input = $normalized;
             } elseif (false === ($input = $this->convertStringToUtf8($input, $charset))) {
                 return false;
@@ -105,13 +105,10 @@ class StringValidatorImpl
      */
     protected function convertStringToUtf8($input, $charset = null)
     {
-        if (null === $charset && 'UTF-8' === ($charset = mb_detect_encoding($input))) {
-            $charset = 'ISO-8859-1';
-        }
-        if (false !== $charset) {
-            return mb_convert_encoding($input, 'UTF-8', $charset);
+        if (null === $charset && false === ($charset = mb_detect_encoding($input))) {
+            return false;
         }
 
-        return false;
+        return mb_convert_encoding($input, 'UTF-8', 'UTF-8' === strtoupper($charset) ? 'ISO-8859-1' : $charset);
     }
 }

@@ -15,6 +15,7 @@ namespace Sjorek\UnicodeNormalization\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
+use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
 
 /**
  * Runtime tests.
@@ -41,7 +42,7 @@ class RuntimeTest extends TestCase
      * @group runtime
      * @coversNothing
      */
-    public function testImplementationIsSymfony()
+    public function testRuntimeIsSymfony()
     {
         $this->assertFalse(extension_loaded('intl'));
         $this->assertTrue(ConfigurationHandler::isPolyfillImplementation());
@@ -53,10 +54,24 @@ class RuntimeTest extends TestCase
      * @group runtime
      * @coversNothing
      */
-    public function testImplementationIsPatchwork()
+    public function testRuntimeIsPatchwork()
     {
         $this->assertFalse(extension_loaded('intl'));
         $this->assertTrue(ConfigurationHandler::isPolyfillImplementation());
         $this->assertTrue(is_a('Normalizer', ConfigurationHandler::PATCHWORK_IMPLEMENTATION, true));
+    }
+
+    /**
+     * @group native
+     * @group symfony
+     * @group patchwork
+     * @group runtime
+     * @coversNothing
+     */
+    public function testKnownUnicodeVersionIsUpToDate()
+    {
+        $localVersion = NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST;
+        $latestVersion = NormalizationTestHandler::detectLatestVersion();
+        $this->assertTrue(version_compare($localVersion, $latestVersion, '='));
     }
 }

@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
-use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
+use Sjorek\UnicodeNormalization\Exception\FeatureDetectionFailure;
+use Sjorek\UnicodeNormalization\Exception\InvalidFormFailure;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
 use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Tests\Helper\NormalizationTestHandler;
-use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
 use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 
 /**
@@ -95,55 +95,13 @@ class NormalizationUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::parseForm()
-     * @expectedException        \Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm
-     * @expectedExceptionMessage Invalid unicode normalization form value: nonsense
-     * @expectedExceptionCode    1398603947
      */
-    public function testParseFormThrowsInvalidNormalizationFormException()
+    public function testParseFormThrowsInvalidFormFailure()
     {
+        $this->expectException(InvalidFormFailure::class);
+        $this->expectExceptionMessage('Invalid unicode normalization form value: nonsense');
+        $this->expectExceptionCode(1398603947);
         NormalizationUtility::parseForm('nonsense');
-    }
-
-    // ///////////////////////////////////////////////////
-    // Tests concerning implementation capabilities
-    // ///////////////////////////////////////////////////
-
-    /**
-     * @covers ::isNfdMacCompatible()
-     */
-    public function testIsNfdMacCompatible()
-    {
-        $expected = extension_loaded('iconv');
-        if ($expected) {
-            $level = error_reporting();
-            error_reporting(E_ALL);
-            set_error_handler(
-                function ($errno, $errstr, $errfile, $errline) use (&$expected) {
-                    $message = 'iconv(): Wrong charset';
-                    if ($message === substr($errstr, 0, strlen($message))) {
-                        $expected = false;
-                    }
-                },
-                E_ALL
-            );
-            iconv('utf-8', 'utf-8-mac', 'xxx');
-            restore_error_handler();
-            error_reporting($level);
-        }
-        $this->assertSame($expected, NormalizationUtility::isNfdMacCompatible());
-    }
-
-    /**
-     * @covers ::isStrictImplementation()
-     */
-    public function testIsStrictImplementation()
-    {
-        $isStrict = NormalizationUtility::isStrictImplementation();
-        if (ConfigurationHandler::isPolyfillImplementation()) {
-            $this->assertFalse($isStrict);
-        } else {
-            $this->assertTrue($isStrict);
-        }
     }
 
     // ///////////////////////////////////////////////////
@@ -161,11 +119,8 @@ class NormalizationUtilityTest extends AbstractTestCase
         if (ConfigurationHandler::isPolyfillImplementation()) {
             $this->assertSame('7.0.0', $unicodeVersion);
         }
-        $localVersion = NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST;
-        $latestVersion = NormalizationTestHandler::detectLatestVersion();
-        $this->assertTrue(version_compare($unicodeVersion, $localVersion, '<='));
+        $latestVersion = NormalizationTestHandler::UPDATE_CHECK_VERSION_LATEST;
         $this->assertTrue(version_compare($unicodeVersion, $latestVersion, '<='));
-        $this->assertTrue(version_compare($localVersion, $latestVersion, '='));
     }
 
     /**
@@ -189,7 +144,7 @@ class NormalizationUtilityTest extends AbstractTestCase
     public function testDetectUnicodeVersionByIntlIcuVersionConstant()
     {
         if (!defined('INTL_ICU_VERSION')) {
-            $this->markTestSkipped('Skipped test as "INTL_ICU_VERSION" is not defined.');
+            define('INTL_ICU_VERSION', '60.0');
         }
         require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture1.php';
         $this->testDetectUnicodeVersion();
@@ -215,15 +170,64 @@ class NormalizationUtilityTest extends AbstractTestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testDetectUnicodeVersionThrowsRuntimeExceptionIfImplementationisMissing()
+    public function testDetectUnicodeVersionByParsingIntlExtensionInfoWithFailure()
     {
-        $this->assertTrue(AutoloadUtility::registerNormalizerImplementation());
-        // Use the autoloader here !
-        if (class_exists('Normalizer', true) && is_a('Normalizer', MissingNormalizer::class, true)) {
-            $this->expectException(\RuntimeException::class);
-            $this->expectExceptionCode(1519488534);
-            $this->expectExceptionMessage('Could not determine unicode version.');
-            NormalizationUtility::detectUnicodeVersion();
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('Skipped test as "intl"-extension is not loaded.');
         }
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture1.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture2.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture3.php';
+        $this->testDetectUnicodeVersion();
+    }
+
+    /**
+     * @covers ::detectUnicodeVersion()
+     * @testWith ["", "empty version"]
+     *           ["0.0", "unknown version"]
+     *           ["x.y", "invalid version"]
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     *
+     * @param mixed $version
+     */
+    public function testDetectUnicodeVersionThrowsFeatureDetectionFailureForInvalidIcuVersion($version)
+    {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('Skipped test as "intl"-extension is not loaded.');
+        }
+        define('FAKE_INTL_ICU_VERSION', sprintf('ICU version => %s', $version));
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture1.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture2.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture4.php';
+        $this->expectFeatureDetectionFailure('Could not determine unicode version from ICU version.', 1519488536);
+        NormalizationUtility::detectUnicodeVersion();
+    }
+
+    /**
+     * @covers ::detectUnicodeVersion()
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testDetectUnicodeVersionThrowsFeatureDetectionFailureIfImplementationisMissing()
+    {
+        define('FAKE_INTL_ICU_VERSION', '');
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture1.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture2.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture4.php';
+        require_once __DIR__ . '/../Fixtures/NormalizationUtilityTestFixture5.php';
+        $this->expectFeatureDetectionFailure('Could not determine unicode version.', 1519488534);
+        NormalizationUtility::detectUnicodeVersion();
+    }
+
+    /**
+     * @param string $message
+     * @param int    $code
+     */
+    protected function expectFeatureDetectionFailure($message, $code)
+    {
+        $this->expectException(FeatureDetectionFailure::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode($code);
     }
 }

@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
+// DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
+// use Sjorek\UnicodeNormalization\Normalizer;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\Error\Warning;
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Sjorek\UnicodeNormalization\StreamFilter;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
@@ -123,67 +125,67 @@ class StreamFilterTest extends ConformanceTestCase
 
         $data = [
             'return false on zero length string' => [
-                false, NormalizerInterface::NONE, '', 1,
+                false, NormalizationForms::NONE, '', 1,
             ],
             'return false on zero length value' => [
-                false, NormalizerInterface::NONE, 'x', 0,
+                false, NormalizationForms::NONE, 'x', 0,
             ],
             'return false on on invalid initial byte' => [
-                false, NormalizerInterface::NONE, substr('ä', 1) . 'a', 1,
+                false, NormalizationForms::NONE, substr('ä', 1) . 'a', 1,
             ],
             'return false on invalid byte' => [
-                false, NormalizerInterface::NONE, $string . chr(0b11111111), 11,
+                false, NormalizationForms::NONE, $string . chr(0b11111111), 11,
             ],
             'pass through' => [
-                ['äa', 2], NormalizerInterface::NONE, 'äa', 2,
+                ['äa', 2], NormalizationForms::NONE, 'äa', 2,
             ],
             'normalize NFC to NFC' => [
-                [$s_nfc, $l_nfc], NormalizerInterface::NFC, $s_nfc, $l_nfc,
+                [$s_nfc, $l_nfc], NormalizationForms::NFC, $s_nfc, $l_nfc,
             ],
             'normalize NFD to NFC' => [
-                [$s_nfc, $l_nfd], NormalizerInterface::NFC, $s_nfd, $l_nfd,
+                [$s_nfc, $l_nfd], NormalizationForms::NFC, $s_nfd, $l_nfd,
             ],
             'normalize NFKC to NFC' => [
-                [$s_nfkc, $l_nfkc], NormalizerInterface::NFC, $s_nfkc, $l_nfkc,
+                [$s_nfkc, $l_nfkc], NormalizationForms::NFC, $s_nfkc, $l_nfkc,
             ],
             'normalize NFKD to NFC' => [
-                [$s_nfkc, $l_nfkd], NormalizerInterface::NFC, $s_nfkd, $l_nfkd,
+                [$s_nfkc, $l_nfkd], NormalizationForms::NFC, $s_nfkd, $l_nfkd,
             ],
             'normalize NFC to NFD_MAC' => [
-                [$s_mac, $l_nfc], NormalizerInterface::NFD_MAC, $s_nfc, $l_nfc,
+                [$s_mac, $l_nfc], NormalizationForms::NFD_MAC, $s_nfc, $l_nfc,
             ],
             'normalize NFD_MAC to NFC' => [
-                [$s_nfc, $l_mac], NormalizerInterface::NFC, $s_mac, $l_mac,
+                [$s_nfc, $l_mac], NormalizationForms::NFC, $s_mac, $l_mac,
             ],
             'process single byte' => [
-                [substr($string, 0, 1), 1], NormalizerInterface::NONE, substr($string, 0, 1), 1,
+                [substr($string, 0, 1), 1], NormalizationForms::NONE, substr($string, 0, 1), 1,
             ],
             'process partial double byte' => [
-                [substr($string, 0, 1), 1], NormalizerInterface::NONE, substr($string, 0, 2), 2,
+                [substr($string, 0, 1), 1], NormalizationForms::NONE, substr($string, 0, 2), 2,
             ],
             'process double byte' => [
-                [substr($string, 0, 3), 3], NormalizerInterface::NONE, substr($string, 0, 3), 3,
+                [substr($string, 0, 3), 3], NormalizationForms::NONE, substr($string, 0, 3), 3,
             ],
             'process partial triple byte' => [
-                [substr($string, 0, 3), 3], NormalizerInterface::NONE, substr($string, 0, 4), 4,
+                [substr($string, 0, 3), 3], NormalizationForms::NONE, substr($string, 0, 4), 4,
             ],
             'process partial triple byte with one trailing payload byte' => [
-                [substr($string, 0, 3), 3], NormalizerInterface::NONE, substr($string, 0, 5), 5,
+                [substr($string, 0, 3), 3], NormalizationForms::NONE, substr($string, 0, 5), 5,
             ],
             'process triple byte' => [
-                [substr($string, 0, 6), 6], NormalizerInterface::NONE, substr($string, 0, 6), 6,
+                [substr($string, 0, 6), 6], NormalizationForms::NONE, substr($string, 0, 6), 6,
             ],
             'process partial quad byte' => [
-                [substr($string, 0, 6), 6], NormalizerInterface::NONE, substr($string, 0, 7), 7,
+                [substr($string, 0, 6), 6], NormalizationForms::NONE, substr($string, 0, 7), 7,
             ],
             'process partial quad byte with one trailing payload byte' => [
-                [substr($string, 0, 6), 6], NormalizerInterface::NONE, substr($string, 0, 8), 8,
+                [substr($string, 0, 6), 6], NormalizationForms::NONE, substr($string, 0, 8), 8,
             ],
             'process partial quad byte with two trailing payload bytes' => [
-                [substr($string, 0, 6), 6], NormalizerInterface::NONE, substr($string, 0, 9), 9,
+                [substr($string, 0, 6), 6], NormalizationForms::NONE, substr($string, 0, 9), 9,
             ],
             'process quad byte' => [
-                [substr($string, 0, 10), 10], NormalizerInterface::NONE, $string, 10,
+                [substr($string, 0, 10), 10], NormalizationForms::NONE, $string, 10,
             ],
         ];
 
@@ -194,18 +196,20 @@ class StreamFilterTest extends ConformanceTestCase
      * @covers ::processStringFragment
      *
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::setForm
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::setForm
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestProcessStringFragmentData
      *
@@ -223,7 +227,7 @@ class StreamFilterTest extends ConformanceTestCase
             $fragment,
             $size,
             /* @see NormalizationTestCase::setUpNormalizationTestCase() */
-            new Normalizer($form)
+            new \Sjorek\UnicodeNormalization\Normalizer($form)
         );
         if (false === $expected) {
             $this->assertFalse($actual);
@@ -283,8 +287,8 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::onCreate
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getForm
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getForm
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @testWith    [null, "without normalization form value"]
@@ -384,20 +388,22 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::filter
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestFilterWithParameterData
      *
@@ -422,22 +428,22 @@ class StreamFilterTest extends ConformanceTestCase
             function ($arguments) {
                 list($expected, $form, $fragment) = $arguments;
                 switch ($form) {
-                    case NormalizerInterface::NONE:
+                    case NormalizationForms::NONE:
                         $form = 'none';
                         break;
-                    case NormalizerInterface::NFC:
+                    case NormalizationForms::NFC:
                         $form = 'nfc';
                         break;
-                    case NormalizerInterface::NFD:
+                    case NormalizationForms::NFD:
                         $form = 'nfd';
                         break;
-                    case NormalizerInterface::NFKC:
+                    case NormalizationForms::NFKC:
                         $form = 'nfkc';
                         break;
-                    case NormalizerInterface::NFKD:
+                    case NormalizationForms::NFKD:
                         $form = 'nfkd';
                         break;
-                    case NormalizerInterface::NFD_MAC:
+                    case NormalizationForms::NFD_MAC:
                         $form = 'mac';
                         break;
                 }
@@ -451,20 +457,22 @@ class StreamFilterTest extends ConformanceTestCase
     /**
      * @covers ::filter
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::getCodePointSize
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::onCreate
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::processStringFragment
      * @uses \Sjorek\UnicodeNormalization\StreamFilter::register
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestFilterWithNamespaceData
      *

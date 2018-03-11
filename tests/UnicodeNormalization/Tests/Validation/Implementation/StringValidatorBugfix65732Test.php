@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Validation\Implementation;
 
-use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Sjorek\UnicodeNormalization\Tests\Validation\StringValidatorTestCase;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732;
 
@@ -54,8 +54,8 @@ class StringValidatorBugfix65732Test extends StringValidatorTestCase
         // Test https://bugs.php.net/65732
         $bugs_65732 = "\n\r" . $utf8_nfc . "\n\r";
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
 
         return [
             'test bug https://bugs.php.net/65732 without normalization' => [
@@ -70,17 +70,20 @@ class StringValidatorBugfix65732Test extends StringValidatorTestCase
     /**
      * @covers ::filter
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::filter
@@ -111,8 +114,8 @@ class StringValidatorBugfix65732Test extends StringValidatorTestCase
         // Test https://bugs.php.net/65732
         $bugs_65732 = "\n\r" . $utf8_nfc . "\n\r";
 
-        $f_NONE = NormalizerInterface::NONE;
-        $f_NFC = NormalizerInterface::NFC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
 
         return [
             'test bug https://bugs.php.net/65732 without normalization' => [
@@ -127,17 +130,20 @@ class StringValidatorBugfix65732Test extends StringValidatorTestCase
     /**
      * @covers ::isValid
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeStringTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeStringTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732::filter
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::__construct
      * @uses \Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl::convertStringToUtf8

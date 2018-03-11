@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace Sjorek\UnicodeNormalization\Tests\Utility;
 
 use Sjorek\UnicodeNormalization\Implementation\InvalidNormalizer;
-use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
+// DO NOT USE HERE, TO PREVENT TOO EARLY AUTOLOADING
+// use Sjorek\UnicodeNormalization\Implementation\MacNormalizer;
 use Sjorek\UnicodeNormalization\Implementation\StrictNormalizer;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
+use Sjorek\UnicodeNormalization\Tests\Helper\ConfigurationHandler;
 use Sjorek\UnicodeNormalization\Utility\AutoloadUtility;
-use Sjorek\UnicodeNormalization\Utility\NormalizationUtility;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorBugfix65732;
 use Sjorek\UnicodeNormalization\Validation\Implementation\StringValidatorImpl;
 
@@ -62,8 +63,8 @@ class AutoloadUtilityTest extends AbstractTestCase
      * @covers ::registerNormalizerImplementation()
      *
      * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::getRootNamespace
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isStrictImplementation
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::isNfdMacCompatible
+     * @uses \Sjorek\UnicodeNormalization\Utility\AutoloadUtility::isStrictImplementation
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      *
@@ -81,11 +82,11 @@ class AutoloadUtilityTest extends AbstractTestCase
         );
         $className = \Sjorek\UnicodeNormalization\Normalizer::class;
         $this->assertSame(
-            NormalizationUtility::isNfdMacCompatible(),
-            is_a($className, MacNormalizer::class, true)
+            AutoloadUtility::isNfdMacCompatible(),
+            is_a($className, \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::class, true)
         );
         $this->assertSame(
-            NormalizationUtility::isStrictImplementation(),
+            AutoloadUtility::isStrictImplementation(),
             // strict implementations should not inherit the strict-enforcing facade
             !is_a($className, StrictNormalizer::class, true)
         );
@@ -103,9 +104,6 @@ class AutoloadUtilityTest extends AbstractTestCase
         );
         $this->assertTrue(
             is_a(\Sjorek\UnicodeNormalization\Implementation\NormalizerImpl::class, InvalidNormalizer::class, true)
-        );
-        $this->assertTrue(
-            is_a(\Sjorek\UnicodeNormalization\Implementation\MacNormalizer::class, InvalidNormalizer::class, true)
         );
     }
 
@@ -156,5 +154,47 @@ class AutoloadUtilityTest extends AbstractTestCase
                 true
             )
         );
+    }
+
+    // ///////////////////////////////////////////////////
+    // Tests concerning implementation capabilities
+    // ///////////////////////////////////////////////////
+
+    /**
+     * @covers ::isNfdMacCompatible()
+     */
+    public function testIsNfdMacCompatible()
+    {
+        $expected = extension_loaded('iconv');
+        if ($expected) {
+            $level = error_reporting();
+            error_reporting(E_ALL);
+            set_error_handler(
+                function ($errno, $errstr, $errfile, $errline) use (&$expected) {
+                    $message = 'iconv(): Wrong charset';
+                    if ($message === substr($errstr, 0, strlen($message))) {
+                        $expected = false;
+                    }
+                },
+                E_ALL
+            );
+            iconv('utf-8', 'utf-8-mac', 'xxx');
+            restore_error_handler();
+            error_reporting($level);
+        }
+        $this->assertSame($expected, AutoloadUtility::isNfdMacCompatible());
+    }
+
+    /**
+     * @covers ::isStrictImplementation()
+     */
+    public function testIsStrictImplementation()
+    {
+        $isStrict = AutoloadUtility::isStrictImplementation();
+        if (ConfigurationHandler::isPolyfillImplementation()) {
+            $this->assertFalse($isStrict);
+        } else {
+            $this->assertTrue($isStrict);
+        }
     }
 }

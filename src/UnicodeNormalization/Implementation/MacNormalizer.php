@@ -16,7 +16,7 @@ namespace Sjorek\UnicodeNormalization\Implementation;
 /**
  * Class for normalizing unicode, supporting a special normalization form NFD_MAC.
  *
- * @see NormalizerInterface::NFD_MAC
+ * @see NormalizationForms::NFD_MAC
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
  */
@@ -39,47 +39,29 @@ class MacNormalizer extends NormalizerImpl
     /**
      * {@inheritdoc}
      *
-     * @see \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize()
+     * @see Normalizer::callNormalize()
      */
-    public function normalize($input, $form = null)
+    protected static function callNormalize($input, $form)
     {
-        $form = $this->getFormArgument($form);
         if (self::NFD_MAC !== $form) {
-            return parent::normalize($input, $form);
+            return \Normalizer::normalize($input, $form);
         }
-        if ("\xFF" === $input) {
-            return null;
-        }
-        // Empty string or plain ASCII is always valid for all forms, let it through.
-        if ('' === $input || !preg_match('/[\x80-\xFF]/', $input)) {
-            return $input;
-        }
-        $result = parent::normalize($input, self::NFD);
-        if (null !== $result) {
-            $result = iconv('utf-8', 'utf-8-mac', $result);
-        }
+        $input = \Normalizer::normalize($input, self::NFD);
 
-        return false !== $result ? $result : null;
+        return false !== $input ? iconv('utf-8', 'utf-8-mac', $input) : false;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @see \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized()
+     * @see Normalizer::callIsNormalized()
      */
-    public function isNormalized($input, $form = null)
+    protected static function callIsNormalized($input, $form)
     {
-        $form = $this->getFormArgument($form);
         if (self::NFD_MAC !== $form) {
-            return parent::isNormalized($input, $form);
+            return NormalizerImpl::callIsNormalized($input, $form);
         }
-        if ('' === $input) {
-            return true;
-        }
-        $result = parent::normalize($input, self::NFD);
-
         // Having no cheap check here, forces us to do a full equality-check here.
-        // As we just want it to use for file names, this full check should be ok.
-        return null !== $result ? $input === iconv('utf-8', 'utf-8-mac', $result) : false;
+        return self::NONE !== $form && $input === static::callNormalize($input, $form);
     }
 }

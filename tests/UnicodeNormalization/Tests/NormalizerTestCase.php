@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests;
 
+use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 
 /**
@@ -29,8 +30,8 @@ class NormalizerTestCase extends ConformanceTestCase
     {
         static::setUpNormalizationTestCase();
 
-        $forms = static::getNormalizationForms();
-        $strict = static::isStrictImplementation();
+        $forms = static::$normalizationForms;
+        $strict = static::$isStrictImplementation;
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -39,12 +40,12 @@ class NormalizerTestCase extends ConformanceTestCase
         $s_nfkd = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ad544d286129e4bda0');
         $s_mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
 
-        $f_NONE = Normalizer::NONE;
-        $f_NFC = Normalizer::NFC;
-        $f_NFD = Normalizer::NFD;
-        $f_NFKC = Normalizer::NFKC;
-        $f_NFKD = Normalizer::NFKD;
-        $f_MAC = Normalizer::NFD_MAC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
+        $f_NFD = NormalizationForms::NFD;
+        $f_NFKC = NormalizationForms::NFKC;
+        $f_NFKD = NormalizationForms::NFKD;
+        $f_MAC = NormalizationForms::NFD_MAC;
 
         $data = [];
 
@@ -140,7 +141,7 @@ class NormalizerTestCase extends ConformanceTestCase
             $data['NFKC string is not normalized for NFD_MAC'] = [false, $s_nfkc, $f_MAC];
 
             $data['Empty string is normalized for NFD_MAC'] = [true, '', $f_MAC];
-            $data['ASCII string is always normalized for default'] = [true, 'abc', $f_MAC];
+            $data['ASCII string is always normalized for NFD_MAC'] = [true, 'abc', $f_MAC];
             $data['Reserved byte 0xFF is not normalized for NFD_MAC'] = [false, "\xFF", $f_MAC];
         }
 
@@ -150,16 +151,16 @@ class NormalizerTestCase extends ConformanceTestCase
     /**
      * @covers ::isNormalized
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::detectUnicodeVersion
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestIsNormalizedData
      *
@@ -178,13 +179,42 @@ class NormalizerTestCase extends ConformanceTestCase
     }
 
     /**
+     * @covers ::callIsNormalized
+     *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
+     * @dataProvider provideTestIsNormalizedData
+     *
+     * @param bool     $assert
+     * @param string   $string
+     * @param null|int $form
+     */
+    public function testCallIsNormalized($assert, $string, $form)
+    {
+        if (null === $form) {
+            $form = NormalizationForms::NFC;
+        }
+        $this->markTestSkippedIfNfdMacIsNotSupported($form);
+        $actual = $this->callProtectedMethod(get_class($this->subject), 'callIsNormalized', $string, $form);
+        if ($assert) {
+            $this->assertTrue($actual);
+        } else {
+            $this->assertFalse($actual);
+        }
+    }
+
+    /**
      * @return array
      */
     public function provideTestNormalizeData()
     {
         static::setUpNormalizationTestCase();
 
-        $forms = static::getNormalizationForms();
+        $forms = static::$normalizationForms;
 
         // déjà 훈쇼™⒜你
         $s_nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
@@ -193,12 +223,12 @@ class NormalizerTestCase extends ConformanceTestCase
         $s_nfkd = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ad544d286129e4bda0');
         $s_mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
 
-        $f_NONE = Normalizer::NONE;
-        $f_NFC = Normalizer::NFC;
-        $f_NFD = Normalizer::NFD;
-        $f_NFKC = Normalizer::NFKC;
-        $f_NFKD = Normalizer::NFKD;
-        $f_MAC = Normalizer::NFD_MAC;
+        $f_NONE = NormalizationForms::NONE;
+        $f_NFC = NormalizationForms::NFC;
+        $f_NFD = NormalizationForms::NFD;
+        $f_NFKC = NormalizationForms::NFKC;
+        $f_NFKD = NormalizationForms::NFKD;
+        $f_MAC = NormalizationForms::NFD_MAC;
 
         $c = $s_nfc . $s_nfd . $s_nfkc . $s_nfkd;
         $c_plus_m = $c . $s_mac;
@@ -209,12 +239,12 @@ class NormalizerTestCase extends ConformanceTestCase
         $data['Combined string plus NFD_MAC is same for NONE'] = [$c_plus_m, $c_plus_m, $f_NONE];
 
         $data['Empty string is same for default'] = ['', '', null];
-        $data['Reserved byte 0xFF is not normalize-able for default'] = [null, "\xFF", null];
+        $data['Reserved byte 0xFF is not normalize-able for default'] = [false, "\xFF", null];
 
         if (in_array($f_MAC, $forms, true)) {
             $data['Empty string is same for NFD_MAC'] = ['', '', $f_MAC];
             $data['ASCI string is same for NFD_MAC'] = ['abc', 'abc', $f_MAC];
-            $data['Reserved byte 0xFF is not normalize-able for NFD_MAC'] = [null, "\xFF", $f_MAC];
+            $data['Reserved byte 0xFF is not normalize-able for NFD_MAC'] = [false, "\xFF", $f_MAC];
         }
 
         // if NFC and NFD are supported
@@ -277,15 +307,14 @@ class NormalizerTestCase extends ConformanceTestCase
     /**
      * @covers ::normalize
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
@@ -306,16 +335,18 @@ class NormalizerTestCase extends ConformanceTestCase
     /**
      * @covers ::normalizeTo
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
@@ -336,17 +367,19 @@ class NormalizerTestCase extends ConformanceTestCase
     /**
      * @covers ::normalizeStringTo
      *
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::__construct
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getFormArgument
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getNormalizationForms
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::getUnicodeVersion
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::getFormArgument
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::normalizeTo
+     * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::callIsNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\StrictNormalizer::isNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callIsNormalized
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::isNormalized
      * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::normalize
-     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::isNfdMacCompatible
      * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
      * @dataProvider provideTestNormalizeData
      *
@@ -361,6 +394,33 @@ class NormalizerTestCase extends ConformanceTestCase
             $this->assertSame($same, $this->subject->normalizeStringTo($string, $form));
         } else {
             $this->assertFalse($this->subject->normalizeStringTo($string, $form));
+        }
+    }
+
+    /**
+     * @covers ::callNormalize
+     *
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::__construct
+     * @uses \Sjorek\UnicodeNormalization\Implementation\Normalizer::callNormalize
+     * @uses \Sjorek\UnicodeNormalization\Implementation\MacNormalizer::callNormalize
+     * @uses \Sjorek\UnicodeNormalization\Utility\NormalizationUtility::parseForm
+     * @dataProvider provideTestNormalizeData
+     *
+     * @param false|string $expect
+     * @param string       $string
+     * @param null|int     $form
+     */
+    public function testCallNormalize($expect, $string, $form)
+    {
+        if (null === $form) {
+            $form = NormalizationForms::NFC;
+        }
+        $this->markTestSkippedIfNfdMacIsNotSupported($form);
+        $actual = $this->callProtectedMethod(get_class($this->subject), 'callNormalize', $string, $form);
+        if (false !== $expect) {
+            $this->assertSame($expect, $actual);
+        } else {
+            $this->assertFalse($actual);
         }
     }
 

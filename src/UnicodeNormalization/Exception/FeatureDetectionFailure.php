@@ -11,13 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Sjorek\UnicodeNormalization\Tests\Implementation;
+namespace Sjorek\UnicodeNormalization\Exception;
 
 /**
- * MacNormalizer implementation (for IDE and to prevent too early auto-loading).
- *
- * @author Stephan Jorek <stephan.jorek@gmail.com>
+ * Exception for invalid normalizer implementation usage.
  */
-class MacNormalizer extends \Sjorek\UnicodeNormalization\Implementation\MacNormalizer
+class FeatureDetectionFailure extends \RuntimeException
 {
 }

@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Utility;
 
-use Sjorek\UnicodeNormalization\Exception\InvalidNormalizationForm;
-use Sjorek\UnicodeNormalization\Implementation\MissingNormalizer;
+use Sjorek\UnicodeNormalization\Exception\FeatureDetectionFailure;
+use Sjorek\UnicodeNormalization\Exception\InvalidFormFailure;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
+use Sjorek\UnicodeNormalization\Implementation\Runtime\MissingNormalizer;
 
 /**
  * Class to handle unicode specific functionality.
@@ -48,7 +49,7 @@ class NormalizationUtility
      *
      * @param null|bool|int|string $value
      *
-     * @throws InvalidNormalizationForm
+     * @throws InvalidFormFailure
      */
     public static function parseForm($value)
     {
@@ -104,48 +105,9 @@ class NormalizationUtility
                 return NormalizerInterface::NFD_MAC;
         }
 
-        throw new InvalidNormalizationForm(
+        throw new InvalidFormFailure(
             sprintf('Invalid unicode normalization form value: %s', $value), 1398603947
         );
-    }
-
-    /**
-     * Return true if the \Normalizer implementation is strict.
-     * Strict implementations process every character in a string to determine if a string is normalized.
-     *
-     * @return bool
-     *
-     * @see \Symfony\Polyfill\Intl\Normalizer\Normalizer
-     * @see https://github.com/symfony/polyfill-intl-normalizer/blob/master/Normalizer.php#L56
-     * @see https://packagist.org/packages/symfony/polyfill-intl-normalizer
-     * @see \Patchwork\PHP\Shim\Normalizer
-     * @see https://github.com/tchwork/utf8/blob/master/src/Patchwork/PHP/Shim/Normalizer.php#L53
-     * @see https://packagist.org/packages/patchwork/utf8
-     */
-    public static function isStrictImplementation()
-    {
-        // déjà 훈쇼™⒜你
-        return \Normalizer::isNormalized(hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0'));
-    }
-
-    /**
-     * Return true if all dependencies of a special variant of an iconv-implementation is available.
-     * This is usually the case on Darwin, OS X and MacOS.
-     *
-     * @return bool
-     *
-     * @see \Sjorek\UnicodeNormalization\Implementation\NormalizerInterface::NFD_MAC
-     */
-    public static function isNfdMacCompatible()
-    {
-        $nfc = hex2bin('64c3a96ac3a020ed9b88ec87bce284a2e2929ce4bda0');
-        $mac = hex2bin('6465cc816a61cc8020e18492e185aee186abe18489e185ade284a2e2929ce4bda0');
-
-        return
-            extension_loaded('iconv') &&
-            $mac === @iconv('utf-8', 'utf-8-mac', $nfc) &&
-            $nfc === @iconv('utf-8-mac', 'utf-8', $mac)
-        ;
     }
 
     /**
@@ -166,7 +128,7 @@ class NormalizationUtility
     /**
      * Get the supported unicode version level as version triple ("X.Y.Z").
      *
-     * @throws \RuntimeException
+     * @throws FeatureDetectionFailure
      *
      * @return string
      */
@@ -185,28 +147,29 @@ class NormalizationUtility
                 $reflector->info();
                 $output = strip_tags(ob_get_clean());
                 $matches = null;
-                preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
-                $icuVersion = trim($matches[1]);
+                if (1 === preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches)) {
+                    $icuVersion = trim($matches[1]);
+                }
             } catch (\ReflectionException $e) {
                 $icuVersion = null;
             }
         }
         if (null !== $icuVersion) {
-            $majorVersion = $minorVersion = null;
-            if (2 !== sscanf($icuVersion, '%u.%u', $majorVersion, $minorVersion)) {
-                throw new \RuntimeException('Could not determine unicode version from ICU version.', 1519488534);
-            }
-            if (!isset(self::MAP_ICU_TO_UNICODE_VERSION[$majorVersion])) {
-                throw new \RuntimeException('Could not determine unicode version from ICU version.', 1519488534);
+            if (
+                1 === sscanf($icuVersion, '%u.', $icuVersion) &&
+                isset(self::MAP_ICU_TO_UNICODE_VERSION[$icuVersion])
+            ) {
+                return self::MAP_ICU_TO_UNICODE_VERSION[$icuVersion];
             }
 
-            return self::MAP_ICU_TO_UNICODE_VERSION[$majorVersion];
-        }
-        if (class_exists('Normalizer', true) && !is_a('Normalizer', MissingNormalizer::class, true)) {
-            // TODO replace hard-coded version with a real detection
-            return '7.0.0';
+            throw new FeatureDetectionFailure('Could not determine unicode version from ICU version.', 1519488536);
         }
 
-        throw new \RuntimeException('Could not determine unicode version.', 1519488534);
+        if (is_a(\Normalizer::class, MissingNormalizer::class, true)) {
+            throw new FeatureDetectionFailure('Could not determine unicode version.', 1519488534);
+        }
+
+        // TODO replace hard-coded version with a real detection
+        return '7.0.0';
     }
 }

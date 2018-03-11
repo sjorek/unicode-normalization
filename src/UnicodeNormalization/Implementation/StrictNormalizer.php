@@ -21,26 +21,19 @@ namespace Sjorek\UnicodeNormalization\Implementation;
  * @see https://github.com/symfony/polyfill/blob/master/src/Intl/Normalizer/Normalizer.php#L56
  * @see https://github.com/tchwork/utf8/blob/master/src/Patchwork/PHP/Shim/Normalizer.php#L53
  */
-class StrictNormalizer extends BaseNormalizer
+class StrictNormalizer extends Normalizer
 {
     /**
      * {@inheritdoc}
      *
-     * @see \Sjorek\UnicodeNormalization\Implementation\BaseNormalizer::isNormalized()
+     * @see Normalizer::callIsNormalized()
      */
-    public function isNormalized($input, $form = null)
+    protected static function callIsNormalized($input, $form)
     {
-        $form = $this->getFormArgument($form);
-        if (self::NONE === $form) {
-            return false;
-        }
-        if (parent::isNormalized($input, $form)) {
-            return true;
-        }
-        // Having no cheap check here, forces us to do a full equality-check here.
-        // As we just want it to use for file names, this full check should be ok.
-        $result = $this->normalize($input, $form);
-
-        return null !== $result ? $result === $input : false;
+        return
+            self::NONE !== $form &&
+            // Having no cheap check here, forces us to do a full equality-check here.
+            (\Normalizer::isNormalized($input, $form) || $input === \Normalizer::normalize($input, $form))
+        ;
     }
 }
