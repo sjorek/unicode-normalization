@@ -64,9 +64,9 @@
         "ext-iconv" : "Eventually enables a special unicode-normalization mode for HFS+ filesystems (NFD_MAC), if the 'iconv' extension supports the 'utf-8-mac' charset.",
         "ext-intl" : "For best performance, but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
         "ext-mbstring" : "For best performance, but please consider 'sjorek/unicode-normalization-native-implementation' package instead.",
-        "symfony/polyfill-intl-normalizer": "For compatibility, if one of the above php extensions is not available and the 'patchwork/utf8' package is not suiteable.",
-        "symfony/polyfill-mbstring": "For compatibility, if one of the above php extensions is not available and the 'patchwork/utf8' package is not suiteable.",
-        "patchwork/utf8": "For compatibility, if one of the above php extensions is not available and the 'symfony/polyfill-*' packages are not suiteable."
+        "symfony/polyfill-intl-normalizer": "For compatibility, if the php extension 'intl' is not available and the 'patchwork/utf8' package is not suiteable.",
+        "symfony/polyfill-mbstring": "For compatibility, if the php extension 'intl' is not available and the 'patchwork/utf8' package is not suiteable.",
+        "patchwork/utf8": "For compatibility, if one of the above php extensions 'mbstring' or 'intl' is not available and the 'symfony/polyfill-*' packages are not suiteable."
     },
     "config": {
         "process-timeout": 1200
