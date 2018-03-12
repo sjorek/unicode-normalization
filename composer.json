@@ -38,8 +38,8 @@
         ]
     },
     "require" : {
-        "php": ">=7.0",
-        "symfony/filesystem": "^3.4"
+        "php": "^7.0",
+        "symfony/filesystem": "^3.4 || ^4.0"
     },
     "require-dev" : {
         "ext-iconv": "*",
