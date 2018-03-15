@@ -67,6 +67,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::detect
      * @covers ::exists
      * @covers ::getFilesystem
      * @covers ::isDirectory
@@ -121,6 +122,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::detect
      * @covers ::concat
      * @covers ::exists
      * @covers ::getFilesystem
@@ -170,6 +172,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::detect
      * @covers ::concat
      * @covers ::exists
      * @covers ::getFilesystem
@@ -192,6 +195,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::detect
      * @covers ::concat
      * @covers ::exists
      * @covers ::getFilesystem
@@ -217,6 +221,7 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::detect
      * @covers ::getFilesystem
      * @covers ::clearCache
      * @covers ::concat

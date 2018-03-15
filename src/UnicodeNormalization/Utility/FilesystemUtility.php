@@ -104,7 +104,21 @@ class FilesystemUtility
     ];
 
     /**
-     * Detect utf8-capabilities for given absolute path.
+     * Detect utf8-capabilities for given path.
+     *
+     * @param string $path
+     *
+     * @return array[]|bool[] see FilesystemUtility::detect() for a detailed description of the result
+     *
+     * @see FilesystemUtility::detect()
+     */
+    public static function detectCapabilitiesForPath(string $path)
+    {
+        return static::detect($path);
+    }
+
+    /**
+     * Detect utf8-capabilities for given path.
      *
      * The result will look like one of the following examples.
      *
@@ -182,14 +196,14 @@ class FilesystemUtility
      * php > ]
      * </pre>
      *
-     * @param string $path
+     * @param mixed $path
      *
      * @throws \InvalidArgumentException if given path is not a directory or does not exist
      * @throws IOExceptionInterface      on filesystem error
      *
      * @return array[]|bool[]
      */
-    public static function detectCapabilitiesForPath($path)
+    protected static function detect($path)
     {
         if (!static::isDirectory($path)) {
             throw new \InvalidArgumentException(
