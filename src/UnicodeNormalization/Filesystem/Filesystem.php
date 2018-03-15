@@ -17,6 +17,8 @@ namespace Sjorek\UnicodeNormalization\Filesystem;
  * Facade to filesystem specific functionality, providing a reduced interface to what is needed.
  *
  * @author Stephan Jorek <stephan.jorek@gmail.com>
+ *
+ * @todo Check if we need to implement chdir() to circumvent exceeding maximum path length
  */
 class Filesystem implements FilesystemInterface
 {
@@ -29,70 +31,128 @@ class Filesystem implements FilesystemInterface
      * Constructor.
      *
      * @codeCoverageIgnore
-     *
-     * @param \Symfony\Component\Filesystem\Filesystem $fs
      */
-    public function __construct(\Symfony\Component\Filesystem\Filesystem $fs = null)
+    public function __construct()
     {
-        if (null === $fs) {
-            $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $this->fs = new \Symfony\Component\Filesystem\Filesystem();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see FilesystemInterface::isDirectory()
+     * @codeCoverageIgnore
+     */
+    public function isDirectory($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = $this->concat($parent, $path);
         }
-        $this->fs = $fs;
+
+        return $this->exists($path) && is_dir($path) && !is_link($path);
     }
 
     /**
-     * Returns whether the file path is an absolute path.
+     * {@inheritdoc}
      *
+     * @see FilesystemInterface::exists()
      * @codeCoverageIgnore
-     *
-     * @param string $file A file path
-     *
-     * @return bool
      */
-    public function isAbsolutePath($file)
+    public function exists($path, $parent = null)
     {
-        return $this->fs->isAbsolutePath($file);
+        if (null !== $parent) {
+            $path = $this->concat($parent, $path);
+        }
+
+        return $this->fs->exists($path) || is_link($path);
     }
 
     /**
-     * Creates a directory recursively.
+     * {@inheritdoc}
      *
+     * @see FilesystemInterface::mkdir()
      * @codeCoverageIgnore
-     *
-     * @param string $dir The directory path
-     *
-     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface On any directory creation failure
      */
-    public function mkdir($dir)
+    public function mkdir($path, $parent = null)
     {
-        $this->fs->mkdir($dir);
+        if (null !== $parent) {
+            $path = $this->concat($parent, $path);
+        }
+        $this->fs->mkdir($path);
+
+        return $path;
     }
 
     /**
-     * Create an empty file.
+     * {@inheritdoc}
      *
+     * @see FilesystemInterface::touch()
      * @codeCoverageIgnore
-     *
-     * @param string $file A filename
-     *
-     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When touch fails
      */
-    public function touch($file)
+    public function touch($path, $parent = null)
     {
-        $this->fs->touch($file);
+        if (null !== $parent) {
+            $path = $this->concat($parent, $path);
+        }
+        $this->fs->touch($path);
+        // TODO really use clearstatcache() here?
+        clearstatcache(true, $path);
+
+        return $path;
     }
 
     /**
-     * Removes file.
+     * {@inheritdoc}
      *
+     * @see FilesystemInterface::remove()
      * @codeCoverageIgnore
-     *
-     * @param string $file A filename to remove
-     *
-     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When removal fails
      */
-    public function remove($file)
+    public function remove($path, $parent = null)
     {
-        $this->fs->remove($file);
+        if (null !== $parent) {
+            $path = $this->concat($parent, $path);
+        }
+        $this->fs->remove($path);
+        // TODO really use clearstatcache() here?
+        clearstatcache(true, $path);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see FilesystemInterface::traverse()
+     * @codeCoverageIgnore
+     */
+    public function traverse($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = $this->concat($parent, $path);
+        }
+
+        return (function () use ($path) {
+            $iterator = new \FilesystemIterator(
+                $path,
+                \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME
+            );
+            foreach ($iterator as $path) {
+                yield basename($path);
+            }
+        })();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see FilesystemInterface::concat()
+     * @codeCoverageIgnore
+     */
+    protected function concat(...$segments)
+    {
+        // Normalize separators on Windows
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $segments = array_map(function ($segment) { return strtr($segment, '\\', '/'); }, $segments);
+        }
+
+        return implode('/', array_map(function ($segment) { return rtrim($segment, '/'); }, $segments));
     }
 }

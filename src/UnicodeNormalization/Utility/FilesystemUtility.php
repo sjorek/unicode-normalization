@@ -184,36 +184,31 @@ class FilesystemUtility
      * php > ]
      * </pre>
      *
-     * @param string              $absolutePath
+     * @param string              $path
      * @param FilesystemInterface $fs
      *
-     * @throws \InvalidArgumentException if given path is not an absolute path to a directory
+     * @throws \InvalidArgumentException if given path is not a directory or does not exist
      * @throws IOExceptionInterface      on filesystem error
      *
      * @return array[]|bool[]
      */
-    public static function detectCapabilitiesForPath($absolutePath, FilesystemInterface $fs = null)
+    public static function detectCapabilitiesForPath($path, FilesystemInterface $fs = null)
     {
         if (null === $fs) {
             $fs = new Filesystem();
         }
 
-        $absolutePath = (string) $absolutePath;
-        if (DIRECTORY_SEPARATOR !== $absolutePath) {
-            $absolutePath = rtrim($absolutePath, DIRECTORY_SEPARATOR);
-        }
-
-        if ('' === $absolutePath || !$fs->isAbsolutePath($absolutePath) || !is_dir($absolutePath)) {
+        if (!$fs->isDirectory($path)) {
             throw new \InvalidArgumentException(
-                sprintf('Invalid path given, which is either not absolute or does not exist: %s', $absolutePath),
+                sprintf('Invalid path given, which either is not a directory or does not exist: %s', $path),
                 1518778464
             );
         }
 
-        $fullPath = $absolutePath . DIRECTORY_SEPARATOR . self::DETECTION_FOLDER;
-        if (file_exists($fullPath) || is_link($fullPath) || is_dir($fullPath)) {
+        $detectionFolder = static::DETECTION_FOLDER;
+        if ($fs->exists($detectionFolder, $path)) {
             throw new IOException(
-                sprintf('The detection folder already exists: %s', $fullPath),
+                sprintf('The detection folder "%s" already exists in path: %s', $detectionFolder, $path),
                 1519131257
             );
         }
@@ -224,7 +219,7 @@ class FilesystemUtility
             'unicode' => false,
         ];
 
-        $isWindows = static::isWindows();
+        $isWindows = '\\' === DIRECTORY_SEPARATOR;
         $currentLocale = setlocale(LC_CTYPE, 0);
         if (false !== strpos(strtolower(str_replace('-', '', $currentLocale)), '.utf8')) {
             $capabilities['locale'] = true;
@@ -256,6 +251,7 @@ class FilesystemUtility
         // @see https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/mbclen-mblen-mblen-l
         if (escapeshellarg($fileName) === $quote . $fileName . $quote &&
             (
+                // TODO remove PHP version < 5.6.0 check, as we depend on PHP ≥ 7.0 ?
                 version_compare(PHP_VERSION, '5.6.0', '<') ||
                 'utf8' === strtolower(str_replace('-', '', (string) ini_get('default_charset')))
             )) {
@@ -264,8 +260,7 @@ class FilesystemUtility
             return $capabilities;
         }
 
-        // TODO Check if we need to implement chdir() to circumvent (too) long paths under Windows
-        $fs->mkdir($fullPath);
+        $detectionFolder = $fs->mkdir($detectionFolder, $path);
 
         $fileNames = [];
         $normalizations = array_map(function ($_) { return false; }, self::FILESYSTEM_MODES);
@@ -280,37 +275,28 @@ class FilesystemUtility
             ];
             $fileName = $normalization . '-' . hex2bin($fileName);
             $fileNames[$normalization] = $fileName;
-            $filePath = $fullPath . DIRECTORY_SEPARATOR . $fileName;
             try {
-                // TODO chdir() above and use relative $fileName to circumvent (too) long paths under Windows?
-                $fs->touch($filePath);
+                $fs->touch($fileName, $detectionFolder);
             } catch (IOExceptionInterface $e) {
                 $normalizations[$normalization]['write'] = false;
             }
-            // TODO verify the need of clearstatcache() here
-            clearstatcache(true, $filePath);
         }
-
-        $iteratorMode = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME;
-        $iterator = new \FilesystemIterator($fullPath, $iteratorMode);
-
-        foreach ($iterator as $filePath) {
-            $fileName = basename($filePath);
+        foreach ($fs->traverse($detectionFolder) as $fileName) {
             foreach ($fileNames as $normalization => $candidate) {
                 if ($normalizations[$normalization]['read'] === true) {
                     continue;
                 }
+                // If all files exist then the filesystem does not normalize unicode. If
+                // some files are missing then the filesystem either normalizes unicode
+                // or it denies access to not-normalized paths or it simply does not support
+                // unicode at all, at least not those normalization forms we test.
                 if ($fileName === $candidate) {
-                    // If all files exist then the filesystem does not normalize unicode. If
-                    // some files are missing then the filesystem, either normalizes unicode
-                    // or it denies access to not-normalized filepaths or it simply does not
-                    // support unicode at all, at least not those normalization forms we test.
                     $normalizations[$normalization]['read'] = true;
                 }
             }
-            $fs->remove($fullPath . DIRECTORY_SEPARATOR . $fileName);
+            $fs->remove($fileName, $detectionFolder);
         }
-        $fs->remove($fullPath);
+        $fs->remove($detectionFolder);
 
         // Reduce the given array of normalization detection results
         $capabilities['unicode'] = array_map(
@@ -331,13 +317,5 @@ class FilesystemUtility
         );
 
         return $capabilities;
-    }
-
-    /**
-     * @return bool
-     */
-    protected static function isWindows()
-    {
-        return !stristr(PHP_OS, 'darwin') && !stristr(PHP_OS, 'cygwin') && stristr(PHP_OS, 'win');
     }
 }

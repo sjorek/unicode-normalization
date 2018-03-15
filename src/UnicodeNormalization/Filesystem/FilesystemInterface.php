@@ -21,38 +21,72 @@ namespace Sjorek\UnicodeNormalization\Filesystem;
 interface FilesystemInterface
 {
     /**
-     * Returns whether the file path is an absolute path.
+     * Returns whether the path points to a directory, taking symlinks into account. The latter are not considered
+     * to be a valid directory.
      *
-     * @param string $file A file path
+     * @param string      $path   A file or directory path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface If path length exceeds the limit
      *
      * @return bool
      */
-    public function isAbsolutePath($file);
+    public function isDirectory($path, $parent = null);
+
+    /**
+     * Returns whether the path already exists, taking dangling symlinks into account.
+     *
+     * @param string      $path   A file or directory path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface If path length exceeds the limit
+     *
+     * @return bool
+     */
+    public function exists($path, $parent = null);
 
     /**
      * Creates a directory recursively.
      *
-     * @param string $dir The directory path
+     * @param string      $path   The directory path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
      *
      * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface On any directory creation failure
+     *
+     * @return string The path of the directory, prepended with the given parent path
      */
-    public function mkdir($dir);
+    public function mkdir($path, $parent = null);
 
     /**
      * Create an empty file.
      *
-     * @param string $file A filename
+     * @param string      $path   A filename or -path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
      *
      * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When touch fails
+     *
+     * @return string The path of the file, prepended with the given parent path
      */
-    public function touch($file);
+    public function touch($path, $parent = null);
 
     /**
-     * Removes file.
+     * Removes file, symlinks and folders. The latter is processed recursively.
      *
-     * @param string $file A filename to remove
+     * @param string      $path   A path to remove
+     * @param null|string $parent A optional path to prepend, while operating with the given path
      *
      * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When removal fails
      */
-    public function remove($file);
+    public function remove($path, $parent = null);
+
+    /**
+     * Return a filename yielding traverse-able object or an generator for the given path,
+     * for use in foreach-loops. Filenames with leading dot should be ignored.
+     *
+     * @param string      $path   A path to traverse upon
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @return \Generator|\Traversable
+     */
+    public function traverse($path, $parent = null);
 }

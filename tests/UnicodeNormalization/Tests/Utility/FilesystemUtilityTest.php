@@ -76,12 +76,12 @@ class FilesystemUtilityTest extends AbstractTestCase
      * @covers ::detectCapabilitiesForPath
      *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @testWith                       [""]
      *                                 ["relative\/path"]
      *                                 ["vfs:\/\/root\/path-does-not-exist"]
      * @expectedException              \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^Invalid path given, which is either not absolute or does not exist: /
+     * @expectedExceptionMessageRegExp /^Invalid path given, which either is not a directory or does not exist: /
      * @expectedExceptionCode          1518778464
      *
      * @param mixed $path
@@ -118,7 +118,7 @@ class FilesystemUtilityTest extends AbstractTestCase
         $data = [
             [self::UNSUPPORTED_LOCALES, 'ASCII'],
         ];
-        if ($this->callProtectedMethod(FilesystemUtility::class, 'isWindows')) {
+        if ('//' === DIRECTORY_SEPARATOR) {
             $data[] = [self::UNSUPPORTED_WINDOWS_LOCALES, 'ASCII'];
         }
 
@@ -129,8 +129,8 @@ class FilesystemUtilityTest extends AbstractTestCase
      * @covers ::detectCapabilitiesForPath
      *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
-     * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @dataProvider provideTestDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
      *
      * @param mixed $locale
@@ -177,9 +177,10 @@ class FilesystemUtilityTest extends AbstractTestCase
      * @covers ::detectCapabilitiesForPath
      *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessageRegExp /^The detection folder already exists: /
+     * @expectedExceptionMessageRegExp /^The detection folder "[^"]+" already exists in path: /
      * @expectedExceptionCode          1519131257
      */
     public function testDetectCapabilitiesForPathWithExistingDetectionFolder()
@@ -200,9 +201,9 @@ class FilesystemUtilityTest extends AbstractTestCase
      * @covers ::detectCapabilitiesForPath
      *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
-     * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^Failed to create "vfs:\/\/root\/[^"]+"/
      */
@@ -224,11 +225,12 @@ class FilesystemUtilityTest extends AbstractTestCase
      * @covers ::detectCapabilitiesForPath
      *
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isAbsolutePath
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::remove
      * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::touch
-     * @uses \Sjorek\UnicodeNormalization\Utility\FilesystemUtility::isWindows
+     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::traverse
      */
     public function testDetectCapabilitiesForPath()
     {
