@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Utility;
 
-use Sjorek\UnicodeNormalization\Filesystem\Filesystem;
-use Sjorek\UnicodeNormalization\Filesystem\FilesystemInterface;
 use Sjorek\UnicodeNormalization\Implementation\NormalizationForms;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -184,21 +182,16 @@ class FilesystemUtility
      * php > ]
      * </pre>
      *
-     * @param string              $path
-     * @param FilesystemInterface $fs
+     * @param string $path
      *
      * @throws \InvalidArgumentException if given path is not a directory or does not exist
      * @throws IOExceptionInterface      on filesystem error
      *
      * @return array[]|bool[]
      */
-    public static function detectCapabilitiesForPath($path, FilesystemInterface $fs = null)
+    public static function detectCapabilitiesForPath($path)
     {
-        if (null === $fs) {
-            $fs = new Filesystem();
-        }
-
-        if (!$fs->isDirectory($path)) {
+        if (!static::isDirectory($path)) {
             throw new \InvalidArgumentException(
                 sprintf('Invalid path given, which either is not a directory or does not exist: %s', $path),
                 1518778464
@@ -206,7 +199,7 @@ class FilesystemUtility
         }
 
         $detectionFolder = static::DETECTION_FOLDER;
-        if ($fs->exists($detectionFolder, $path)) {
+        if (static::exists($detectionFolder, $path)) {
             throw new IOException(
                 sprintf('The detection folder "%s" already exists in path: %s', $detectionFolder, $path),
                 1519131257
@@ -260,7 +253,7 @@ class FilesystemUtility
             return $capabilities;
         }
 
-        $detectionFolder = $fs->mkdir($detectionFolder, $path);
+        $detectionFolder = static::mkdir($detectionFolder, $path);
 
         $fileNames = [];
         $normalizations = array_map(function ($_) { return false; }, self::FILESYSTEM_MODES);
@@ -276,12 +269,12 @@ class FilesystemUtility
             $fileName = $normalization . '-' . hex2bin($fileName);
             $fileNames[$normalization] = $fileName;
             try {
-                $fs->touch($fileName, $detectionFolder);
+                static::touch($fileName, $detectionFolder);
             } catch (IOExceptionInterface $e) {
                 $normalizations[$normalization]['write'] = false;
             }
         }
-        foreach ($fs->traverse($detectionFolder) as $fileName) {
+        foreach (static::traverse($detectionFolder) as $fileName) {
             foreach ($fileNames as $normalization => $candidate) {
                 if ($normalizations[$normalization]['read'] === true) {
                     continue;
@@ -294,9 +287,9 @@ class FilesystemUtility
                     $normalizations[$normalization]['read'] = true;
                 }
             }
-            $fs->remove($fileName, $detectionFolder);
+            static::remove($fileName, $detectionFolder);
         }
-        $fs->remove($detectionFolder);
+        static::remove($detectionFolder);
 
         // Reduce the given array of normalization detection results
         $capabilities['unicode'] = array_map(
@@ -317,5 +310,168 @@ class FilesystemUtility
         );
 
         return $capabilities;
+    }
+
+    /**
+     * @var \Symfony\Component\Filesystem\Filesystem
+     */
+    protected static $fs = null;
+
+    /**
+     * @return \Symfony\Component\Filesystem\Filesystem
+     */
+    protected static function getFilesystem()
+    {
+        if (null === static::$fs) {
+            static::$fs = new \Symfony\Component\Filesystem\Filesystem();
+        }
+
+        return static::$fs;
+    }
+
+    /**
+     * Returns whether the path points to a directory, taking symlinks into account. The latter are not considered
+     * to be a valid directory.
+     *
+     * @param string      $path   A file or directory path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface If path length exceeds the limit
+     *
+     * @return bool
+     */
+    protected static function isDirectory($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = static::concat($parent, $path);
+        }
+
+        return static::exists($path) && is_dir($path) && !is_link($path);
+    }
+
+    /**
+     * Returns whether the path already exists, taking dangling symlinks into account.
+     *
+     * @param string      $path   A file or directory path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface If path length exceeds the limit
+     *
+     * @return bool
+     */
+    protected static function exists($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = static::concat($parent, $path);
+        }
+
+        return static::getFilesystem()->exists($path) || is_link($path);
+    }
+
+    /**
+     * Creates a directory recursively.
+     *
+     * @param string      $path   The directory path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface On any directory creation failure
+     *
+     * @return string The path of the directory, prepended with the given parent path
+     */
+    protected static function mkdir($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = static::concat($parent, $path);
+        }
+        static::getFilesystem()->mkdir($path);
+
+        return $path;
+    }
+
+    /**
+     * Create an empty file.
+     *
+     * @param string      $path   A filename or -path
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When touch fails
+     *
+     * @return string The path of the file, prepended with the given parent path
+     */
+    protected static function touch($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = static::concat($parent, $path);
+        }
+        static::getFilesystem()->touch($path);
+        static::clearCache($path);
+
+        return $path;
+    }
+
+    /**
+     * Removes file, symlinks and folders. The latter is processed recursively.
+     *
+     * @param string      $path   A path to remove
+     * @param null|string $parent A optional path to prepend, while operating with the given path
+     *
+     * @throws \Symfony\Component\Filesystem\Exception\IOExceptionInterface When removal fails
+     */
+    protected static function remove($path, $parent = null)
+    {
+        if (null !== $parent) {
+            $path = static::concat($parent, $path);
+        }
+        static::getFilesystem()->remove($path);
+        static::clearCache($path);
+    }
+
+    /**
+     * Return a filename yielding traverse-able object or an generator for the given path,
+     * for use in foreach-loops. Filenames with leading dot should be ignored.
+     *
+     * @param string $path A path to traverse upon
+     *
+     * @return \Generator|\Traversable
+     */
+    protected static function traverse($path)
+    {
+        return (function () use ($path) {
+            $iterator = new \FilesystemIterator(
+                $path,
+                \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME
+            );
+            foreach ($iterator as $path) {
+                yield basename($path);
+            }
+        })();
+    }
+
+    /**
+     * Concatenate given path segments.
+     *
+     * @param $segments string[]
+     *
+     * @return string
+     */
+    protected static function concat(...$segments)
+    {
+        // Normalize separators on Windows
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $segments = array_map(function ($segment) { return strtr($segment, '\\', '/'); }, $segments);
+        }
+
+        return implode('/', array_map(function ($segment) { return rtrim($segment, '/'); }, $segments));
+    }
+
+    /**
+     * Clear filesystem cache for given path.
+     *
+     * @param string $path
+     */
+    protected static function clearCache($path)
+    {
+        // TODO really use clearstatcache() here?
+        clearstatcache(true, $path);
     }
 }

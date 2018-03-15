@@ -17,7 +17,6 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use Sjorek\UnicodeNormalization\Implementation\NormalizerInterface;
 use Sjorek\UnicodeNormalization\Tests\AbstractTestCase;
-use Sjorek\UnicodeNormalization\Tests\Fixtures\VfsFilesystem;
 use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 
 /**
@@ -30,11 +29,6 @@ use Sjorek\UnicodeNormalization\Utility\FilesystemUtility;
 class FilesystemUtilityTest extends AbstractTestCase
 {
     /**
-     * @var VfsFilesystem
-     */
-    protected $fs;
-
-    /**
      * @var \org\bovigo\vfs\vfsStreamDirectory
      */
     protected $vfs;
@@ -46,7 +40,6 @@ class FilesystemUtilityTest extends AbstractTestCase
      */
     protected function setUp()
     {
-        $this->fs = new VfsFilesystem();
         $this->vfs = vfsStream::setup(
             'root',
             null,
@@ -74,9 +67,10 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::exists
+     * @covers ::getFilesystem
+     * @covers ::isDirectory
      *
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @testWith                       [""]
      *                                 ["relative\/path"]
      *                                 ["vfs:\/\/root\/path-does-not-exist"]
@@ -88,7 +82,7 @@ class FilesystemUtilityTest extends AbstractTestCase
      */
     public function testDetectCapabilitiesForPathWithInvalidPath($path)
     {
-        FilesystemUtility::detectCapabilitiesForPath($path, $this->fs);
+        FilesystemUtility::detectCapabilitiesForPath($path);
     }
 
     /**
@@ -127,10 +121,11 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::concat
+     * @covers ::exists
+     * @covers ::getFilesystem
+     * @covers ::isDirectory
      *
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @dataProvider provideTestDetectCapabilitiesForPathWithUnsupportedLocaleAndCharsetData
      *
      * @param mixed $locale
@@ -147,7 +142,7 @@ class FilesystemUtilityTest extends AbstractTestCase
                 'shell' => false,
                 'unicode' => false,
             ],
-            FilesystemUtility::detectCapabilitiesForPath($this->vfs->url(), $this->fs),
+            FilesystemUtility::detectCapabilitiesForPath($this->vfs->url()),
             'Do not expect any capabilities for unsupported locale.'
         );
 
@@ -175,10 +170,11 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::concat
+     * @covers ::exists
+     * @covers ::getFilesystem
+     * @covers ::isDirectory
      *
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^The detection folder "[^"]+" already exists in path: /
      * @expectedExceptionCode          1519131257
@@ -188,10 +184,7 @@ class FilesystemUtilityTest extends AbstractTestCase
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);
         $charset = $this->assertSetCharset('UTF-8');
 
-        FilesystemUtility::detectCapabilitiesForPath(
-            $this->vfs->getChild('existing-detection-folder')->url(),
-            $this->fs
-        );
+        FilesystemUtility::detectCapabilitiesForPath($this->vfs->getChild('existing-detection-folder')->url());
 
         setlocale(LC_CTYPE, $locale);
         ini_set('default_charset', $charset);
@@ -199,11 +192,12 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
+     * @covers ::concat
+     * @covers ::exists
+     * @covers ::getFilesystem
+     * @covers ::isDirectory
+     * @covers ::mkdir
      *
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
      * @expectedException              \Symfony\Component\Filesystem\Exception\IOException
      * @expectedExceptionMessageRegExp /^Failed to create "vfs:\/\/root\/[^"]+"/
      */
@@ -215,7 +209,7 @@ class FilesystemUtilityTest extends AbstractTestCase
         $locale = $this->assertSetLocale(static::UTF8_LOCALES);
         $charset = $this->assertSetCharset('UTF-8');
 
-        FilesystemUtility::detectCapabilitiesForPath($vfs->url(), $this->fs);
+        FilesystemUtility::detectCapabilitiesForPath($vfs->url());
 
         setlocale(LC_CTYPE, $locale);
         ini_set('default_charset', $charset);
@@ -223,14 +217,15 @@ class FilesystemUtilityTest extends AbstractTestCase
 
     /**
      * @covers ::detectCapabilitiesForPath
-     *
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::__construct
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::concat
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::isDirectory
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::mkdir
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::remove
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::touch
-     * @uses \Sjorek\UnicodeNormalization\Filesystem\Filesystem::traverse
+     * @covers ::getFilesystem
+     * @covers ::clearCache
+     * @covers ::concat
+     * @covers ::exists
+     * @covers ::isDirectory
+     * @covers ::mkdir
+     * @covers ::remove
+     * @covers ::touch
+     * @covers ::traverse
      */
     public function testDetectCapabilitiesForPath()
     {
@@ -251,7 +246,7 @@ class FilesystemUtilityTest extends AbstractTestCase
                     NormalizerInterface::NFKC => false,
                 ],
             ],
-            FilesystemUtility::detectCapabilitiesForPath($this->vfs->url(), $this->fs),
+            FilesystemUtility::detectCapabilitiesForPath($this->vfs->url()),
             'Expect locale- and shell- and all (supported) unicode-capabilities.'
         );
         $this->assertFalse(
