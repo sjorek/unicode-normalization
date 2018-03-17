@@ -39,7 +39,8 @@
     },
     "require" : {
         "php": "^7.0",
-        "symfony/filesystem": "^3.4 || ^4.0"
+        "symfony/filesystem": "^3.4 || ^4.0",
+        "symfony/polyfill-php72": "^1.4"
     },
     "require-dev" : {
         "ext-iconv": "*",
