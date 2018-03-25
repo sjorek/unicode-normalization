@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Sjorek\UnicodeNormalization\Tests\Helper;
 
-use Sjorek\UnicodeNormalization\Filesystem\Filesystem;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestReader;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestUpdater;
 use Sjorek\UnicodeNormalization\Tests\Helper\Conformance\NormalizationTestWriter;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Utility functions dealing with "NormalizationTest.X.Y.Z.txt" fixture files.
