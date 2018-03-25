@@ -582,7 +582,7 @@ class StreamFilterTest extends ConformanceTestCase
                 fwrite($actualStream, sprintf('%s: %s %s', $message, $actual, $delimiter));
 
                 if ($position < $chunkSize) {
-                    $position += 1;
+                    ++$position;
                     continue;
                 }
 

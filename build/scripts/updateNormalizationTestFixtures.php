@@ -106,7 +106,7 @@ EOT;
         foreach ($updater as $lineNumber => $data) {
             list($line, $comment) = $data;
             if ($comment) {
-                $amount += 1;
+                ++$amount;
                 if ($verbose) {
                     echo sprintf('Processed line %s: %s' . PHP_EOL, $lineNumber, $comment);
                 }

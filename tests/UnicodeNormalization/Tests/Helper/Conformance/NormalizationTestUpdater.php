@@ -92,7 +92,7 @@ class NormalizationTestUpdater implements \IteratorAggregate
                 mb_internal_encoding('8bit');
             }
             foreach ($this->iterator as $lineNumber => $line) {
-                $lineNumber += 1;
+                ++$lineNumber;
                 yield $lineNumber => $this->processLine($lineNumber, $line);
             }
             if (null !== $mbEncoding) {
